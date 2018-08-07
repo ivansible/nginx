@@ -1,4 +1,68 @@
 ---
 # defaults file for ivansible.srv-squid
 
+web_domain: "{{ ansible_dns.domain
+              | default(ansible_fqdn | regex_replace('^[^.]+[.]', '')) }}"
+web_group: www-data
+
+squid_host: "{{ ansible_fqdn }}"
+squid_port: 3128
+
+squid_ssl_enable: no
+squid_ssl_port: 3129
+
+squid_pkg: squid-ssl
+
+squid_user: proxy
+squid_group: proxy
+
+squid_auth_ldap: no
+squid_auth_htpasswd: no
+squid_use_squidguard: no
+
+squid_proxy_users: []
+squid_cachemgr_password: secretpass
+
+squid_etc_dir: /etc/{{ squid_pkg }}
+squid_lib_dir: /usr/lib/{{ squid_pkg }}
+squid_spool_dir: /var/spool/{{ squid_pkg }}
+squid_log_dir: /var/log/{{ squid_pkg }}
+
+squid_helper_suffix: "{{ '-ssl' if squid_pkg == 'squid-ssl' else '' }}"
+
+squid_safe_ports:
+  - 80
+  - 443
+  - 21
+  - 1025-65535
+
+squid_local_subnets: []
+squid_nopassword_networks: []
+
+squid_url_rewrite: []
+squid_domain_rules: []
+
+squid_outgoing_addresses: []
+
+squid_outgoing_ipv4: "{{ ansible_all_ipv4_addresses
+                       | reject('match', '^10[.]')
+                       | list | first }}"
+squid_outgoing_ipv6: "{{ (ansible_all_ipv6_addresses
+                         | reject('match', '^fe80:')
+                         | list or [''])
+                       | first }}"
+
+squid_pac_types:
+  - name: http
+    url: "PROXY {{ squid_host }}:{{ squid_port }}"
+  - name: ssl
+    url: "HTTPS {{ squid_host }}:{{ squid_ssl_port }}"
+squid_pac:
+  pac_types: "{{ squid_pac_types }}"
+  direct_nets:
+    - "127."
+  direct_hosts:
+    - "localhost"
+  direct_domains:
+    - ".localdomain"
 ...

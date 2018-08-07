@@ -1,0 +1,33 @@
+---
+- name: add squid-ssl ppa repository
+  apt_repository:
+    # (no longer maintained) https://launchpad.net/~notartom/+archive/ubuntu/squid-ssl
+    #repo: ppa:notartom/squid-ssl
+    # (active) https://launchpad.net/~llxdev/+archive/ubuntu/xenial
+    # (lacks squid atm) https://launchpad.net/~llxdev/+archive/ubuntu/bionic/
+    repo: ppa:llxdev/xenial
+    codename: xenial
+    filename: squid-ssl
+  register: squid_ssl_ppa
+  become: yes
+
+- name: remove stock squid package
+  apt:
+    name:
+      - squid
+      - squid3
+    state: absent
+    purge: yes
+    autoremove: yes
+  become: yes
+  when: "squid_ssl_ppa is changed
+         and squid_pkg == 'squid-ssl'"
+
+- name: install squid-ssl package
+  apt:
+    name: "{{ squid_pkg }}"
+    state: latest
+    update_cache: "{{ squid_ssl_ppa is changed }}"
+    install_recommends: no
+  become: yes
+...

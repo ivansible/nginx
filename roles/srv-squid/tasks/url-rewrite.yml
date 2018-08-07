@@ -1,0 +1,42 @@
+---
+- name: install pypy for url-rewrite
+  apt:
+    name: pypy
+    state: present
+
+- name: create url-rewrite.py
+  template:
+    src: url-rewrite.py.j2
+    dest: "{{ squid_lib_dir }}/url-rewrite-custom.py"
+    owner: root
+    group: "{{ squid_group }}"
+    mode: 0750
+  register: url_rewrite_py
+  notify: restart squid service
+
+- name: byte-compile url-rewrite
+  when: url_rewrite_py is changed
+  command:
+    argv:
+      - pypycompile
+      - "{{ squid_lib_dir }}/url-rewrite-custom.py"
+  notify: restart squid service
+
+- name: harden url-rewrite-custom.pyc permissions
+  when: url_rewrite_py is changed
+  shell: >
+    if [ -f {{ item }} ]; then
+      chown root:{{ squid_group }} {{ item }} &&
+      chmod 0640 {{ item }}
+    fi
+  loop:
+    - "{{ squid_lib_dir }}/url-rewrite-custom.pyc"
+    - "{{ squid_lib_dir }}/__pycache__/url-rewrite-custom.*pyc"
+  notify: restart squid service
+
+- name: remove obsolete url-rewrite log
+  file:
+    path: "{{ squid_log_dir }}/url-rewrite.log"
+    state: absent
+  when: url_rewrite_py is changed
+...

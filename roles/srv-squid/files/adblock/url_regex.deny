@@ -1,0 +1,16 @@
+^https?://.+/googleanalytics/ga\.js
+^https?://.+\.google-analytics\.com/__utm\.gif
+^https?://.+\.google-analytics\.com/analytics\.js
+^https?://.+\.services\.livejournal\.com/ljcounter
+^https?://.+\.ssl\.hwcdn\.net/swf/
+^https?://grzbeacon\.s3\.amazonaws\.com/pixel\.gif
+^https?://l-stat\.livejournal\.net/js/ads/yandex_metrika\.js
+^https?://l-userpic\.livejournal\.com/109657069/35364820
+^https?://l-userpic\.livejournal\.com/61037347/12553665
+^https?://www\.news1130\.com/wp-content/blogs\.dir/sites/
+^https?://init\.startappexchange\.com/[^/]+/getads
+^https?://req\.startappservice\.com/[^/]+/gethtmlad
+^https?://req\.startappservice\.com/[^/]+/getads
+^https?://images\.startappservice\.com/image/fetch/f_auto
+^https?://i\.w\.inmobi\.com/showad\.asm
+^https?://www\.trackimpression\.com/tracking/ad

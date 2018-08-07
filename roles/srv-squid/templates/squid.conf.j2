@@ -1,0 +1,178 @@
+# squid.conf
+# ansible-managed
+
+{%- macro cache_peer(name, host, port, when_domain='', when_port=0) %}
+# access {{name}}
+cache_peer {{host}} parent {{port}} 0 round-robin
+{% if when_port %}
+acl to_{{name}} localport {{when_port}}
+{% endif %}
+{% if when_domain %}
+acl to_{{name}} dstdomain .{{when_domain}}
+{% endif %}
+cache_peer_access {{host}} allow to_{{name}}
+never_direct allow to_{{name}}
+cache_peer_access {{host}} deny !to_{{name}}
+{% endmacro %}
+
+{% if squid_use_squidguard %}
+# squidGuard
+redirect_program /usr/bin/squidGuard
+redirect_children 1
+{% endif %}
+
+auth_param basic realm Secure access
+{% if squid_auth_ldap | bool %}
+auth_param basic program {{squid_lib_dir}}/basic_ldap_auth{{squid_helper_suffix}} -b "ou=users,dc={{web_domain}}" -f "uid=%s" -D "cn=browse,dc={{web_domain}}"
+{% endif %}
+{% if squid_auth_htpasswd | bool %}
+auth_param basic program {{squid_lib_dir}}/basic_ncsa_auth{{squid_helper_suffix}} {{squid_etc_dir}}/users.db
+{% endif %}
+auth_param basic children 2
+
+{% for port in squid_safe_ports %}
+acl safe_ports port {{port}}
+{% endfor %}
+{#acl CONNECT method CONNECT#}
+
+acl localnet src 10.0.0.0/8     # RFC1918 possible internal network
+acl localnet src 172.16.0.0/12  # RFC1918 possible internal network
+acl localnet src 192.168.0.0/16 # RFC1918 possible internal network
+{#acl localnet src fc00::/7       # RFC 4193 local private network range#}
+{#acl localnet src fe80::/10      # RFC 4291 link-local (directly plugged) machines#}
+
+acl ourhost src{% for ip in ansible_all_ipv4_addresses|sort %} {{ip}}/32{% endfor %}
+
+acl ournets src{% for subnet in squid_local_subnets %} {{subnet}}{% endfor %}
+
+{% for network in squid_nopassword_networks %}
+acl {{ network.name }} src{% for range in network.ranges %} {{range}}{% endfor %}
+
+{% endfor %}
+
+# ad block
+{% for rule in [ 'dstdomain', 'dstdom_regex', 'url_regex' ] %}
+acl adblock{{loop.index}} dstdomain -i "{{squid_etc_dir}}/adblock/{{rule}}.deny"
+http_access deny adblock{{loop.index}}
+{% endfor %}
+
+# hierarchy stoplists
+acl direct1 url_regex cgi-bin
+always_direct allow direct1
+
+acl direct2 url_regex [?]
+always_direct allow direct2
+
+# IPv6
+acl to_ipv6 dst ipv6
+# magic entry. place first in your config. this makes sure squid has ip variable.
+http_access deny to_ipv6 !all
+
+# only allow cachemgr access from localhost
+http_access allow manager ourhost
+http_access deny manager
+
+# deny requests to certain unsafe ports
+http_access deny !safe_ports
+
+http_access allow localnet
+http_access allow ourhost
+http_access allow ournets
+{% for network in squid_nopassword_networks %}
+http_access allow {{ network.name }}
+{% endfor %}
+
+{% if squid_auth_ldap | bool or squid_auth_htpasswd | bool %}
+# allow anybody with authentication
+acl authenticated proxy_auth REQUIRED
+http_access allow authenticated
+{% endif %}
+
+# finally deny all other access to this proxy
+http_access deny all
+
+http_port {{squid_port}}
+{% if squid_ssl_enable | bool %}
+https_port {{squid_ssl_port}} cert={{squid_etc_dir}}/ssl.crt key={{squid_etc_dir}}/ssl.key
+{% endif %}
+
+{% for rule in squid_domain_rules %}
+{{ cache_peer(rule.name, rule.host, rule.port, when_domain=rule.domain) }}
+{% endfor -%}
+
+{% if squid_outgoing_addresses | length > 0 %}
+# outgoing rules
+{% for rule in squid_outgoing_addresses %}
+acl to_{{rule.name}} dst {{rule.network}}
+tcp_outgoing_address {{rule.via}} to_{{rule.name}}
+
+{% endfor %}
+{% endif %}
+
+tcp_outgoing_address {{ squid_outgoing_ipv4 }} !to_ipv6
+{% if squid_outgoing_ipv6 != '' %}
+tcp_outgoing_address {{ squid_outgoing_ipv6 }} to_ipv6
+{% endif %}
+
+# security
+{# prefer ipv4 with vk.com #}
+dns_v4_first on
+via off
+{# save my ass #}
+forwarded_for delete
+{#request_header_access User-Agent deny all#}
+{#request_header_replace Mozilla/5.0 (Windows NT 6.3; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0 IP/{{squid_outgoing_ipv4}} #}
+
+# configurable parameters
+error_directory {{squid_etc_dir}}/errorpages
+cache_log {{squid_log_dir}}/cache.log
+coredump_dir {{squid_spool_dir}}
+pid_filename /var/run/{{squid_pkg}}.pid
+cache_effective_user {{squid_user}}
+cache_effective_group {{squid_group}}
+visible_hostname {{web_domain}}
+ftp_user postmaster@{{web_domain}}
+cache_mgr postmaster@{{web_domain}}
+cachemgr_passwd {{squid_cachemgr_password}} all
+
+{% if squid_url_rewrite | length > 0 %}
+url_rewrite_bypass off
+url_rewrite_program {{squid_lib_dir}}/url-rewrite-custom.py
+url_rewrite_children 2 startup=0 idle=1 concurrency=0
+{% endif %}
+
+refresh_pattern ^ftp:		1440	20%	10080
+refresh_pattern ^gopher:	1440	0%	1440
+refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
+refresh_pattern .		0	20%	4320
+
+# cache settings
+cache_mem 12 MB
+maximum_object_size_in_memory 1 MB
+memory_replacement_policy heap GDSF
+cache_dir aufs {{squid_spool_dir}} 300 32 256
+minimum_object_size 1 KB
+cache_swap_low 96
+cache_swap_high 98
+cache_store_log none
+logfile_rotate 0
+strip_query_terms off
+quick_abort_min 0 KB
+quick_abort_max 0 KB
+negative_ttl 1 minutes
+request_header_max_size 40 KB
+read_timeout 5 minutes
+request_timeout 60 seconds
+shutdown_lifetime 3 seconds
+server_persistent_connections off
+snmp_port 0
+snmp_access deny all
+icp_port 0
+nonhierarchical_direct on
+prefer_direct on
+ipcache_size 8192
+memory_pools_limit 10 MB
+pipeline_prefetch 0
+high_response_time_warning 1000
+
+{# end #}

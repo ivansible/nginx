@@ -1,0 +1,67 @@
+---
+- name: detect target python version
+  set_fact:
+    python_ver: "{{ (ansible_python.version.major == 3)
+                  | ternary('python3','python') }}"
+
+- name: install ansible passlib bindings
+  apt:
+    name:
+      - "{{ python_ver }}-passlib"
+      - "{{ python_ver }}-pip"
+    state: present
+
+- name: configure squid authentication
+  no_log: "{{ hide_secrets }}"
+  when: squid_auth_htpasswd | bool
+  # crypt_scheme is MD5 because squid does not support SHA
+  htpasswd:
+    path: "{{ squid_etc_dir }}/users.db"
+    name: "{{ item.user }}"
+    password: "{{ item.pass }}"
+    crypt_scheme: apr_md5_crypt
+    owner: root
+    group: "{{ squid_group }}"
+    mode: 0640
+  loop: "{{ squid_proxy_users }}"
+  notify: restart squid service
+
+
+- name: backup vanilla squid configuration
+  command:
+    argv:
+      - cp
+      - -a
+      - "{{ squid_etc_dir }}/squid.conf"
+      - "{{ squid_etc_dir }}/squid.conf.orig"
+    creates: "{{ squid_etc_dir }}/squid.conf.orig"
+  when: squid_pkg != 'squid-ssl'
+  tags: srv_squid_config
+
+- name: create squid configuration
+  template:
+    src: squid.conf.j2
+    dest: "{{ squid_etc_dir }}/squid.conf"
+    backup: yes
+    owner: root
+    group: "{{ squid_group }}"
+    mode: 0640
+  notify: restart squid service
+
+
+- name: upload squid error pages
+  unarchive:
+    src: errorpages.tar.gz
+    dest: "{{ squid_etc_dir }}"  # /errorpages
+    owner: root
+    group: "{{ squid_group }}"
+  notify: restart squid service
+
+- name: upload squid adblock rules
+  copy:
+    src: adblock
+    dest: "{{ squid_etc_dir }}"
+    owner: root
+    group: "{{ squid_group }}"
+  notify: restart squid service
+...

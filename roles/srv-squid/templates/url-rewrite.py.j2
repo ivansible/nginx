@@ -1,0 +1,50 @@
+#!/usr/bin/pypy -usES
+from __future__ import print_function
+import sys
+import re
+import os
+import logging
+
+LOG_LEVEL = logging.INFO
+
+rules = [
+{% for rule in squid_url_rewrite %}
+    ('{{ rule.src }}', '{{ rule.dst }}'),
+{% endfor %}
+]
+
+class AppendPid(logging.Filter):
+    def __init__(self, *args, **kwargs):
+        logging.Filter.__init__(self, *args, **kwargs)
+        self.pid = os.getpid()
+
+    def filter(self, record):
+        record.pid = self.pid
+        return True
+
+logging.basicConfig(
+    filename='{{ squid_log_dir }}/url-rewrite.log',
+    filemode='a',
+    format='%(asctime)s.%(msecs)003d [%(pid)s] %(name)s %(levelname)s %(message)s',
+    datefmt='%y-%m-%d %H:%M:%S',
+    level=LOG_LEVEL
+)
+
+log = logging.getLogger("url-rewrite")
+log.addFilter(AppendPid())
+
+while 1:
+    try:
+        line = raw_input()
+    except (EOFError, KeyboardInterrupt):
+        break
+    url, _, _ = line.partition(' ')
+    orig = url
+
+    for src, dst in rules:
+        if url.startswith(src):
+            url = dst + url[len(src):]
+            break
+
+    print(url)
+    log.log(logging.INFO if orig != url else logging.DEBUG, '%s --> %s', orig, url)

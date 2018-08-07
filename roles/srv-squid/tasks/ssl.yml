@@ -1,0 +1,62 @@
+---
+- name: detect target python version
+  set_fact:
+    python_ver: "{{ (ansible_python.version.major == 3)
+                  | ternary('python3','python') }}"
+
+- name: install ansible openssl bindings
+  apt:
+    name:
+      - "{{ python_ver }}-openssl"
+      - "{{ python_ver }}-pip"
+    state: present
+
+- block:
+    - name: verify pyOpenSSL validity
+      command:
+        argv:
+          - "{{ ansible_python.executable }}"
+          - -c
+          - "from OpenSSL import SSL"
+      changed_when: false
+  rescue:
+    - name: upgrade ansible openssl bindings
+      command:
+        argv:
+          - "{{ ansible_python.executable }}"
+          - -m
+          - pip
+          - install
+          - --upgrade
+          - pyOpenSSL
+
+
+- name: generate squid ssl private key (4096 bits, rsa)
+  openssl_privatekey:
+    path: "{{ squid_etc_dir }}/ssl.key"
+    owner: root
+    group: "{{ squid_group }}"
+    mode: 0640
+  notify: restart squid service
+
+- name: generate squid certificate signing request
+  openssl_csr:
+    path: "{{ squid_etc_dir }}/ssl.csr"
+    privatekey_path: "{{ squid_etc_dir }}/ssl.key"
+    common_name: "{{ squid_host }}"
+    owner: root
+    group: "{{ squid_group }}"
+    mode: 0640
+  notify: restart squid service
+
+- name: generate self-signed squid ssl certificate
+  openssl_certificate:
+    path: "{{ squid_etc_dir }}/ssl.crt"
+    privatekey_path: "{{ squid_etc_dir }}/ssl.key"
+    csr_path: "{{ squid_etc_dir }}/ssl.csr"
+    provider: selfsigned
+    owner: root
+    group: "{{ squid_group }}"
+    mode: 0640
+  notify: restart squid service
+...

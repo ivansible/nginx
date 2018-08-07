@@ -4,7 +4,9 @@
   become: no
 
 # use import to become root globally
-- name: become root
-  import_tasks: root.yml
+- import_tasks: root.yml
   become: yes
+
+# apply squid changes now
+- meta: flush_handlers
 ...

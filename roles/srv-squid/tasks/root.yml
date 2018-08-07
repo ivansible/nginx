@@ -1,5 +1,106 @@
 ---
-- name: ROLENAME root action 1
-  debug:
-    msg: action 1
+- name: install squid with ssl support
+  # llxdev ppa for bionic lacks squid atm
+  #include_tasks: "install-{{ ansible_distribution_release }}.yml"
+  include_tasks: "install-xenial.yml"
+  tags: srv_squid_install
+
+
+- name: setup squid ssl certificate
+  import_tasks: ssl.yml
+  when: squid_ssl_enable | bool
+  tags: srv_squid_ssl
+
+- name: add local upstream peers to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "127.0.0.1\t{{ item.host }}"
+    state: present
+  loop: "{{ squid_domain_rules
+          | json_query('[?!!localhost]')
+          | list }}"
+  tags: srv_squid_config
+
+- name: configure squid
+  import_tasks: config.yml
+  tags: srv_squid_config
+
+- name: url-rewrite for squid
+  import_tasks: url-rewrite.yml
+  when: squid_url_rewrite | length > 0
+  tags: srv_squid_config
+
+
+- name: open squid port
+  ufw:
+    rule: allow
+    port: "{{ squid_port }}"
+    proto: tcp
+  tags: srv_squid_firewall
+
+- name: open squid ssl port
+  ufw:
+    rule: allow
+    port: "{{ squid_ssl_port }}"
+    proto: tcp
+  when: squid_ssl_enable | bool
+  tags: srv_squid_firewall
+
+
+- name: ensure directory for iptables transparent rules
+  file:
+    path: /usr/share/iptables/rules
+    state: directory
+  tags: srv_squid_iptables
+
+- name: ensure some iptables transparent rules
+  copy:
+    # /etc/init.d/squid-ssl won't start squid if this file is absent
+    dest: /usr/share/iptables/rules/transparent.rules
+    content: ""
+    force: no
+  tags: srv_squid_iptables
+
+
+- name: stop obsolete squid service
+  systemd:
+    name: squid
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+  when: "squid_pkg == 'squid-ssl'
+         and squid_ssl_ppa is defined
+         and squid_ssl_ppa is changed"
+  ignore_errors: yes
+  tags: srv_squid_service
+
+- name: activate squid-ssl service
+  systemd:
+    name: "{{ squid_pkg }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  tags: srv_squid_service
+
+
+- name: directory for distributed pac files
+  file:
+    path: "{{ squid_etc_dir }}/pac"
+    state: directory
+    owner: root
+    group: "{{ web_group }}"
+    mode: 0750
+  when: web_group is defined
+  tags: srv_squid_pac
+
+- name: generate pac files
+  template:
+    src: squid.pac.j2
+    dest: "{{ squid_etc_dir }}/pac/{{ item.name }}.pac"
+    owner: root
+    group: "{{ web_group }}"
+    mode: 0640
+  loop: "{{ squid_pac.pac_types }}"
+  when: web_group is defined
+  tags: srv_squid_pac
 ...

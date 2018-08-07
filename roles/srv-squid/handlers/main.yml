@@ -1,4 +1,9 @@
 ---
 # handlers file for ivansible.srv-squid
 
+- name: restart squid service
+  systemd:
+    name: "{{ squid_pkg }}"
+    state: restarted
+  become: yes
 ...

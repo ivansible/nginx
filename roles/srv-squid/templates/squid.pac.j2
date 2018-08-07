@@ -1,0 +1,20 @@
+#jinja2: lstrip_blocks: "True"
+// vim:set syntax=javascript:
+
+function FindProxyForURL(url, orig_host)
+{
+    var proxy = "{{ item.url }}";
+    var host = orig_host.toLowerCase();
+    var dir = "DIRECT";
+{% for net in squid_pac.direct_nets %}
+    if (host.substring(0, {{ net|length }}) == "{{ net }}")  return dir;
+{% endfor %}
+    if (isPlainHostName(host))  return dir;
+{% for host in squid_pac.direct_hosts %}
+    if (localHostOrDomainIs(host, "{{ host }}"))  return dir;
+{% endfor %}
+{% for domain in squid_pac.direct_domains %}
+    if (dnsDomainIs(host, "{{ domain }}"))  return dir;
+{% endfor %}
+    return proxy;
+}
