@@ -101,6 +101,8 @@
     group: "{{ web_group }}"
     mode: 0640
   loop: "{{ squid_pac.pac_types }}"
+  loop_control:
+    label: "{{ item.name }}"
   when: web_group is defined
   tags: srv_squid_pac
 ...

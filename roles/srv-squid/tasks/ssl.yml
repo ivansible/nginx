@@ -59,4 +59,13 @@
     group: "{{ squid_group }}"
     mode: 0640
   notify: restart squid service
+
+- name: grant squid user access to letsencrypt certificates
+  user:
+    name: "{{ squid_user }}"
+    groups: "{{ certbot_group }}"
+    append: yes
+  notify: restart squid service
+  when: "squid_letsencrypt_cert != ''
+         and certbot_group is defined"
 ...

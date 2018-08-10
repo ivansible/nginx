@@ -93,7 +93,11 @@ http_access deny all
 
 http_port {{squid_port}}
 {% if squid_ssl_enable | bool %}
+{% if squid_letsencrypt_cert == '' %}
 https_port {{squid_ssl_port}} cert={{squid_etc_dir}}/ssl.crt key={{squid_etc_dir}}/ssl.key
+{% else %}
+https_port {{squid_ssl_port}} cert=/etc/letsencrypt/live/{{squid_letsencrypt_cert}}/fullchain.pem key=/etc/letsencrypt/live/{{squid_letsencrypt_cert}}/privkey.pem
+{% endif %}
 {% endif %}
 
 {% for rule in squid_domain_rules %}

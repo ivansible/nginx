@@ -3,6 +3,7 @@
 
 web_domain: "{{ ansible_dns.domain
               | default(ansible_fqdn | regex_replace('^[^.]+[.]', '')) }}"
+
 web_group: www-data
 
 squid_host: "{{ ansible_fqdn }}"
@@ -10,6 +11,7 @@ squid_port: 3128
 
 squid_ssl_enable: no
 squid_ssl_port: 3129
+squid_letsencrypt_cert: ""
 
 squid_pkg: squid-ssl
 
