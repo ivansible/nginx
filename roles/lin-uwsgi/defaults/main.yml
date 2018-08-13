@@ -1,4 +1,10 @@
 ---
 # defaults file for ivansible.lin-uwsgi
 
+uwsgi_ini_file: "{{ uwsgi_base }}/emperor.ini"
+uwsgi_log_dir: /var/log/uwsgi
+uwsgi_user: "{{ web_user }}"
+uwsgi_group: "{{ web_group }}"
+uwsgi_vassal_dirs:
+  - "{{ ansible_user_dir }}/etc/uwsgi"
 ...

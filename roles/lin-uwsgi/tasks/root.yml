@@ -1,5 +1,77 @@
 ---
-- name: ROLENAME root action 1
-  debug:
-    msg: action 1
+- name: install uwsgi emperor packages
+  apt:
+    name:
+      - uwsgi-core
+      - uwsgi-emperor
+      - uwsgi-plugin-python
+      - uwsgi-plugin-python3
+    state: present
+
+
+- name: activate uwsgi cache directories
+  copy:
+    content: "d    /run/uwsgi.php-sess    0750    {{ web_user }}    {{ web_group }}    -       -"
+    dest: /etc/tmpfiles.d/uwsgi.php-sess.conf
+  notify: update system temp files
+
+- name: create cache directories before activating uwsgi
+  meta: flush_handlers
+
+
+- name: tune kernel for uwsgi listen backlog
+  sysctl:
+    name: net.core.somaxconn
+    value: 1024
+    state: present
+    sysctl_file: /etc/sysctl.d/77-uwsgi.conf
+
+
+- name: backup vanilla uwsgi configuration (optional)
+  command:
+    argv:
+      - cp
+      - -a
+      - "{{ uwsgi_ini_file }}"
+      - "{{ uwsgi_ini_file }}.orig"
+    creates: "{{ uwsgi_ini_file }}.orig"
+  ignore_errors: yes
+
+- name: create main uwsgi configuration file
+  template:
+    src: emperor.ini.j2
+    dest: "{{ uwsgi_ini_file }}"
+  notify: restart uwsgi service
+
+- name: create base includes for uwsgi vassals
+  template:
+    src: common.inc.j2
+    dest: "{{ uwsgi_vassals }}/common.inc"
+  notify: restart uwsgi service
+
+
+- name: fix permissions on uwsgi log directory
+  file:
+    path: "{{ uwsgi_log_dir}}"
+    state: directory
+    owner: "{{ uwsgi_user }}"
+    group: "{{ uwsgi_group }}"
+    mode: 0755
+
+- name: create link for uwsgi log directory
+  file:
+    src: "{{ uwsgi_log_dir }}"
+    dest: "{{ uwsgi_vassals }}/log"
+    state: link
+
+
+- name: activate uwsgi service
+  systemd:
+    name: uwsgi-emperor
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+- name: restart uwsgi now
+  meta: flush_handlers
 ...

@@ -1,0 +1,28 @@
+[uwsgi]
+
+# try to autoload appropriate plugin if "unknown" option has been specified
+autoload = true
+
+# enable master process manager
+master = true
+
+# spawn 2 uWSGI emperor worker processes
+workers = 2
+
+# automatically kill workers on master's death
+no-orphans = true
+
+# place timestamps into log
+log-date = true
+
+# user/group identifiers of uWSGI processes
+#uid = {{ web_user }}
+#gid = {{ web_group }}
+
+# vassals directory
+emperor-tyrant = true
+emperor = /etc/uwsgi-emperor/vassals/*.ini
+
+{% for vassal_dir in uwsgi_vassal_dirs %}
+emperor = {{ vassal_dir }}/*.ini
+{% endfor %}

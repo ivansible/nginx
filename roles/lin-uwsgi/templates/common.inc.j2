@@ -1,0 +1,7 @@
+[uwsgi]
+strict = true
+logformat = +++ %(addr) - %(user) [%(ltime)] %(method) %(uri) %(proto) "%(status)" %(rsize) "%(referer)" "%(uagent)" "-" %(host) "-" {elap:%(msecs)ms sz:%(size) core:%N.%(core) wid:%(wid) pid:%(pid) vm:%(vszM)M rss:%(rssM)M s.name:"%(var.SCRIPT_NAME)" p.info:"%(var.PATH_INFO)" s.f.name:"%(var.SCRIPT_FILENAME)"}
+log-maxsize = 1048576
+logto = {{ uwsgi_log_dir }}/%N.log
+auto-procname = true
+procname-prefix-spaced = %N
