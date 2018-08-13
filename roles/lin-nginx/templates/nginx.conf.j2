@@ -1,0 +1,110 @@
+#jinja2: lstrip_blocks: "True"
+# {{ nginx_base_dir }}/nginx.conf
+# ansible-managed
+
+user {{ nginx_user }};
+pid {{ nginx_pid_file }};
+worker_processes {{ nginx_workers }};
+worker_priority -2;
+worker_rlimit_nofile 8192;
+# timer_resolution 100ms;
+
+events {
+    worker_connections 2048;
+    # use epoll;
+    # multi_accept on;
+}
+
+http {
+    ##
+    # Basic Settings
+    ##
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 75 20;
+    types_hash_max_size 2048;
+
+    # server_names_hash_bucket_size 64;
+    # server_name_in_redirect off;
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    ## Use local resolver
+    {% if nginx_local_resolver | bool == false %}
+    #{% endif %}
+    resolver  127.0.0.1;
+
+    ## General options
+    ignore_invalid_headers  on;
+    recursive_error_pages   on;
+
+    ## Size limits
+    client_body_buffer_size        32k;
+    client_header_buffer_size      4k;
+    client_max_body_size           90m;
+    #client_body_temp_path         {{ nginx_cache_dir }}/client_body_temp 1 2;
+    #large_client_header_buffers   3 3k;
+
+    connection_pool_size           256;
+    request_pool_size              4k;
+    server_names_hash_max_size     1024;
+    server_names_hash_bucket_size  64;
+
+    ## Anti-DDOS
+    limit_req_zone      $binary_remote_addr  zone=html:10m  rate=80r/s;
+    limit_req_zone      $binary_remote_addr  zone=php:10m   rate=40r/s;
+    limit_req           zone=html  burst=80;
+
+    ##
+    # Logging Settings
+    ##
+    log_format main '$remote_addr - $remote_user [$time_local] $request ' '"$status" $body_bytes_sent "$http_referer" ' '"$http_user_agent" "$http_x_forwarded_for" ' '$host "$http_cf_connecting_ip"';
+    access_log {{ nginx_log_dir }}/access.log main;
+    error_log {{ nginx_log_dir }}/error.log;
+
+    ##
+    # Gzip Settings
+    ##
+    gzip                on;
+    gzip_buffers        64 8k;
+    gzip_comp_level     3;
+    gzip_http_version   1.1;
+    gzip_min_length     1000;
+    gzip_types          text/plain text/css image/png image/gif image/jpeg application/x-javascript text/xml application/xml application/xml+rss text/javascript image/x-icon;
+    gzip_vary           on;
+    gzip_static         on;
+    gzip_proxied        any;
+    gzip_disable        "MSIE [1-6]\." "mirall/1";
+  {% if nginx_cache_enable | bool %}
+
+    ##
+    # Cache Settings
+    ##
+    proxy_cache_path    {{nginx_cache_dir}}/proxy-cache levels=1:2 keys_zone=pcache1:2m max_size=200m;
+    proxy_temp_path     {{nginx_cache_dir}}/proxy-temp;
+    uwsgi_temp_path     {{nginx_cache_dir}}/uwsgi-temp;
+    scgi_temp_path      {{nginx_cache_dir}}/scgi-temp;
+  {% endif %}
+  {% if nginx_upload_progress | bool %}
+
+    ##
+    # Upload Progress module
+    ##
+    upload_progress uploads 1m;
+  {% endif %}
+
+    ##
+    # Cloudflare
+    ##
+  {% for ip in nginx_cloudflare_ips %}
+    set_real_ip_from {{ ip }};
+  {% endfor %}
+
+    ##
+    # Virtual Hosts
+    ##
+    include {{ nginx_conf_dir }}/*.conf;
+    include {{ nginx_site_dir }}/*;
+}

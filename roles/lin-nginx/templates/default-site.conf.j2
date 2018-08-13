@@ -1,0 +1,39 @@
+# Default server configuration
+server {
+    server_name _;
+
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+{% if nginx_ssl_cert != "" %}
+    listen 443 ssl http2 default_server;
+    listen [::]:443 ssl http2 default_server;
+
+    ssl_certificate     {{ nginx_ssl_cert }};
+    ssl_certificate_key {{ nginx_ssl_key }};
+
+{% endif %}
+{% if nginx_main_site != "" %}
+    if ($host != "{{ nginx_main_site }}") { return 301 "$scheme://{{ nginx_main_site }}$uri"; }
+{% endif %}
+
+    root {{ nginx_def_site_dir }};
+
+    index index.html index.htm;
+
+    location / {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to displaying a 404.
+        try_files $uri $uri/ =404;
+    }
+
+    error_page  500 502 503 504  /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+
+    # deny access to .htaccess files
+    location ~ /\.ht {
+        deny all;
+    }
+}

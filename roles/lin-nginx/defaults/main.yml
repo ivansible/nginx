@@ -1,4 +1,29 @@
 ---
 # defaults file for ivansible.lin-nginx
 
+nginx_base_domain: "{{ web_domain }}"
+nginx_main_site: ""
+
+nginx_letsencrypt_cert: ""
+nginx_ssl_cert: "{{ '' if nginx_letsencrypt_cert == '' else
+                    '/etc/letsencrypt/live/%s/fullchain.pem' % nginx_letsencrypt_cert }}"
+nginx_ssl_key: "{{ '' if nginx_letsencrypt_cert == '' else
+                    '/etc/letsencrypt/live/%s/privkey.pem' % nginx_letsencrypt_cert }}"
+
+nginx_xframe_uri: "https://{{ nginx_main_site }}"  # uri or 'same' or 'none'
+nginx_cache_enable: yes
+nginx_local_resolver: no
+nginx_behind_vpn: yes
+nginx_upload_progress: no
+nginx_cloudflare_ips: []
+
+nginx_user: "{{ web_user }}"
+nginx_group: "{{ web_group }}"
+nginx_workers: auto   # 2
+
+nginx_base_dir: /etc/nginx
+nginx_cache_dir: /run/nginx
+nginx_log_dir: /var/log/nginx
+nginx_pid_file: /run/nginx.pid
+nginx_def_site_dir: /var/www/dummy
 ...

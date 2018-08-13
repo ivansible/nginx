@@ -1,5 +1,188 @@
 ---
-- name: ROLENAME root action 1
-  debug:
-    msg: action 1
+- name: install nginx signing key
+  apt_key:
+    url: http://nginx.org/keys/nginx_signing.key
+  tags: lin_nginx_install
+
+- name: add nginx apt repository
+  apt_repository:
+    repo: deb http://nginx.org/packages/ubuntu/ {{ ansible_lsb.codename }} nginx
+    filename: nginx
+    update_cache: yes
+  tags: lin_nginx_install
+
+- name: install nginx package
+  apt:
+    name: nginx
+    state: present
+  tags: lin_nginx_install
+
+
+- name: activate nginx cache directories
+  when: nginx_cache_enable | bool
+  copy:
+    content: "d    {{ nginx_cache_dir }}    0750    {{ web_user }}    root    -       -"
+    dest: /etc/tmpfiles.d/nginx.conf
+  notify: update system temp files
+  tags: lin_nginx_dirs
+
+- name: create cache directories before activating nginx
+  meta: flush_handlers
+  tags: lin_nginx_dirs
+
+
+- name: directory for included nginx configuration files
+  file:
+    path: "{{ nginx_conf_dir }}"
+    state: directory
+  tags: lin_nginx_dirs
+
+- name: directory for included nginx site configurations
+  file:
+    path: "{{ nginx_site_dir }}"
+    state: directory
+  tags: lin_nginx_dirs
+
+- name: directory for nginx password files
+  file:
+    path: "{{ nginx_base_dir }}/users"
+    state: directory
+    owner: root
+    group: "{{ web_group }}"
+    mode: 0750
+  tags: lin_nginx_dirs
+
+
+- name: backup vanilla nginx configuration (optional)
+  command:
+    argv:
+      - cp
+      - -a
+      - "{{ nginx_base_dir }}/nginx.conf"
+      - "{{ nginx_base_dir }}/nginx.conf.orig"
+    creates: "{{ nginx_base_dir }}/nginx.conf.orig"
+  ignore_errors: yes
+  tags: lin_nginx_config
+
+- name: create main nginx configuration file
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_base_dir }}/nginx.conf"
+  notify: restart nginx service
+  tags: lin_nginx_config
+
+- name: uwsgi parameters for nginx behind balancer
+  template:
+    src: uwsgi_params.j2
+    dest: "{{ nginx_base_dir }}/uwsgi_params"
+  notify: restart nginx service
+  tags: lin_nginx_config
+
+
+- name: comment for extra mime types
+  lineinfile:
+    path: "{{ nginx_base_dir }}/mime.types"
+    regexp: "# \\w+ mime"
+    line: "    # custom mime types"
+    insertbefore: "^}"
+  tags: lin_nginx_config
+
+- name: let nginx know some extra mime types
+  lineinfile:
+    path: "{{ nginx_base_dir }}/mime.types"
+    regexp: "{{ item.split().0 }}\\s"
+    line: "    {{ item }};"
+    insertbefore: "^}"
+  loop:
+    - "application/x-ns-proxy-autoconfig     pac"
+    - "application/x-pkcs12                  p12"
+    - "application/x-pkcs7-crl               crl"
+    - "application/x-x509-ca-cert            der pem crt cer"
+  loop_control:
+    label: "{{ item.split().0 }}"
+  notify: restart nginx service
+  tags: lin_nginx_config
+
+
+- name: configure nginx ssl settings
+  template:
+    src: security.conf.j2
+    dest: "{{ nginx_conf_dir }}/security.conf"
+  notify: restart nginx service
+  tags: lin_nginx_ssl
+
+- name: generate diffie-helman parameters for nginx ssl
+  openssl_dhparam:
+    path: "{{ nginx_conf_dir }}/ssl-dhparam.pem"
+    # default 4096 bits can take too long
+    # normally this step takes some 4 minutes
+    size: 2048
+    owner: root
+    group: "{{ nginx_group }}"
+    mode: 0640
+  notify: restart nginx service
+  tags: lin_nginx_ssl
+
+- name: check that nginx ssl certificate exists (if configured)
+  file:
+    path: "{{ item }}"
+    state: file
+  loop:
+    - "{{ nginx_ssl_cert }}"
+    - "{{ nginx_ssl_key }}"
+  when: "nginx_ssl_cert != ''
+         or nginx_ssl_key != ''"
+  tags: lin_nginx_ssl
+
+
+- name: create directory for default nginx site
+  file:
+    path: "{{ nginx_def_site_dir }}"
+    state: directory
+  tags: lin_nginx_site
+
+- name: upload www files for default nginx site
+  copy:
+    src: www/{{ item }}
+    dest: "{{ nginx_def_site_dir }}/{{ item }}"
+  loop:
+    - favicon.ico
+    - index.html
+    - robots.txt
+  tags: lin_nginx_site
+
+- name: configuration for default nginx site
+  template:
+    src: default-site.conf.j2
+    # prepend "0" to the file name so that
+    # default site is alphabetically first in the site directory
+    dest: "{{ nginx_site_dir }}/0.default.conf"
+  tags: lin_nginx_site
+
+- name: remove link to obsolete default nginx site
+  file:
+    path: "{{ nginx_site_dir }}/default"
+    state: absent
+  tags: lin_nginx_site
+
+
+- name: enable nginx service
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  tags: lin_nginx_run
+
+- name: open nginx ports
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: "{{ web_ports }}"
+  tags: lin_nginx_run
+
+- name: restart nginx service now
+  meta: flush_handlers
+  tags: lin_nginx_run
 ...

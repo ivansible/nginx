@@ -1,5 +1,6 @@
 ---
-dependencies: []
+dependencies:
+  - ivansible.lin-base
 
 galaxy_info:
   role_name: lin-nginx
@@ -17,7 +18,8 @@ galaxy_info:
 
   galaxy_tags:
     - linux
-    - ansible
+    - web
+    - nginx
 
   github_branch: master
 ...
