@@ -157,12 +157,14 @@
     # prepend "0" to the file name so that
     # default site is alphabetically first in the site directory
     dest: "{{ nginx_site_dir }}/0.default.conf"
+  notify: restart nginx service
   tags: lin_nginx_site
 
 - name: remove link to obsolete default nginx site
   file:
     path: "{{ nginx_site_dir }}/default"
     state: absent
+  notify: restart nginx service
   tags: lin_nginx_site
 
 

@@ -1,5 +1,6 @@
-# ivansible.lin-nginx
-This role installs nginx server on linux machine
+# ivansible.lin_nginx
+
+This role installs `nginx` web server on linux machine
 
 
 ## Requirements
@@ -9,7 +10,7 @@ None
 
 ## Variables
 
-### Variables from `ivansible.lin-base` shared with other roles
+### Variables from `ivansible.lin_base` shared with other roles
 
     web_user: www-data
     web_group: www-data
@@ -82,14 +83,14 @@ when run behind a web proxy.
 
 ## Dependencies
 
-- `ivansible.lin-base` -- common handlers and default parameters
+- `ivansible.lin_base` -- common handlers and default parameters
 
 
 ## Example Playbook
 
     - hosts: vag1
       roles:
-         - role: ivansible.lin-nginx
+         - role: ivansible.lin_nginx
            web_domain: mysite.com
            nginx_letsencrypt_cert: mysite.com
            nginx_main_site: www.mysite.com

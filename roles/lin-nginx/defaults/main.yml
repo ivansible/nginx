@@ -1,5 +1,5 @@
 ---
-# defaults file for ivansible.lin-nginx
+# defaults file for ivansible.lin_nginx
 
 nginx_base_domain: "{{ web_domain }}"
 nginx_main_site: ""
