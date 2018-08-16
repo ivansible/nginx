@@ -1,4 +1,5 @@
-# ivansible.lin-uwsgi
+# ivansible.lin_uwsgi
+
 This role installs uwsgi on linux in the tyrant emperor mode.
 
 The main service runs as root and spawns vassal processes for
@@ -20,14 +21,14 @@ None
 
 ## Variables
 
-### Variables from `ivansible.lin-base` shared with other roles
+### Variables from `ivansible.lin_base` shared with other roles
 
     uwsgi_base: /etc/uwsgi-emperor
     uwsgi_vassals: "{{ uwsgi_base }}/vassals"
     uwsgi_plugin_dir: /usr/lib/uwsgi/plugins
 
 
-### Variables specific to `lin-uwsgi` role are listed below
+### Variables specific to `lin_uwsgi` role are listed below
 
     uwsgi_ini_file: "{{ uwsgi_base }}/emperor.ini"
 
@@ -48,14 +49,14 @@ Note: by default, uwsgi emperor looks for vassals in the given subdirectory
 
 ## Dependencies
 
-- `ivansible.lin-base` -- common handlers and default parameters
+- `ivansible.lin_base` -- common handlers and default parameters
 
 
 ## Example Playbook
 
     - hosts: vagrant-boxes
       roles:
-         - role: ivansible.lin-uwsgi
+         - role: ivansible.lin_uwsgi
 
 
 ## License
