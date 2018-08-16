@@ -19,6 +19,8 @@
   loop: "{{ squid_domain_rules
           | json_query('[?!!localhost]')
           | list }}"
+  loop_control:
+    label: "{{ item.host }}"
   tags: srv_squid_config
 
 - name: configure squid

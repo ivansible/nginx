@@ -2,7 +2,7 @@
 dependencies: []
 
 galaxy_info:
-  role_name: srv-squid
+  role_name: srv_squid
   author: "Ivan Andreev"
   description: "install and configure squid with ssl"
   company: "IvanSible"
@@ -17,6 +17,7 @@ galaxy_info:
 
   galaxy_tags:
     - linux
+    - server
     - proxy
 
   github_branch: master

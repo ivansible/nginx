@@ -24,6 +24,8 @@
     group: "{{ squid_group }}"
     mode: 0640
   loop: "{{ squid_proxy_users }}"
+  loop_control:
+    label: "{{ item.user }}"
   notify: restart squid service
 
 

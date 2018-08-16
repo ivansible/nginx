@@ -1,5 +1,5 @@
 ---
-# defaults file for ivansible.srv-squid
+# defaults file for ivansible.srv_squid
 
 web_domain: "{{ ansible_dns.domain
               | default(ansible_fqdn | regex_replace('^[^.]+[.]', '')) }}"

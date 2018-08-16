@@ -1,4 +1,4 @@
-# ivansible.srv-squid
+# ivansible.srv_squid
 
 This role installs `squid` with ssl support on linux:
  - install custom package with ssl support from the [llxdev ppa](https://launchpad.net/~llxdev/+archive/ubuntu/xenial/);
@@ -124,14 +124,14 @@ Example list entry:
 
 ## Dependencies
 
-`ivansible.lin-tor`
+`ivansible.lin_tor`
 
 
 ## Example Playbook
 
     - hosts: example
       roles:
-         - role: ivansible.srv-squid
+         - role: ivansible.srv_squid
            squid_host: example.domain.com
            squid_ssl_enable: yes
            squid_ssl_port: 443
