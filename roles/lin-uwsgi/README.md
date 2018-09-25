@@ -21,7 +21,7 @@ None
 
 ## Variables
 
-### Variables from `ivansible.lin_base` shared with other roles
+### Variables from `ivansible.nginx_base` shared with other roles
 
     uwsgi_base: /etc/uwsgi-emperor
     uwsgi_vassals: "{{ uwsgi_base }}/vassals"
@@ -49,7 +49,10 @@ Note: by default, uwsgi emperor looks for vassals in the given subdirectory
 
 ## Dependencies
 
-- `ivansible.lin_base` -- common handlers and default parameters
+- [ivansible.lin_base](https://github.com/ivansible/lin-base)
+  -- common ansible handlers and default parameters
+- [ivansible.nginx_base](https://github.com/ivansible/nginx-base)
+  -- common nginx-related handlers and default parameters
 
 
 ## Example Playbook
