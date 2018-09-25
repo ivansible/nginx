@@ -11,9 +11,11 @@
     update_cache: yes
   tags: lin_nginx_install
 
-- name: install nginx package
+- name: install nginx and ssl packages
   apt:
-    name: nginx
+    name:
+      - nginx
+      - ssl-cert  # for snakeoil certificate
     state: present
   tags: lin_nginx_install
 

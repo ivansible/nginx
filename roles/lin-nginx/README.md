@@ -10,7 +10,7 @@ None
 
 ## Variables
 
-### Variables from `ivansible.lin_base` shared with other roles
+### Variables from `ivansible.nginx_base` shared with other roles
 
     web_user: www-data
     web_group: www-data
@@ -30,22 +30,22 @@ Extra configuration will be put here.
     nginx_site_dir: /etc/nginx/sites-enabled
 The default nginx site configuration will be put here.
 
-
-### Nginx role variables are listed below
-
-    nginx_base_domain: "{{ web_domain }}"
-
     nginx_def_site_dir: /var/www/dummy
 The default nginx site files will be put here.
-
-    nginx_main_site: ""
-If this setting is non-empty, accessing nginx at an unconfigured server name
-will redirect to this URL.
 
     nginx_ssl_cert: <derived from letsencrypt setting>
     nginx_ssl_key: <derived from letsencrypt setting>
     nginx_letsencrypt_cert: ""
 Setting one of these will activate HTTPS for default nginx site.
+
+
+### Nginx role variables are listed below
+
+    nginx_base_domain: "{{ web_domain }}"
+
+    nginx_main_site: ""
+If this setting is non-empty, accessing nginx at an unconfigured server name
+will redirect to this URL.
 
     nginx_xframe_uri: nginx_main_site uri or 'same' or 'none'
 This setting will trigger `SAMEORIGIN` frame security policy.
@@ -65,8 +65,13 @@ such as `uwsgi`.
 This setting activates the `upload_progress` nginx module.
 
     nginx_cloudflare_ips: []
-A list of IP subnets. Nginx will correctly expose its IP address
-when run behind a web proxy.
+A list of IP subnets. Nginx will correctly expose its IP address when run
+behind the cloudflare web proxy. See:
+ - https://www.cloudflare.com/ips-v4
+ - https://www.cloudflare.com/ips-v6
+ - https://www.cloudflare.com/ips
+ - https://www.babaei.net/blog/getting-real-ip-addresses-using-nginx-and-cloudflare
+ - https://stackoverflow.com/q/26983893
 
 
 ## Tags
@@ -83,7 +88,10 @@ when run behind a web proxy.
 
 ## Dependencies
 
-- `ivansible.lin_base` -- common handlers and default parameters
+- [ivansible.lin_base](https://github.com/ivansible/lin-base)
+  -- common ansible handlers and default parameters
+- [ivansible.nginx_base](https://github.com/ivansible/nginx-base)
+  -- common nginx-related handlers and default parameters
 
 
 ## Example Playbook
