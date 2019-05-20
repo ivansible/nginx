@@ -55,7 +55,7 @@
   tags: lin_nginx_dirs
 
 
-- name: backup vanilla nginx configuration (optional)
+- name: backup vanilla nginx configuration (optional, so ok to fail)
   command:
     argv:
       - cp
