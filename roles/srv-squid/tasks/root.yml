@@ -64,7 +64,7 @@
   tags: srv_squid_iptables
 
 
-- name: stop obsolete squid service
+- name: stop obsolete squid service (ok to fail, if not found)
   systemd:
     name: squid
     state: stopped
