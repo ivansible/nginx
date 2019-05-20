@@ -27,7 +27,7 @@
     sysctl_file: /etc/sysctl.d/77-uwsgi.conf
 
 
-- name: backup vanilla uwsgi configuration (optional)
+- name: backup vanilla uwsgi configuration (optional, so ok to fail)
   command:
     argv:
       - cp
