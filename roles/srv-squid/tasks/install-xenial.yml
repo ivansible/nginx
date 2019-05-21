@@ -26,7 +26,8 @@
 - name: install squid-ssl package
   apt:
     name: "{{ squid_pkg }}"
-    state: latest
+    #state: latest  # triggers galaxy warning
+    state: present
     update_cache: "{{ squid_ssl_ppa is changed }}"
     install_recommends: no
   become: yes

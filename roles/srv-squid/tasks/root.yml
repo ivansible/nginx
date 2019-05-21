@@ -33,17 +33,17 @@
   tags: srv_squid_config
 
 
-- name: open squid port
+- name: open unencryped squid port, if allowed
   ufw:
-    rule: allow
-    port: "{{ squid_port }}"
+    rule: "{{ squid_allow_unencrypted | ternary('allow','deny') }}"
+    port: "{{ squid_port |string }}"
     proto: tcp
   tags: srv_squid_firewall
 
 - name: open squid ssl port
   ufw:
     rule: allow
-    port: "{{ squid_ssl_port }}"
+    port: "{{ squid_ssl_port |string }}"
     proto: tcp
   when: squid_ssl_enable | bool
   tags: srv_squid_firewall

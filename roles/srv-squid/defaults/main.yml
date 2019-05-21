@@ -3,11 +3,15 @@
 
 web_domain: "{{ ansible_dns.domain
               | default(ansible_fqdn | regex_replace('^[^.]+[.]', '')) }}"
+# web_domain is shared with many web roles.
+# squid_domain is specific to this role.
+squid_domain: "{{ web_domain }}"
 
 web_group: www-data
 
 squid_host: "{{ ansible_fqdn }}"
 squid_port: 3128
+squid_allow_unencrypted: yes
 
 squid_ssl_enable: no
 squid_ssl_port: 3129

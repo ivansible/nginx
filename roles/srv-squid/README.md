@@ -26,18 +26,20 @@ None
 
 Available variables are listed below, along with default values.
 
-    web_domain: none
-By default, `web_domain` is derived from the fully qualified host name.
+    squid_domain: none
+By default, `squid_domain` is derived from the fully qualified host name.
 This setting is used in many places in the squid conifguration file, e.g.:
 `visible_hostname`, `ftp_user` e-mail, `cache_mgr` e-mail
 and for ldap authentication.
 
     squid_ssl_enable: no
 If this flag is truthy, the script will install SSL certificate, configure SSL port in squid and open it in the firewall.
+    squid_allow_unencrypted: yes
+If this flag is truthy, the non-ssl ports will be open in the firewall.
 
     squid_port: 3128
     squid_ssl_port: 3129
-Unencrypted and SSL_enabled incoming ports
+Unencrypted and SSL-enabled incoming ports
 
     squid_host: "{{ ansible_fqdn }}"
 Used as common name in self-signed ssl certificate.

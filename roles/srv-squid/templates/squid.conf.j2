@@ -23,7 +23,7 @@ redirect_children 1
 
 auth_param basic realm Secure access
 {% if squid_auth_ldap | bool %}
-auth_param basic program {{squid_lib_dir}}/basic_ldap_auth{{squid_helper_suffix}} -b "ou=users,dc={{web_domain}}" -f "uid=%s" -D "cn=browse,dc={{web_domain}}"
+auth_param basic program {{squid_lib_dir}}/basic_ldap_auth{{squid_helper_suffix}} -b "ou=users,dc={{squid_domain}}" -f "uid=%s" -D "cn=browse,dc={{squid_domain}}"
 {% endif %}
 {% if squid_auth_htpasswd | bool %}
 auth_param basic program {{squid_lib_dir}}/basic_ncsa_auth{{squid_helper_suffix}} {{squid_etc_dir}}/users.db
@@ -134,9 +134,9 @@ coredump_dir {{squid_spool_dir}}
 pid_filename /var/run/{{squid_pkg}}.pid
 cache_effective_user {{squid_user}}
 cache_effective_group {{squid_group}}
-visible_hostname {{web_domain}}
-ftp_user postmaster@{{web_domain}}
-cache_mgr postmaster@{{web_domain}}
+visible_hostname {{squid_domain}}
+ftp_user postmaster@{{squid_domain}}
+cache_mgr postmaster@{{squid_domain}}
 cachemgr_passwd {{squid_cachemgr_password}} all
 
 {% if squid_url_rewrite | length > 0 %}
