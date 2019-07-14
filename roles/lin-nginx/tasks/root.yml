@@ -132,8 +132,29 @@
   loop:
     - "{{ nginx_ssl_cert }}"
     - "{{ nginx_ssl_key }}"
-  when: "nginx_ssl_cert != ''
-         or nginx_ssl_key != ''"
+  when: nginx_ssl_cert != '' or nginx_ssl_key != ''
+  tags: lin_nginx_ssl
+
+
+- name: directory for letsencrypt post-renewal hooks
+  file:
+    path: /etc/letsencrypt/renewal-hooks/post
+    state: directory
+  when: "'/letsencrypt/' in nginx_ssl_cert"
+  tags: lin_nginx_ssl
+
+- name: add letsencrypt post-renewal hook for nginx
+  copy:
+    dest: /etc/letsencrypt/renewal-hooks/post/nginx
+    owner: root
+    group: root
+    mode: 0750
+    content: |
+      #!/bin/sh
+      # nginx certificate update hook
+      # ansible-managed
+      systemctl reload nginx
+  when: "'/letsencrypt/' in nginx_ssl_cert"
   tags: lin_nginx_ssl
 
 
