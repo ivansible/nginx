@@ -50,13 +50,8 @@ squid_domain_rules: []
 
 squid_outgoing_addresses: []
 
-squid_outgoing_ipv4: "{{ ansible_all_ipv4_addresses
-                       | reject('match', '^10[.]')
-                       | list | first }}"
-squid_outgoing_ipv6: "{{ (ansible_all_ipv6_addresses
-                         | reject('match', '^fe80:')
-                         | list or [''])
-                       | first }}"
+squid_outgoing_ipv4: "{{ ansible_default_ipv4.address }}"
+squid_outgoing_ipv6: "{{ ansible_default_ipv6.address }}"
 
 squid_pac_types:
   - name: http
