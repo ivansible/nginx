@@ -25,6 +25,7 @@ squid_group: proxy
 squid_auth_ldap: no
 squid_auth_htpasswd: no
 squid_use_squidguard: no
+squid_cloaking: false
 
 squid_proxy_users: []
 squid_cachemgr_password: secretpass

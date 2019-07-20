@@ -12,7 +12,7 @@
     state: present
 
 - block:
-    - name: verify pyOpenSSL validity
+    - name: verify validity of pyOpenSSL (ansible openssl bindings)
       command:
         argv:
           - "{{ ansible_python.executable }}"
@@ -31,7 +31,7 @@
           - pyOpenSSL
 
 
-- name: generate squid ssl private key (4096 bits, rsa)
+- name: generate ssl private key (4096 bits, rsa) for squid
   openssl_privatekey:
     path: "{{ squid_etc_dir }}/ssl.key"
     owner: root
@@ -39,7 +39,7 @@
     mode: 0640
   notify: restart squid service
 
-- name: generate squid certificate signing request
+- name: generate certificate signing request for squid
   openssl_csr:
     path: "{{ squid_etc_dir }}/ssl.csr"
     privatekey_path: "{{ squid_etc_dir }}/ssl.key"
@@ -49,7 +49,7 @@
     mode: 0640
   notify: restart squid service
 
-- name: generate self-signed squid ssl certificate
+- name: generate self-signed ssl certificate for squid
   openssl_certificate:
     path: "{{ squid_etc_dir }}/ssl.crt"
     privatekey_path: "{{ squid_etc_dir }}/ssl.key"

@@ -53,7 +53,7 @@
 
 - name: upload squid error pages
   unarchive:
-    src: errorpages.tar.gz
+    src: errorpages-{{ squid_cloaking | bool | ternary('cloaked', 'plain') }}.tar.gz
     dest: "{{ squid_etc_dir }}"  # /errorpages
     owner: root
     group: "{{ squid_group }}"
@@ -66,4 +66,49 @@
     owner: root
     group: "{{ squid_group }}"
   notify: restart squid service
+
+
+- name: perform squid cloaking
+  block:
+    - name: backup original page icon
+      command: cp -a "{{ file }}" "{{ file }}.orig"
+      args:
+        creates: "{{ file }}.orig"
+      vars:
+        file: /usr/share/squid-ssl/icons/SN.png
+
+    - name: reset error page stylesheet and icon
+      copy:
+        dest: "{{ item }}"
+        content: ""
+      loop:
+        - /etc/squid-ssl/errorpage.css
+        - /usr/share/squid-ssl/icons/SN.png
+      register: reset_stylesheet_result
+      notify: restart squid service
+
+    - name: stop squid service before patching the binary
+      systemd:
+        name: squid-ssl
+        state: stopped
+      # assume that binary needs patching if stylesheet was patched
+      when: reset_stylesheet_result is changed
+
+    - name: patch version signature in the squid binary
+      # replace string "squid/3.5.x" by "nginx/1.5.x"
+      # must keep replaced string length unchanged!
+      replace:
+        path: /usr/sbin/squid-ssl
+        regexp:  'squid/[1-5]([\d.]+\0)'
+        replace: 'nginx/1\1'
+        encoding: latin
+        backup: yes
+        validate: 'sh -c "exe=%s && chmod +x $exe && $exe -v"'
+      register: patch_binary_result
+      notify: restart squid service
+
+    - name: disable squid upgrades to keep binary patched
+      command: apt-mark hold squid-ssl
+      when: patch_binary_result is changed
+  when: squid_cloaking |bool
 ...

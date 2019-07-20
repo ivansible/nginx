@@ -104,7 +104,7 @@ https_port {{squid_ssl_port}} cert=/etc/letsencrypt/live/{{squid_letsencrypt_cer
 {{ cache_peer(rule.name, rule.host, rule.port, when_domain=rule.domain) }}
 {% endfor -%}
 
-{% if squid_outgoing_addresses | length > 0 %}
+{% if squid_outgoing_addresses |length > 0 %}
 # outgoing rules
 {% for rule in squid_outgoing_addresses %}
 acl to_{{rule.name}} dst {{rule.network}}
@@ -139,7 +139,13 @@ ftp_user postmaster@{{squid_domain}}
 cache_mgr postmaster@{{squid_domain}}
 cachemgr_passwd {{squid_cachemgr_password}} all
 
-{% if squid_url_rewrite | length > 0 %}
+{% if squid_cloaking |bool %}
+reply_header_access X-Squid-Error deny all
+reply_header_access X-Cache deny all
+reply_header_access X-Cache-Lookup deny all
+
+{% endif %}
+{% if squid_url_rewrite |length > 0 %}
 url_rewrite_bypass off
 url_rewrite_program {{squid_lib_dir}}/url-rewrite-custom.py
 url_rewrite_children 2 startup=0 idle=1 concurrency=0
