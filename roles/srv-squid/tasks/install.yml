@@ -3,10 +3,9 @@
   apt_repository:
     # (no longer maintained) https://launchpad.net/~notartom/+archive/ubuntu/squid-ssl
     #repo: ppa:notartom/squid-ssl
-    # (active) https://launchpad.net/~llxdev/+archive/ubuntu/xenial
-    # (lacks squid atm) https://launchpad.net/~llxdev/+archive/ubuntu/bionic/
-    repo: ppa:llxdev/xenial
-    codename: xenial
+    # (OK) https://launchpad.net/~llxdev/+archive/ubuntu/xenial (bionic)
+    repo: "ppa:llxdev/{{ ansible_lsb.codename }}"
+    codename: "{{ ansible_lsb.codename }}"
     filename: squid-ssl
   register: squid_ssl_ppa
   become: yes

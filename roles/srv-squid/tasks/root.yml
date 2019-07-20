@@ -1,8 +1,6 @@
 ---
 - name: install squid with ssl support
-  # llxdev ppa for bionic lacks squid atm
-  #include_tasks: "install-{{ ansible_distribution_release }}.yml"
-  include_tasks: "install-xenial.yml"
+  include_tasks: "install.yml"
   tags: srv_squid_install
 
 
