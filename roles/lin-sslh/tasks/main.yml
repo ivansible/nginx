@@ -3,7 +3,7 @@
   setup:
   become: no
 
-- name: enable sslh on host
+- name: enable sslh on host (if use_sslh is true)
   include_tasks: install.yml
   args:
     apply:
@@ -14,7 +14,7 @@
     - sslh_all
   when: use_sslh |bool
 
-- name: disable sslh on host
+- name: disable sslh on host (if use_sslh is false)
   include_tasks: uninstall.yml
   args:
     apply:

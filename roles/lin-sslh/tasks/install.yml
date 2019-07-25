@@ -67,10 +67,48 @@
     rule: allow
     port: "443"
     proto: tcp
+  no_log: true
 
-- name: enable sslh service
+- name: enable and start sslh service (will be rescued if it fails)
   systemd:
     name: sslh
     state: started
     enabled: yes
+  register: sslh_service_start_result
+
+- name: determine whether nginx service runs (and possibly blocks ssl port)
+  service_facts:
+  # note: condition "ActiveState == 'failed'" is not enough
+  when: sslh_service_start_result.status.ActiveState != 'active'
+
+- name: let sslh service start when nginx blocks ssl port due to stale settings
+  block:
+    - name: prevent pending sslh restart before nginx gets reconfigured
+      meta: flush_handlers
+
+    - name: stop nginx to unblock bound ssl port (will restart after reconfiguration)
+      systemd:
+        name: nginx
+        state: stopped
+      register: nginx_service_stop_result
+      # make few attempts until nginx really stops
+      until: nginx_service_stop_result.status.ActiveState != 'active'
+      notify: restart nginx service
+      # sometimes change is not detected but we know for sure nginx was running
+      changed_when: true
+
+    - name: pause a little to let ssl port go free in background
+      pause:
+        seconds: 3
+
+    - name: start sslh service once again after stopping nginx
+      systemd:
+        name: sslh
+        # perform restart instead of start to override stuck service state
+        state: started
+        enabled: yes
+
+  when: sslh_service_start_result.status.ActiveState != 'active'
+        and ansible_facts.services.nginx is defined
+        and ansible_facts.services.nginx.state == 'running'
 ...
