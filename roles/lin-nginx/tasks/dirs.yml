@@ -6,9 +6,6 @@
     dest: /etc/tmpfiles.d/nginx.conf
   notify: update system temp files
 
-- name: create cache directories before activating nginx
-  include_tasks: flush-handlers.yml
-
 - name: directory for included nginx configuration files
   file:
     path: "{{ nginx_conf_dir }}"

@@ -1,4 +1,7 @@
 ---
+- name: create cache directories before activating nginx
+  include_tasks: flush-handlers.yml
+
 - name: enable nginx service
   systemd:
     name: nginx
@@ -13,7 +16,4 @@
     port: "{{ item |string }}"
     proto: tcp
   loop: "{{ web_ports }}"
-
-- name: restart nginx service now, if needed
-  include_tasks: flush-handlers.yml
 ...
