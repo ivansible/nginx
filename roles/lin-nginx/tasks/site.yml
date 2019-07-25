@@ -26,7 +26,10 @@
   template:
     src: default-site.conf.j2
     dest: "{{ nginx_site_dir }}/default.conf"
-  notify: restart nginx service
+  notify:
+    - restart nginx service
+    # detect changed binding of https port
+    - restart sslh service
 
 - name: find all configured nginx sites
   find:
@@ -41,7 +44,10 @@
     regexp: 'listen\s+(127\.0\.0\.1:|0\.0\.0\.0:|)443\s+ssl(\s+http2)?'
     replace: "{{ nginx_conf_listen_ssl_ipv4 }}"
   loop: "{{ all_nginx_sites.files }}"
-  notify: restart nginx service
+  notify:
+    - restart nginx service
+    # detect changed binding of https port
+    - restart sslh service
 
 - name: update ipv6 bind interface on existing nginx sites
   replace:
@@ -49,5 +55,8 @@
     regexp: 'listen\s+\[::1?\]:443\s+ssl(\s+http2)?'
     replace: "{{ nginx_conf_listen_ssl_ipv6 }}"
   loop: "{{ all_nginx_sites.files }}"
-  notify: restart nginx service
+  notify:
+    - restart nginx service
+    # detect changed binding of https port
+    - restart sslh service
 ...
