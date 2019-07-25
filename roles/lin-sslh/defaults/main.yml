@@ -1,4 +1,31 @@
 ---
 # defaults file for ivansible.lin_sslh
 
+#use_sslh: <inherited from ivansible.nxinx_base>
+
+sslh_ssh_port: 22
+sslh_ssh_timeout: 16
+sslh_openvpn_port: 0
+sslh_verbose: false
+
+# proxy fix parameters
+# kernel must have the nat netfilter table for this to work
+# note: enabling this on OpenVZ results in sslh failure
+sslh_proxy_fix: true
+sslh_proxy_ports: "80,443,{{ sslh_ssh_port }}"
+
+# transparent redirect parameters
+# note: enabling this on OpenVZ results in sslh failure
+sslh_transparent: true
+sslh_lookup_table: "100"
+sslh_mark_value: "0x01"
+sslh_mark_mask: "0x0f"
+
+# sslh_transparent_setcap must be one of: "enable", "disable", "ignore"
+# note: setting capabilities on OpenVZ results in sslh failure
+sslh_transparent_setcap: enable
+
+sslh_listen_addresses:
+  - "{{ ansible_default_ipv4.address }}"
+  - "{{ ansible_default_ipv6.address }}"
 ...

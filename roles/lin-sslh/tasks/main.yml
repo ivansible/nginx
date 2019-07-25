@@ -1,10 +1,27 @@
 ---
-# perform setup as a non-root user
-- setup:
+- name: refresh host facts as non-root
+  setup:
   become: no
 
-# use import to become root globally
-- name: become root
-  import_tasks: root.yml
-  become: yes
+- name: enable sslh on host
+  include_tasks: install.yml
+  args:
+    apply:
+      become: yes
+      tags: sslh_install
+  tags:
+    - sslh_install
+    - sslh_all
+  when: use_sslh |bool
+
+- name: disable sslh on host
+  include_tasks: uninstall.yml
+  args:
+    apply:
+      become: yes
+      tags: sslh_uninstall
+  tags:
+    - sslh_uninstall
+    - sslh_all
+  when: not use_sslh |bool
 ...

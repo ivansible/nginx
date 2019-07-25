@@ -1,0 +1,27 @@
+---
+- name: disable sslh service (please ignore possible failure, it's expected)
+  systemd:
+    name: sslh
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+  no_log: true
+
+- name: remove sslh package
+  apt:
+    name: sslh
+    state: absent
+    purge: yes
+
+- name: remove sslh configuration files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/default/sslh
+    - /etc/sslh.cfg
+    - /etc/systemd/system/sslh.service
+    - /etc/systemd/system/sslh.service.d
+    - /usr/local/sbin/sslh-helper-proxy-fix.sh
+    - /usr/local/sbin/sslh-helper-transparent.sh
+...

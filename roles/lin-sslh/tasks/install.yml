@@ -1,0 +1,76 @@
+---
+- name: install sslh package
+  apt:
+    name: sslh
+    state: present
+
+- name: add dual ipv4/ipv6 localhost in /etc/hosts as sslh target
+  blockinfile:
+    path: /etc/hosts
+    block: |
+      127.0.0.1 localhost4or6
+      ::1       localhost4or6
+    marker: "# {mark} dual-stack target for sslh"
+  notify: restart sslh service
+
+- name: create sslh config file
+  template:
+    src: sslh.cfg
+    dest: /etc/sslh.cfg
+    owner: root
+    group: sslh
+    mode: 0640
+  notify: restart sslh service
+
+- name: override sslh service settings
+  template:
+    src: sslh.service
+    dest: /etc/systemd/system/sslh.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart sslh service
+
+- name: create group for proxy processes
+  group:
+    name: proxy
+    gid: 13
+  when: sslh_proxy_fix |bool
+
+- name: configure helper parameters for sslh
+  blockinfile:
+    path: /etc/default/sslh
+    block: |
+      PROXY_PORTS={{ sslh_proxy_ports }}
+      LOOKUP_TABLE={{ sslh_lookup_table }}
+      MARK_VALUE={{ sslh_mark_value }}
+      MARK_MASK={{ sslh_mark_mask }}
+      # TRANSPARENT_SETCAP must be one of: enable, disable, ignore
+      TRANSPARENT_SETCAP={{ sslh_transparent_setcap }}
+    marker: "# {mark} sslh helper parameters"
+  notify: restart sslh service
+
+- name: install sslh helpers
+  copy:
+    src: "{{ item }}"
+    dest: /usr/local/sbin/sslh-helper-{{ item }}
+    owner: root
+    group: root
+    mode: 0754
+  loop:
+    - proxy-fix.sh
+    - transparent.sh
+  notify: restart sslh service
+
+- name: open https port for sslh
+  ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+
+- name: enable sslh service
+  systemd:
+    name: sslh
+    state: started
+    enabled: yes
+...

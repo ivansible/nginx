@@ -1,5 +1,7 @@
 ---
-dependencies: []
+dependencies:
+  # inherit parameter use_sslh from nginx_base
+  - ivansible.nginx_base
 
 galaxy_info:
   role_name: lin_sslh
