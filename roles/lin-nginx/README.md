@@ -80,10 +80,11 @@ behind the cloudflare web proxy. See:
 - `lin_nginx_dirs` -- activate nginx cache and create directories under /etc/nginx
 - `lin_nginx_config` -- create main configuration and uwsgi parameters
                         and add extra mime types
-- `lin_nginx_ssl` -- configure security settings
-                     and generate diffie-helman parameters for ssl
+- `lin_nginx_tls` -- configure security settings
+                     and generate diffie-helman parameters for tls
 - `lin_nginx_site` -- configure default site and upload www files
 - `lin_nginx_run` -- enable service and open ports in firewall
+- `lin_nginx_all` -- all of the above
 
 
 ## Dependencies

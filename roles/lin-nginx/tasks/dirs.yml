@@ -1,0 +1,29 @@
+---
+- name: activate nginx cache directories
+  when: nginx_cache_enable | bool
+  copy:
+    content: "d    {{ nginx_cache_dir }}    0750    {{ web_user }}    root    -       -"
+    dest: /etc/tmpfiles.d/nginx.conf
+  notify: update system temp files
+
+- name: create cache directories before activating nginx
+  include_tasks: flush-handlers.yml
+
+- name: directory for included nginx configuration files
+  file:
+    path: "{{ nginx_conf_dir }}"
+    state: directory
+
+- name: directory for included nginx site configurations
+  file:
+    path: "{{ nginx_site_dir }}"
+    state: directory
+
+- name: directory for nginx password files
+  file:
+    path: "{{ nginx_base_dir }}/users"
+    state: directory
+    owner: root
+    group: "{{ web_group }}"
+    mode: 0750
+...

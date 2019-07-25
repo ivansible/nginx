@@ -1,0 +1,46 @@
+---
+- name: configure nginx tls settings
+  template:
+    src: security.conf.j2
+    dest: "{{ nginx_conf_dir }}/security.conf"
+  notify: restart nginx service
+
+- name: generate diffie-helman parameters for nginx ssl (may take a while)
+  openssl_dhparam:
+    path: "{{ nginx_conf_dir }}/ssl-dhparam.pem"
+    # default 4096 bits can take too long
+    # normally this step takes some 4 minutes
+    size: 2048
+    owner: root
+    group: "{{ nginx_group }}"
+    mode: 0640
+  notify: restart nginx service
+
+- name: check that nginx certificate exists (if configured)
+  file:
+    path: "{{ item }}"
+    state: file
+  loop:
+    - "{{ nginx_ssl_cert }}"
+    - "{{ nginx_ssl_key }}"
+  when: nginx_ssl_cert != '' or nginx_ssl_key != ''
+
+- name: directory for letsencrypt post-renewal hooks
+  file:
+    path: /etc/letsencrypt/renewal-hooks/post
+    state: directory
+  when: "'/letsencrypt/' in nginx_ssl_cert"
+
+- name: add letsencrypt post-renewal hook for nginx
+  copy:
+    dest: /etc/letsencrypt/renewal-hooks/post/nginx
+    owner: root
+    group: root
+    mode: 0750
+    content: |
+      #!/bin/sh
+      # nginx certificate update hook
+      # ansible-managed
+      systemctl reload nginx
+  when: "'/letsencrypt/' in nginx_ssl_cert"
+...

@@ -1,0 +1,19 @@
+---
+- name: enable nginx service
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+- name: open nginx ports
+  ufw:
+    rule: allow
+    # force string conversion to prevent module warning
+    port: "{{ item |string }}"
+    proto: tcp
+  loop: "{{ web_ports }}"
+
+- name: restart nginx service now, if needed
+  include_tasks: flush-handlers.yml
+...

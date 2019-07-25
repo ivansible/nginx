@@ -1,0 +1,45 @@
+---
+- name: backup vanilla nginx configuration (optional, so ok to fail)
+  command:
+    argv:
+      - cp
+      - -a
+      - "{{ nginx_base_dir }}/nginx.conf"
+      - "{{ nginx_base_dir }}/nginx.conf.orig"
+    creates: "{{ nginx_base_dir }}/nginx.conf.orig"
+  ignore_errors: yes
+
+- name: create main nginx configuration file
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_base_dir }}/nginx.conf"
+  notify: restart nginx service
+
+- name: uwsgi parameters for nginx behind balancer
+  template:
+    src: uwsgi_params.j2
+    dest: "{{ nginx_base_dir }}/uwsgi_params"
+  notify: restart nginx service
+
+- name: comment for extra mime types
+  lineinfile:
+    path: "{{ nginx_base_dir }}/mime.types"
+    regexp: "# \\w+ mime"
+    line: "    # custom mime types"
+    insertbefore: "^}"
+
+- name: let nginx know some extra mime types
+  lineinfile:
+    path: "{{ nginx_base_dir }}/mime.types"
+    regexp: "{{ item.split().0 }}\\s"
+    line: "    {{ item }};"
+    insertbefore: "^}"
+  loop:
+    - "application/x-ns-proxy-autoconfig     pac"
+    - "application/x-pkcs12                  p12"
+    - "application/x-pkcs7-crl               crl"
+    - "application/x-x509-ca-cert            der pem crt cer"
+  loop_control:
+    label: "{{ item.split().0 }}"
+  notify: restart nginx service
+...
