@@ -6,8 +6,8 @@ server {
     listen [::]:80 default_server;
 
 {% if nginx_ssl_cert != "" %}
-    listen 443 ssl http2 default_server;
-    listen [::]:443 ssl http2 default_server;
+    {{ nginx_conf_listen_ssl_ipv4 }} default_server;
+    {{ nginx_conf_listen_ssl_ipv6 }} default_server;
 
     ssl_certificate     {{ nginx_ssl_cert }};
     ssl_certificate_key {{ nginx_ssl_key }};

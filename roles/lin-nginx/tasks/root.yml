@@ -174,22 +174,48 @@
     - robots.txt
   tags: lin_nginx_site
 
-- name: configuration for default nginx site
+- name: remove obsolete default nginx sites
+  file:
+    path: "{{ nginx_site_dir }}/{{ item }}"
+    state: absent
+  loop:
+    - default
+    - 0.default.conf
+  notify: restart nginx service
+  tags: lin_nginx_site
+
+- name: create configuration for default nginx site
   template:
     src: default-site.conf.j2
-    # prepend "0" to the file name so that
-    # default site is alphabetically first in the site directory
-    dest: "{{ nginx_site_dir }}/0.default.conf"
+    dest: "{{ nginx_site_dir }}/default.conf"
   notify: restart nginx service
   tags: lin_nginx_site
 
-- name: remove link to obsolete default nginx site
-  file:
-    path: "{{ nginx_site_dir }}/default"
-    state: absent
+- name: find all configured nginx sites
+  find:
+    paths: "{{ nginx_site_dir }}"
+    recurse: no
+    patterns: "*.conf"
+  register: all_nginx_sites
+  tags: lin_nginx_site
+
+- name: update ipv4 bind interface in current nginx sites
+  replace:
+    path: "{{ item.path }}"
+    regexp: 'listen\s+(127\.0\.0\.1:|0\.0\.0\.0:|)443\s+ssl(\s+http2)?'
+    replace: "{{ nginx_conf_listen_ssl_ipv4 }}"
+  loop: "{{ all_nginx_sites.files }}"
   notify: restart nginx service
   tags: lin_nginx_site
 
+- name: update ipv6 bind interface in current nginx sites
+  replace:
+    path: "{{ item.path }}"
+    regexp: 'listen\s+\[::1?\]:443\s+ssl(\s+http2)?'
+    replace: "{{ nginx_conf_listen_ssl_ipv6 }}"
+  loop: "{{ all_nginx_sites.files }}"
+  notify: restart nginx service
+  tags: lin_nginx_site
 
 - name: enable nginx service
   systemd:
@@ -202,7 +228,7 @@
 - name: open nginx ports
   ufw:
     rule: allow
-    port: "{{ item }}"
+    port: "{{ item |string }}"
     proto: tcp
   loop: "{{ web_ports }}"
   tags: lin_nginx_run
