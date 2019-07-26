@@ -9,6 +9,18 @@
     creates: "{{ nginx_base_dir }}/nginx.conf.orig"
   ignore_errors: yes
 
+- name: select nginx fallback resolver on xenial
+  set_fact:
+    # assume installed dnsmasq or bind9
+    nginx_fallback_resolver: 127.0.0.1
+  when: ansible_lsb.codename == 'xenial' and nginx_fallback_resolver is not defined
+
+- name: select nginx fallback resolver on bionic
+  set_fact:
+    # fallback to systemd-resolved on bionic
+    nginx_fallback_resolver: 127.0.0.53
+  when: ansible_lsb.codename == 'bionic' and nginx_fallback_resolver is not defined
+
 - name: create main nginx configuration file
   template:
     src: nginx.conf

@@ -6,10 +6,13 @@ nginx_main_site: ""
 
 nginx_xframe_uri: "https://{{ nginx_main_site }}"  # uri or 'same' or 'none'
 nginx_cache_enable: yes
-nginx_local_resolver: no
 nginx_behind_vpn: yes
 nginx_upload_progress: no
 nginx_cloudflare_ips: []
+
+nginx_use_resolver: yes
+# use fallback resolver by default
+#nginx_resolver: 8.8.8.8
 
 nginx_user: "{{ web_user }}"
 nginx_group: "{{ web_group }}"

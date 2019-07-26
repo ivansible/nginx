@@ -16,4 +16,5 @@
     port: "{{ item |string }}"
     proto: tcp
   loop: "{{ web_ports }}"
+  no_log: true
 ...
