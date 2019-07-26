@@ -5,9 +5,12 @@
 
 - name: add nginx apt repository
   apt_repository:
-    repo: deb http://nginx.org/packages/ubuntu/ {{ ansible_lsb.codename }} nginx
+    repo: deb http://nginx.org/packages/{{ repo_path }}/ {{ codename }} nginx
     filename: nginx
     update_cache: yes
+  vars:
+    repo_path: "{{ nginx_prefer_stable |bool |ternary('ubuntu', 'mainline/ubuntu') }}"
+    codename: "{{ ansible_lsb.codename }}"
 
 - name: install nginx and ssl packages
   apt:

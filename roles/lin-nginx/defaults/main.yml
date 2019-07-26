@@ -10,6 +10,9 @@ nginx_behind_vpn: yes
 nginx_upload_progress: no
 nginx_cloudflare_ips: []
 
+# stable or mainline repository?
+nginx_prefer_stable: no
+
 nginx_use_resolver: yes
 # use fallback resolver by default
 #nginx_resolver: 8.8.8.8
