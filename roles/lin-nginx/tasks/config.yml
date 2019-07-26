@@ -11,13 +11,13 @@
 
 - name: create main nginx configuration file
   template:
-    src: nginx.conf.j2
+    src: nginx.conf
     dest: "{{ nginx_base_dir }}/nginx.conf"
   notify: restart nginx service
 
 - name: uwsgi parameters for nginx behind balancer
   template:
-    src: uwsgi_params.j2
+    src: uwsgi_params
     dest: "{{ nginx_base_dir }}/uwsgi_params"
   notify: restart nginx service
 

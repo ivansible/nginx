@@ -1,11 +1,11 @@
 ---
 - name: configure nginx tls settings
   template:
-    src: security.conf.j2
+    src: security.conf
     dest: "{{ nginx_conf_dir }}/security.conf"
   notify: restart nginx service
 
-- name: generate diffie-helman parameters for nginx ssl (may take a while)
+- name: generate diffie-helman parameters for nginx tls (may take a while)
   openssl_dhparam:
     path: "{{ nginx_conf_dir }}/ssl-dhparam.pem"
     # default 4096 bits can take too long

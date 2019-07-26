@@ -24,7 +24,7 @@
 
 - name: create configuration for default nginx site
   template:
-    src: default-site.conf.j2
+    src: default-site.conf
     dest: "{{ nginx_site_dir }}/default.conf"
   notify:
     - restart nginx service
