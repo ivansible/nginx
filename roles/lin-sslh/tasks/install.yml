@@ -1,4 +1,8 @@
 ---
+- name: assert parameter validity
+  assert:
+    that: sslh_transparent_setcap in ['enable', 'disable', 'ignore']
+
 - name: install sslh package
   apt:
     name: sslh
@@ -45,21 +49,20 @@
       LOOKUP_TABLE={{ sslh_lookup_table }}
       MARK_VALUE={{ sslh_mark_value }}
       MARK_MASK={{ sslh_mark_mask }}
+      USE_PROXY_FIX={{ sslh_proxy_fix |bool |to_json }}
+      USE_TRANSPARENT={{ sslh_transparent |bool |to_json }}
       # TRANSPARENT_SETCAP must be one of: enable, disable, ignore
       TRANSPARENT_SETCAP={{ sslh_transparent_setcap }}
     marker: "# {mark} sslh helper parameters"
   notify: restart sslh service
 
-- name: install sslh helpers
+- name: install iptables helper for sslh
   copy:
-    src: "{{ item }}"
-    dest: /usr/local/sbin/sslh-helper-{{ item }}
+    src: iptables-helper.sh
+    dest: /usr/local/sbin/sslh-helper-iptables.sh
     owner: root
     group: root
     mode: 0754
-  loop:
-    - proxy-fix.sh
-    - transparent.sh
   notify: restart sslh service
 
 - name: open https port for sslh

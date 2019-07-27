@@ -9,11 +9,9 @@ ExecStart=/usr/sbin/sslh --foreground -F /etc/sslh.cfg
 # ignore DAEMON_OPTS from /etc/default/sslh
 #EnvironmentFile=/etc/default/sslh
 KillMode=process
-{% if not sslh_transparent |bool %}#{% endif %}ExecStartPre=/usr/local/sbin/sslh-helper-transparent.sh restart
-{% if not sslh_transparent |bool %}#{% endif %}ExecStopPost=/usr/local/sbin/sslh-helper-transparent.sh stop
-{% if not sslh_proxy_fix |bool %}#{% endif %}ExecStartPre=/usr/local/sbin/sslh-helper-proxy-fix.sh restart
-{% if not sslh_proxy_fix |bool %}#{% endif %}ExecStopPost=/usr/local/sbin/sslh-helper-proxy-fix.sh stop
-# prevent exposing ip addresses in syslog
+ExecStartPre=/usr/local/sbin/sslh-helper-iptables.sh restart
+ExecStopPost=/usr/local/sbin/sslh-helper-iptables.sh stop
+# prevent ip addresses exposed in syslog
 {% if sslh_verbose |bool %}#{% endif %}StandardOutput=null
 
 [Install]
