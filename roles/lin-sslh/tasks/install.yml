@@ -3,10 +3,21 @@
   assert:
     that: sslh_transparent_setcap in ['enable', 'disable', 'ignore']
 
-- name: install sslh package
+- name: install sslh package 1.18 from bionic on xenial
+  # with original xenial's sslh 1.17 an attempt of ssh transparent
+  # proxying for a local process (e.g. shadowsocks) fails with error
+  # "bind:98:Address already in use"
+  # issue description: https://github.com/yrutschle/sslh/issues/64
+  # fixed in sslh 1.18 by PR https://github.com/yrutschle/sslh/pull/69
+  apt:
+    deb: http://mirrors.kernel.org/ubuntu/pool/universe/s/sslh/sslh_1.18-1_amd64.deb
+  when: ansible_lsb.codename == 'xenial'
+
+- name: install sslh package on bionic+
   apt:
     name: sslh
     state: present
+  when: ansible_lsb.codename == 'bionic'
 
 - name: add dual ipv4/ipv6 localhost in /etc/hosts as sslh target
   blockinfile:
