@@ -46,21 +46,13 @@
     mode: 0644
   notify: restart sslh service
 
-- name: create group for proxy processes
-  group:
-    name: proxy
-    gid: 13
-  when: sslh_proxy_fix |bool
-
 - name: configure helper parameters for sslh
   blockinfile:
     path: /etc/default/sslh
     block: |
-      PROXY_PORTS={{ sslh_proxy_ports }}
       LOOKUP_TABLE={{ sslh_lookup_table }}
       MARK_VALUE={{ sslh_mark_value }}
       MARK_MASK={{ sslh_mark_mask }}
-      USE_PROXY_FIX={{ sslh_proxy_fix |bool |to_json }}
       USE_TRANSPARENT={{ sslh_transparent |bool |to_json }}
       # TRANSPARENT_SETCAP must be one of: enable, disable, ignore
       TRANSPARENT_SETCAP={{ sslh_transparent_setcap }}

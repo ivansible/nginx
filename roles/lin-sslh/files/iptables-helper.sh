@@ -5,7 +5,6 @@ set -euo pipefail
 . /etc/default/sslh
 ACTION="${1:-}"
 SSLH_UID=sslh
-PROXY_GID=proxy
 COMMENT=sslh_helper_ruleset
 TAG="-m comment --comment ${COMMENT}"
 
@@ -30,23 +29,17 @@ set_capabilities()
   esac
 }
 
-set_proxy_fix()
+start()
 {
-  /sbin/iptables -A OUTPUT -t nat ${TAG} \
-    -m owner --gid-owner ${PROXY_GID} \
-    -p tcp -m multiport --dports ${PROXY_PORTS} \
-    -m addrtype --dst-type LOCAL ! -d 127.0.0.1/8 \
-    -j DNAT --to-destination 127.0.0.1
+  [ ${USE_TRANSPARENT} = true ] || return
 
-  /sbin/ip6tables -A OUTPUT -t nat ${TAG} \
-    -m owner --gid-owner ${PROXY_GID} \
-    -p tcp -m multiport --dports ${PROXY_PORTS} \
-    -m addrtype --dst-type LOCAL ! -d ::1 \
-    -j DNAT --to-destination ::1
-}
+  # Allow sslh to use localhost as destination
+  /sbin/sysctl -q -w net.ipv4.conf.default.route_localnet=1
+  /sbin/sysctl -q -w net.ipv4.conf.all.route_localnet=1
 
-set_transparent()
-{
+  # sslh requires net admin capabilities for transparent redirect
+  set_capabilities ${TRANSPARENT_SETCAP:-ignore}
+
   ### IPv4 ###
 
   # Drop martian packets as they would have been if route_localnet was zero
@@ -67,8 +60,8 @@ set_transparent()
     -j CONNMARK --restore-mark --mask ${MARK_MASK}
 
   # Configure routing for those marked packets
-  /sbin/ip -4 rule add fwmark ${MARK_VALUE} lookup ${LOOKUP_TABLE}
-  /sbin/ip -4 route add local 0/0 dev lo table 100
+  /sbin/ip -4 rule  add fwmark ${MARK_VALUE} lookup ${LOOKUP_TABLE}
+  /sbin/ip -4 route add local  0/0  dev lo   table 100
 
   ### IPv6 ###
 
@@ -91,40 +84,20 @@ set_transparent()
 
   # Configure routing for those marked packets
   /sbin/ip -6 rule  add fwmark ${MARK_VALUE} lookup ${LOOKUP_TABLE}
-  /sbin/ip -6 route add local  ::/0  dev lo table ${LOOKUP_TABLE}
-}
-
-start()
-{
-  if [ ${USE_PROXY_FIX} = true ]; then
-    set_proxy_fix
-  fi
-
-  if [ ${USE_TRANSPARENT} = true ]; then
-    # Allow sslh to use localhost as destination
-    /sbin/sysctl -q -w net.ipv4.conf.default.route_localnet=1
-    /sbin/sysctl -q -w net.ipv4.conf.all.route_localnet=1
-
-    # sslh requires net admin capabilities for transparent redirect
-    set_capabilities ${TRANSPARENT_SETCAP:-ignore}
-
-    set_transparent
-  fi
+  /sbin/ip -6 route add local  ::/0  dev lo  table ${LOOKUP_TABLE}
 }
 
 stop()
 {
-  if [ ${USE_PROXY_FIX} = true -o ${USE_TRANSPARENT} = true ]; then
-    /sbin/iptables-save  | /bin/grep -v ${COMMENT} | /sbin/iptables-restore
-    /sbin/ip6tables-save | /bin/grep -v ${COMMENT} | /sbin/ip6tables-restore
-  fi
+  [ ${USE_TRANSPARENT} = true ] || return
 
-  if [ ${USE_TRANSPARENT} = true ]; then
-    /sbin/ip -4 rule  del fwmark ${MARK_VALUE} lookup ${LOOKUP_TABLE} 2>/dev/null || true
-    /sbin/ip -6 rule  del fwmark ${MARK_VALUE} lookup ${LOOKUP_TABLE} 2>/dev/null || true
-    /sbin/ip -4 route del local  0/0  dev lo table ${LOOKUP_TABLE} 2>/dev/null || true
-    /sbin/ip -6 route del local  ::/0 dev lo table ${LOOKUP_TABLE} 2>/dev/null ||true
-  fi
+  /sbin/iptables-save  | /bin/grep -v ${COMMENT} | /sbin/iptables-restore
+  /sbin/ip6tables-save | /bin/grep -v ${COMMENT} | /sbin/ip6tables-restore
+
+  /sbin/ip -4 rule  del fwmark ${MARK_VALUE} lookup ${LOOKUP_TABLE} 2>/dev/null || true
+  /sbin/ip -6 rule  del fwmark ${MARK_VALUE} lookup ${LOOKUP_TABLE} 2>/dev/null || true
+  /sbin/ip -4 route del local  0/0  dev lo table ${LOOKUP_TABLE} 2>/dev/null || true
+  /sbin/ip -6 route del local  ::/0 dev lo table ${LOOKUP_TABLE} 2>/dev/null ||true
 }
 
 case "${ACTION}" in

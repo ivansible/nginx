@@ -8,12 +8,6 @@ sslh_ssh_timeout: 16
 sslh_openvpn_port: 0
 sslh_verbose: false
 
-# proxy fix parameters
-# kernel must have the nat netfilter table for this to work
-# note: enabling this on OpenVZ results in sslh failure
-sslh_proxy_fix: false
-sslh_proxy_ports: "80,443,{{ sslh_ssh_port }}"
-
 # transparent redirect parameters
 # note: enabling this on OpenVZ results in sslh failure
 sslh_transparent: true
