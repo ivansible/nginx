@@ -2,16 +2,15 @@
 - name: refresh host facts as non-root
   setup:
   become: no
+  tags: sslh_all
 
 - name: enable sslh on host (if use_sslh is true)
   include_tasks: install.yml
   args:
     apply:
       become: yes
-      tags: sslh_install
-  tags:
-    - sslh_install
-    - sslh_all
+      tags: sslh_all
+  tags: sslh_all
   when: use_sslh |bool
 
 - name: disable sslh on host (if use_sslh is false)
@@ -20,8 +19,6 @@
     apply:
       become: yes
       tags: sslh_uninstall
-  tags:
-    - sslh_uninstall
-    - sslh_all
+  tags: sslh_all
   when: not use_sslh |bool
 ...

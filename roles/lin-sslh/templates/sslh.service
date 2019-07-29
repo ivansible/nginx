@@ -5,14 +5,25 @@ After=network.target
 After=ufw.target
 
 [Service]
-ExecStart=/usr/sbin/sslh --foreground -F /etc/sslh.cfg
-# ignore DAEMON_OPTS from /etc/default/sslh
-#EnvironmentFile=/etc/default/sslh
+ExecStart=/usr/sbin/sslh -f -F /etc/sslh.cfg
 KillMode=process
+EnvironmentFile=/etc/default/sslh
 ExecStartPre=/usr/local/sbin/sslh-helper-iptables.sh restart
 ExecStopPost=/usr/local/sbin/sslh-helper-iptables.sh stop
-# prevent ip addresses exposed in syslog
-{% if sslh_verbose |bool %}#{% endif %}StandardOutput=null
 
+{% with comment = sslh_nonroot |bool |ternary('','#') %}
+# Note: non-root mode and ambient capabilities require kernel 4.3+
+{{ comment }}User=sslh
+{{ comment }}CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_NET_ADMIN CAP_NET_RAW
+{{ comment }}AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_ADMIN CAP_NET_RAW
+{{ comment }}NoNewPrivileges=true
+{{ comment }}SecureBits=noroot-locked
+
+{% endwith %}
+{% with comment = sslh_verbose |bool |ternary('#','') %}
+# prevent ip addresses exposed in syslog
+{{ comment }}StandardOutput=null
+
+{% endwith %}
 [Install]
 WantedBy=multi-user.target

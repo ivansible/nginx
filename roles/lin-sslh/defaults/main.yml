@@ -4,20 +4,18 @@
 #use_sslh: <inherited from ivansible.nxinx_base>
 
 sslh_ssh_port: 22
+sslh_ssh_fork: false
 sslh_ssh_timeout: 16
 sslh_openvpn_port: 0
+
 sslh_verbose: false
+sslh_handle_http: true
+sslh_nonroot: "{{ ansible_kernel is version('4.3', '>') }}"
 
-# transparent redirect parameters
-# note: enabling this on OpenVZ results in sslh failure
+# Note: transparency fails on OpenVZ
 sslh_transparent: true
-sslh_lookup_table: "100"
-sslh_mark_value: "0x01"
-sslh_mark_mask: "0x0f"
-
-# sslh_transparent_setcap must be one of: "enable", "disable", "ignore"
-# note: setting capabilities on OpenVZ results in sslh failure
-sslh_transparent_setcap: enable
+sslh_lookup_table: 100
+sslh_mark_value: 0x01
 
 sslh_listen_addresses:
   - "{{ ansible_default_ipv4.address }}"

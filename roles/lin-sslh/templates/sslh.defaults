@@ -1,0 +1,11 @@
+# Default options for sslh helper
+RUN=no
+DAEMON=/usr/sbin/sslh
+DAEMON_OPTS=""
+
+USE_TRANSPARENT={{ sslh_transparent |bool |to_json }}
+RULE_COMMENT=sslh_helper_ruleset
+ROUTE_TABLE={{ sslh_lookup_table }}
+MARK_VALUE={{ sslh_mark_value }}
+MARK_MASK=0x0f
+SSLH_UID=sslh
