@@ -36,6 +36,7 @@
     rule: "{{ squid_allow_unencrypted | ternary('allow','deny') }}"
     port: "{{ squid_port |string }}"
     proto: tcp
+  no_log: true
   tags: srv_squid_firewall
 
 - name: open squid ssl port
@@ -43,6 +44,7 @@
     rule: allow
     port: "{{ squid_ssl_port |string }}"
     proto: tcp
+  no_log: true
   when: squid_ssl_enable | bool
   tags: srv_squid_firewall
 
