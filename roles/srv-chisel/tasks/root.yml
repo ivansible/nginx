@@ -1,0 +1,5 @@
+---
+- name: ivansible.srv_chisel root action 1
+  debug:
+    msg: action 1
+...
