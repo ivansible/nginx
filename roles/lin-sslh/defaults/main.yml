@@ -7,6 +7,7 @@ sslh_ssh_port: 22
 sslh_ssh_fork: false
 sslh_ssh_timeout: 16
 sslh_openvpn_port: 0
+sslh_anyprot_port: 443
 
 sslh_verbose: false
 sslh_handle_http: true
