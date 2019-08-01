@@ -1,5 +1,7 @@
 ---
-dependencies: []
+dependencies:
+  - ivansible.lin_nginx
+  - ivansible.lin_shadowsocks
 
 galaxy_info:
   role_name: srv_doh

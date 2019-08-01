@@ -1,0 +1,12 @@
+# ansible-managed
+[Unit]
+Description=rust-doh
+
+[Service]
+{# set group to "proxy" to activate sslh iptables fix #}
+Group=proxy
+EnvironmentFile=/etc/default/rust-doh
+ExecStart={{ srv_doh_binary }} -l 127.0.0.1:${DOH_PORT} -p ${WEB_PATH} -u ${UPSTREAM_DNS}:53
+
+[Install]
+WantedBy=multi-user.target

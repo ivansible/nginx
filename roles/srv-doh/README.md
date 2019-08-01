@@ -20,13 +20,13 @@ Available variables are listed below, along with default values.
 
 ## Tags
 
-- `role1_tag1` -- action1
-- `role1_tag2` -- action2
+- `srv_doh_all`
 
 
 ## Dependencies
 
-None
+- `ivansible.lin_nginx`
+- `ivansible.lin_shadowsocks`
 
 
 ## Example Playbook

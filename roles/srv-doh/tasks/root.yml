@@ -1,5 +1,48 @@
 ---
-- name: ivansible.srv_doh root action 1
-  debug:
-    msg: action 1
+- name: check that rust-doh binary already exists
+  stat:
+    path: "{{ srv_doh_binary }}"
+    get_checksum: no
+  register: stat_doh_binary
+  tags: srv_doh_install
+
+- name: install rust-doh binary
+  import_tasks: install.yml
+  when: srv_doh_allow_reinstall |bool or not stat_doh_binary.stat.exists
+  tags: srv_doh_install
+
+- name: create group for proxy processes
+  group:
+    name: proxy
+    gid: 13
+
+- name: configure rust-doh service
+  template:
+    src: rust-doh.defaults
+    dest: /etc/default/rust-doh
+    owner: root
+    group: proxy
+    mode: 0640
+  notify: restart rust-doh service
+
+- name: setup rust-doh service unit
+  template:
+    src: rust-doh.service
+    dest: /etc/systemd/system/rust-doh.service
+    mode: 0644
+  notify: restart rust-doh service
+
+- name: configure nginx redirector for rust-doh
+  template:
+    src: rust-doh.nginx.conf
+    dest: /etc/nginx/bastion.d/rust-doh.conf
+    mode: 0644
+  notify: reload nginx service
+
+- name: activate rust-doh service
+  systemd:
+    name: rust-doh
+    state: started
+    enabled: yes
+    daemon_reload: yes
 ...

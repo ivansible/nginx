@@ -1,0 +1,3 @@
+UPSTREAM_DNS={{ srv_doh_upstream_dns }}
+DOH_PORT={{ srv_doh_local_port }}
+WEB_PATH={{ srv_doh_web_path }}
