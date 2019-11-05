@@ -30,35 +30,42 @@
           - --upgrade
           - pyOpenSSL
 
-
-- name: generate ssl private key (4096 bits, rsa) for squid
-  openssl_privatekey:
-    path: "{{ squid_etc_dir }}/ssl.key"
-    owner: root
-    group: "{{ squid_group }}"
-    mode: 0640
+- name: check whether squid ssl files need to be generated
+  stat:
+    path: "{{ squid_etc_dir }}/ssl.{{ item }}"
+  loop: [ key, csr, crt ]
+  register: _squid_ssl_files
+  changed_when: not _squid_ssl_files.stat.exists
   notify: restart squid service
 
-- name: generate certificate signing request for squid
-  openssl_csr:
-    path: "{{ squid_etc_dir }}/ssl.csr"
-    privatekey_path: "{{ squid_etc_dir }}/ssl.key"
-    common_name: "{{ squid_host }}"
-    owner: root
-    group: "{{ squid_group }}"
-    mode: 0640
-  notify: restart squid service
+- name: generate squid ssl files
+  block:
+    - name: generate ssl private key (4096 bits, rsa) for squid
+      openssl_privatekey:
+        path: "{{ squid_etc_dir }}/ssl.key"
+        owner: root
+        group: "{{ squid_group }}"
+        mode: 0640
 
-- name: generate self-signed ssl certificate for squid
-  openssl_certificate:
-    path: "{{ squid_etc_dir }}/ssl.crt"
-    privatekey_path: "{{ squid_etc_dir }}/ssl.key"
-    csr_path: "{{ squid_etc_dir }}/ssl.csr"
-    provider: selfsigned
-    owner: root
-    group: "{{ squid_group }}"
-    mode: 0640
-  notify: restart squid service
+    - name: generate certificate signing request for squid
+      openssl_csr:
+        path: "{{ squid_etc_dir }}/ssl.csr"
+        privatekey_path: "{{ squid_etc_dir }}/ssl.key"
+        common_name: "{{ squid_host }}"
+        owner: root
+        group: "{{ squid_group }}"
+        mode: 0640
+
+    - name: generate self-signed ssl certificate for squid
+      openssl_certificate:
+        path: "{{ squid_etc_dir }}/ssl.crt"
+        privatekey_path: "{{ squid_etc_dir }}/ssl.key"
+        csr_path: "{{ squid_etc_dir }}/ssl.csr"
+        provider: selfsigned
+        owner: root
+        group: "{{ squid_group }}"
+        mode: 0640
+  when: _squid_ssl_files is changed
 
 - name: grant squid user access to letsencrypt certificates
   user:
@@ -66,6 +73,6 @@
     groups: "{{ certbot_group }}"
     append: yes
   notify: restart squid service
-  when: "squid_letsencrypt_cert != ''
-         and certbot_group is defined"
+  when: certbot_group is defined
+        and squid_letsencrypt_cert != '' # noqa 602
 ...
