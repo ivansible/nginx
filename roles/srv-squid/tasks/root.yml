@@ -70,9 +70,9 @@
     state: stopped
     enabled: no
     daemon_reload: yes
-  when: "squid_pkg == 'squid-ssl'
-         and squid_ssl_ppa is defined
-         and squid_ssl_ppa is changed"
+  when: squid_pkg == 'squid-ssl'
+        and squid_ssl_ppa is defined
+        and squid_ssl_ppa is changed
   ignore_errors: yes
   tags: srv_squid_service
 

@@ -33,7 +33,7 @@
 - name: check whether squid ssl files need to be generated
   stat:
     path: "{{ squid_etc_dir }}/ssl.{{ item }}"
-  loop: [ key, csr, crt ]
+  loop: [key, csr, crt]
   register: _squid_ssl_files
   changed_when: not _squid_ssl_files.stat.exists
   notify: restart squid service

@@ -19,8 +19,8 @@
     purge: yes
     autoremove: yes
   become: yes
-  when: "squid_ssl_ppa is changed
-         and squid_pkg == 'squid-ssl'"
+  when: squid_ssl_ppa is changed
+        and squid_pkg == 'squid-ssl'
 
 - name: install squid-ssl package
   apt:

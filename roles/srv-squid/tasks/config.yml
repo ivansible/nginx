@@ -99,7 +99,7 @@
       # must keep replaced string length unchanged!
       replace:
         path: /usr/sbin/squid-ssl
-        regexp:  'squid/[1-5]([\d.]+\0)'
+        regexp: 'squid/[1-5]([\d.]+\0)'
         replace: 'nginx/1\1'
         encoding: latin
         backup: yes
