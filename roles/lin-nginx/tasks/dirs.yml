@@ -1,5 +1,13 @@
 ---
-- name: activate nginx cache directories
+- name: create nginx cache directories
+  file:
+    path: "{{ nginx_cache_dir }}"
+    state: directory
+    owner: "{{ web_user }}"
+    group: root
+    mode: 0750
+
+- name: activate nginx cache directories in systemd
   when: nginx_cache_enable | bool
   copy:
     content: "d    {{ nginx_cache_dir }}    0750    {{ web_user }}    root    -       -"

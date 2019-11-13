@@ -43,4 +43,5 @@
     proto: tcp
   loop: "{{ web_ports }}"
   no_log: true
+  when: lin_use_firewall |bool
 ...
