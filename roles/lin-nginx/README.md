@@ -1,5 +1,9 @@
 # ivansible.lin_nginx
 
+[![Github Test Status](https://github.com/ivansible/lin-nginx/workflows/Molecule%20test/badge.svg?branch=master)](https://github.com/ivansible/lin-nginx/actions)
+[![Travis Test Status](https://travis-ci.org/ivansible/lin-nginx.svg?branch=master)](https://travis-ci.org/ivansible/lin-nginx)
+[![Ansible Galaxy](https://img.shields.io/badge/galaxy-ivansible.lin__nginx-68a.svg?style=flat)](https://galaxy.ansible.com/ivansible/lin_nginx/)
+
 This role installs `nginx` web server on linux machine
 
 
