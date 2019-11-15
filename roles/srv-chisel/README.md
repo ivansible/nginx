@@ -33,7 +33,7 @@ None
 
     - hosts: vagrant-boxes
       roles:
-         - role: srv_chisel
+         - role: ivansible.srv_chisel
            variable1: 1
            variable2: 2
 
