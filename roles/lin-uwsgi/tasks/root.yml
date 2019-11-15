@@ -52,7 +52,7 @@
 
 - name: fix permissions on uwsgi log directory
   file:
-    path: "{{ uwsgi_log_dir}}"
+    path: "{{ uwsgi_log_dir }}"
     state: directory
     owner: "{{ uwsgi_user }}"
     group: "{{ uwsgi_group }}"
