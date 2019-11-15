@@ -33,7 +33,7 @@ None
 
     - hosts: vagrant-boxes
       roles:
-         - role: srv_doh
+         - role: ivansible.srv_doh
            variable1: 1
            variable2: 2
 
