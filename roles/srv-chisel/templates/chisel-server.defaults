@@ -1,0 +1,4 @@
+CHISEL_PORT={{ srv_chisel_port }}
+CHISEL_AUTH={{ srv_chisel_username }}:{{ srv_chisel_password }}
+CHISEL_KEY={{ srv_chisel_key_seed }}
+# fingerprint {{ srv_chisel_fingerprint }}

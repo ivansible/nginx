@@ -1,0 +1,12 @@
+# ansible-managed
+[Unit]
+Description=chisel server
+
+[Service]
+{# set group to "proxy" to activate sslh iptables fix #}
+Group=proxy
+EnvironmentFile=/etc/default/chisel-server
+ExecStart=/usr/local/sbin/chisel server --port $CHISEL_PORT --auth $CHISEL_AUTH --socks5 --reverse
+
+[Install]
+WantedBy=multi-user.target

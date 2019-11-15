@@ -1,4 +1,16 @@
 ---
 # defaults file for ivansible.srv_chisel
 
+srv_chisel_port: 8888
+srv_chisel_direct: false
+srv_chisel_web_path: /secret/chisel
+
+srv_chisel_username: secret_user
+srv_chisel_password: secret_pass
+srv_chisel_key_seed: secret_seed
+srv_chisel_fingerprint: xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx
+
+srv_chisel_version: latest
+srv_chisel_binary: /usr/local/sbin/chisel
+srv_chisel_allow_reinstall: false
 ...

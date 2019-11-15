@@ -1,0 +1,34 @@
+---
+- name: detect latest chisel release
+  uri:
+    url: https://github.com/jpillora/chisel/releases/latest
+    method: HEAD
+  register: latest_chisel_release
+  when: srv_chisel_version == 'latest'
+
+- name: extract chisel version from github page
+  set_fact:
+    srv_chisel_version:
+      "{{ latest_chisel_release.url | basename | regex_replace('^v') }}"
+  when: latest_chisel_release.url is defined
+
+- name: print chisel version
+  debug:
+    msg: "latest chisel release: {{ srv_chisel_version }}"
+  run_once: true
+  when: latest_chisel_release.url is defined
+
+- name: download compressed chisel binary
+  get_url:
+    url: "{{ repo_url }}/releases/download/{{ srv_chisel_version }}/chisel_linux_amd64.gz"
+    dest: "{{ srv_chisel_binary }}.gz"
+    mode: 0755
+    force: true
+  vars:
+    repo_url: https://github.com/jpillora/chisel
+  register: result_get_chisel
+
+- name: uncompress chisel binary
+  command: gunzip -f {{ srv_chisel_binary }}.gz
+  when: result_get_chisel is changed
+...

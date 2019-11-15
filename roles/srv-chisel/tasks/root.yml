@@ -1,5 +1,55 @@
 ---
-- name: ivansible.srv_chisel root action 1
-  debug:
-    msg: action 1
+- name: check that chisel binary already exists
+  stat:
+    path: "{{ srv_chisel_binary }}"
+    get_checksum: no
+  register: stat_chisel_binary
+  tags: srv_chisel_install
+
+- name: install chisel binary
+  import_tasks: install.yml
+  when: srv_chisel_allow_reinstall or not stat_chisel_binary.stat.exists
+  tags: srv_chisel_install
+
+- name: create group for proxy processes
+  group:
+    name: proxy
+    gid: 13
+
+- name: configure chisel service
+  template:
+    src: chisel-server.defaults
+    dest: /etc/default/chisel-server
+    owner: root
+    group: proxy
+    mode: 0640
+  notify: restart chisel service
+
+- name: setup chisel service
+  template:
+    src: chisel-server.service
+    dest: /etc/systemd/system/chisel-server.service
+    mode: 0644
+  notify: restart chisel service
+
+- name: configure nginx redirector for chisel
+  template:
+    src: chisel-server.nginx.conf
+    dest: /etc/nginx/bastion.d/chisel.conf
+    mode: 0644
+  notify: reload nginx service
+
+- name: activate chisel service
+  systemd:
+    name: chisel-server
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+- name: open chisel port, if allowed
+  ufw:
+    rule: "{{ srv_chisel_direct |ternary('allow','deny') }}"
+    port: "{{ srv_chisel_port |string }}"
+    proto: tcp
+  no_log: true
 ...

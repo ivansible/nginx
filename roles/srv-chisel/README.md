@@ -1,8 +1,6 @@
 # ivansible.srv_chisel
 
-This role performs:
- - action1;
- - action2;
+This role installs [chisel](https://github.com/jpillora/chisel) server on linux.
 
 
 ## Requirements
@@ -20,13 +18,13 @@ Available variables are listed below, along with default values.
 
 ## Tags
 
-- `role1_tag1` -- action1
-- `role1_tag2` -- action2
+- `srv_chisel_all`
 
 
 ## Dependencies
 
-None
+- `ivansible.lin_nginx`
+- `ivansible.lin_shadowsocks`
 
 
 ## Example Playbook
