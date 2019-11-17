@@ -22,6 +22,10 @@
       127.0.0.1 localhost4or6
       ::1       localhost4or6
     marker: "# {mark} dual-stack target for sslh"
+    # docker does not allow atomic updates of /etc/hosts
+    # see https://github.com/ansible/ansible/issues/13981
+    # see https://docs.docker.com/network/bridge/#differences-between-user-defined-bridges-and-the-default-bridge
+    unsafe_writes: "{{ ansible_virtualization_type == 'docker' }}"
   notify: restart sslh service
 
 - name: create sslh config file

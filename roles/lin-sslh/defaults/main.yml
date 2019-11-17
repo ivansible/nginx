@@ -15,11 +15,11 @@ sslh_handle_http: true
 sslh_nonroot: "{{ ansible_kernel is version('4.3', '>') }}"
 
 # Note: transparency fails on OpenVZ
-sslh_transparent: true
+sslh_transparent: "{{ lin_use_firewall |bool }}"
 sslh_lookup_table: 100
 sslh_mark_value: 0x01
 
 sslh_listen_addresses:
   - "{{ ansible_default_ipv4.address }}"
-  - "{{ ansible_default_ipv6.address }}"
+  - "{{ ansible_default_ipv6.address |default('') }}"
 ...
