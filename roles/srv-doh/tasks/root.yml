@@ -32,6 +32,11 @@
     mode: 0644
   notify: restart rust-doh service
 
+- name: directory for nginx backend configs
+  file:
+    path: /etc/nginx/bastion.d
+    state: directory
+
 - name: configure nginx redirector for rust-doh
   template:
     src: rust-doh.nginx.conf

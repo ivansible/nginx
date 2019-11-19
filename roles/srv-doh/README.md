@@ -1,8 +1,7 @@
 # ivansible.srv_doh
 
-This role performs:
- - action1;
- - action2;
+This role installs [rust-doh](https://github.com/jedisct1/rust-doh),
+fast and secure DNS-over-HTTP server proxy, and configures nginx fronting.
 
 
 ## Requirements
