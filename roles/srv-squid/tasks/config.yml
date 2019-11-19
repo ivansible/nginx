@@ -12,8 +12,8 @@
     state: present
 
 - name: configure squid authentication
-  no_log: "{{ hide_secrets }}"
-  when: squid_auth_htpasswd | bool
+  no_log: "{{ hide_secrets |bool }}"
+  when: squid_auth_htpasswd |bool
   # crypt_scheme is MD5 because squid does not support SHA
   htpasswd:
     path: "{{ squid_etc_dir }}/users.db"

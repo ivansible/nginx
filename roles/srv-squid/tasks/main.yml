@@ -2,6 +2,7 @@
 - name: become root and install squid
   import_tasks: root.yml
   become: true
+  tags: srv_squid_all
 
 # apply squid changes now
 - meta: flush_handlers

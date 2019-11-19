@@ -113,7 +113,9 @@ tcp_outgoing_address {{rule.via}} to_{{rule.name}}
 {% endfor %}
 {% endif %}
 
+{% if squid_outgoing_ipv4 != '' %}
 tcp_outgoing_address {{ squid_outgoing_ipv4 }} !to_ipv6
+{% endif %}
 {% if squid_outgoing_ipv6 != '' %}
 tcp_outgoing_address {{ squid_outgoing_ipv6 }} to_ipv6
 {% endif %}

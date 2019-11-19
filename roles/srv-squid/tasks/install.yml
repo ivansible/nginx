@@ -8,7 +8,6 @@
     codename: "{{ ansible_lsb.codename }}"
     filename: squid-ssl
   register: squid_ssl_ppa
-  become: yes
 
 - name: remove stock squid package
   apt:
@@ -18,7 +17,6 @@
     state: absent
     purge: yes
     autoremove: yes
-  become: yes
   when: squid_ssl_ppa is changed
         and squid_pkg == 'squid-ssl'
 
@@ -29,5 +27,4 @@
     state: present
     update_cache: "{{ squid_ssl_ppa is changed }}"
     install_recommends: no
-  become: yes
 ...

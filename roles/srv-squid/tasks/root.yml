@@ -14,6 +14,10 @@
     path: /etc/hosts
     line: "127.0.0.1\t{{ item.host }}"
     state: present
+    # docker does not allow atomic updates of /etc/hosts
+    # see https://github.com/ansible/ansible/issues/13981
+    # see https://docs.docker.com/network/bridge/#differences-between-user-defined-bridges-and-the-default-bridge
+    unsafe_writes: "{{ ansible_virtualization_type == 'docker' }}"
   loop: "{{ squid_domain_rules
           | json_query('[?!!localhost]')
           | list }}"
@@ -21,47 +25,19 @@
     label: "{{ item.host }}"
   tags: srv_squid_config
 
+
 - name: configure squid
   import_tasks: config.yml
   tags: srv_squid_config
 
 - name: url-rewrite for squid
   import_tasks: url-rewrite.yml
-  when: squid_url_rewrite | length > 0
+  when: squid_url_rewrite |length > 0
   tags: srv_squid_config
 
-
-- name: open unencryped squid port, if allowed
-  ufw:
-    rule: "{{ squid_allow_unencrypted | ternary('allow','deny') }}"
-    port: "{{ squid_port |string }}"
-    proto: tcp
-  no_log: true
-  tags: srv_squid_firewall
-
-- name: open squid ssl port
-  ufw:
-    rule: allow
-    port: "{{ squid_ssl_port |string }}"
-    proto: tcp
-  no_log: true
-  when: squid_ssl_enable | bool
-  tags: srv_squid_firewall
-
-
-- name: ensure directory for iptables transparent rules
-  file:
-    path: /usr/share/iptables/rules
-    state: directory
-  tags: srv_squid_iptables
-
-- name: ensure some iptables transparent rules
-  copy:
-    # /etc/init.d/squid-ssl won't start squid if this file is absent
-    dest: /usr/share/iptables/rules/transparent.rules
-    content: ""
-    force: no
-  tags: srv_squid_iptables
+- name: firewall and iptables rules for squid
+  import_tasks: iptables.yml
+  when: lin_use_firewall |bool
 
 
 - name: stop obsolete squid service (ok to fail, if not found)

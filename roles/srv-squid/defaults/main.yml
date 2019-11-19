@@ -51,8 +51,8 @@ squid_domain_rules: []
 
 squid_outgoing_addresses: []
 
-squid_outgoing_ipv4: "{{ ansible_default_ipv4.address }}"
-squid_outgoing_ipv6: "{{ ansible_default_ipv6.address }}"
+squid_outgoing_ipv4: "{{ ansible_default_ipv4.address |default('') }}"
+squid_outgoing_ipv6: "{{ ansible_default_ipv6.address |default('') }}"
 
 squid_pac_types:
   - name: http

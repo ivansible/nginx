@@ -122,6 +122,7 @@ Example list entry:
 - `srv_squid_iptables` -- ensure that some iptables rules exist
 - `srv_squid_service` -- activate squid service
 - `srv_squid_pac` -- generate example pac files
+- `srv_squid_all` -- all of the above
 
 
 ## Dependencies
