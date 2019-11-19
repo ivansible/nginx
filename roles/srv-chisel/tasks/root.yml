@@ -32,6 +32,11 @@
     mode: 0644
   notify: restart chisel service
 
+- name: directory for nginx backend configs
+  file:
+    path: /etc/nginx/bastion.d
+    state: directory
+
 - name: configure nginx redirector for chisel
   template:
     src: chisel-server.nginx.conf
@@ -52,4 +57,5 @@
     port: "{{ srv_chisel_port |string }}"
     proto: tcp
   no_log: true
+  when: lin_use_firewall |bool
 ...
