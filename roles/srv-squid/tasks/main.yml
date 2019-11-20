@@ -1,11 +1,7 @@
 ---
-- name: refresh host facts as non-root
-  setup:
-  become: no
-
-# use import to become root globally
-- import_tasks: root.yml
-  become: yes
+- name: become root and install squid
+  import_tasks: root.yml
+  become: true
 
 # apply squid changes now
 - meta: flush_handlers
