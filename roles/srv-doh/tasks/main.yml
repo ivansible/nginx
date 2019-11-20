@@ -1,12 +1,7 @@
 ---
-- name: refresh host facts as non-root
-  setup:
-  become: no
-  tags: srv_doh_all
-
 - name: become root and install rust-doh
   import_tasks: root.yml
-  become: yes
+  become: true
   tags: srv_doh_all
 
 - name: remove rust-doh compilation files now
