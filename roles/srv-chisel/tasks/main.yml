@@ -1,11 +1,6 @@
 ---
-- name: refresh host facts as non-root
-  setup:
-  become: no
-  tags: srv_chisel_all
-
 - name: become root and install chisel
   import_tasks: root.yml
-  become: yes
+  become: true
   tags: srv_chisel_all
 ...
