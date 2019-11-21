@@ -1,14 +1,11 @@
 ---
-- name: detect target python version
-  set_fact:
-    python_ver: "{{ (ansible_python.version.major == 3)
-                  | ternary('python3','python') }}"
-
 - name: install ansible passlib bindings
   apt:
     name:
-      - "{{ python_ver }}-passlib"
-      - "{{ python_ver }}-pip"
+      - python-passlib
+      - python-pip
+      - python3-passlib
+      - python3-pip
     state: present
 
 - name: configure squid authentication

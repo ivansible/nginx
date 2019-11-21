@@ -1,14 +1,11 @@
 ---
-- name: detect target python version
-  set_fact:
-    python_ver: "{{ (ansible_python.version.major == 3)
-                  | ternary('python3','python') }}"
-
 - name: install ansible openssl bindings
   apt:
     name:
-      - "{{ python_ver }}-openssl"
-      - "{{ python_ver }}-pip"
+      - python-openssl
+      - python-pip
+      - python3-openssl
+      - python3-pip
     state: present
 
 - block:
