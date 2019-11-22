@@ -5,6 +5,11 @@ srv_doh_upstream_dns: 127.0.0.1
 srv_doh_local_port: 8053
 srv_doh_web_path: /secret/doh
 
-srv_doh_binary: /usr/local/sbin/rust-doh
+# srv_doh_deb_url and srv_doh_zip_url are mutually exclusive
+# if neither is set, doh-proxy will be compiled from source
+srv_doh_deb_url: ""
+srv_doh_zip_url: ""
+
+srv_doh_binary: /usr/bin/doh-proxy
 srv_doh_allow_reinstall: false
 ...

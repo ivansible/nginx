@@ -6,8 +6,14 @@
   register: stat_doh_binary
   tags: srv_doh_install
 
-- name: install rust-doh binary
-  import_tasks: install.yml
+- name: install rust-doh binary from zip or deb, or compile
+  include_tasks: install.yml
+  args:
+    apply:
+      tags:
+        - srv_doh_install
+        - srv_doh_all
+      become: true
   when: srv_doh_allow_reinstall |bool or not stat_doh_binary.stat.exists
   tags: srv_doh_install
 
