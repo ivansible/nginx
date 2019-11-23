@@ -1,6 +1,6 @@
 ---
 - name: install squid with ssl support
-  include_tasks: "install.yml"
+  import_tasks: install.yml
   tags: srv_squid_install
 
 
