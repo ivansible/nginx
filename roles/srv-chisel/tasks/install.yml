@@ -1,34 +1,24 @@
 ---
 - name: detect latest chisel release
-  uri:
-    url: https://github.com/jpillora/chisel/releases/latest
-    method: HEAD
+  github_release:
+    repository: jpillora/chisel
+    release: "{{ srv_chisel_version }}"
+    strip_v: true
+    creates: "{{ srv_chisel_binary }}"
+    reinstall: "{{ srv_chisel_allow_reinstall |bool }}"
+    template: "{download_url}/chisel_linux_amd64.gz"
   register: latest_chisel_release
-  when: srv_chisel_version == 'latest'
-
-- name: extract chisel version from github page
-  set_fact:
-    srv_chisel_version:
-      "{{ latest_chisel_release.url | basename | regex_replace('^v') }}"
-  when: latest_chisel_release.url is defined
-
-- name: print chisel version
-  debug:
-    msg: "latest chisel release: {{ srv_chisel_version }}"
-  run_once: true
-  when: latest_chisel_release.url is defined
 
 - name: download compressed chisel binary
   get_url:
-    url: "{{ repo_url }}/releases/download/{{ srv_chisel_version }}/chisel_linux_amd64.gz"
+    url: "{{ latest_chisel_release.url }}"
     dest: "{{ srv_chisel_binary }}.gz"
     mode: 0755
     force: true
-  vars:
-    repo_url: https://github.com/jpillora/chisel
-  register: result_get_chisel
+  when: latest_chisel_release is changed
+  register: get_chisel_result
 
 - name: uncompress chisel binary
-  command: gunzip -f {{ srv_chisel_binary }}.gz
-  when: result_get_chisel is changed
+  command: gunzip -f "{{ srv_chisel_binary }}.gz"
+  when: get_chisel_result is changed
 ...
