@@ -46,6 +46,7 @@ matrix:
         - IVATEST_FIREWALL=false
         - IVATEST_CHECK_HTTPS_HTML=true
       script:
+        # run step by step to work around no-output delay with idempotence
         - molecule lint
         - molecule destroy
         - molecule dependency
