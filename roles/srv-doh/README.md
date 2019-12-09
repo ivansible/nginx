@@ -25,7 +25,7 @@ Available variables are listed below, along with default values.
 ## Dependencies
 
 - `ivansible.lin_nginx`
-- `ivansible.lin_shadowsocks`
+- `ivansible.srv_ss`
 
 
 ## Example Playbook
