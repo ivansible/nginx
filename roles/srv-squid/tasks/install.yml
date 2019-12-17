@@ -8,6 +8,8 @@
     codename: "{{ ansible_lsb.codename }}"
     filename: squid-ssl
   register: squid_ssl_ppa
+  # fix sporadic network failure "gpg: keyserver receive failed: Connection closed in DNS"
+  until: squid_ssl_ppa is successful
 
 - name: remove stock squid package
   apt:
