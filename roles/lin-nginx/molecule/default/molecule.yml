@@ -28,9 +28,9 @@ provisioner:
     group_vars:
       molecule:
         ansible_user: ansible
-        linbase_system_locale: en_US.UTF-8
+        linsys_system_locale: en_US.UTF-8
         allow_sysctl: false
-        linbase_time_sync: false
+        linsys_time_sync: false
         lin_use_firewall: ${IVATEST_FIREWALL:-true}
         lin_use_ssh: ${IVATEST_SSH_SERVER:-true}
         lin_systemd_tmpfiles: ${IVATEST_SYSTEMD_TMPFILES:-true}
