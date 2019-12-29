@@ -4,6 +4,7 @@
   become: true
   tags: srv_squid_all
 
-# apply squid changes now
-- meta: flush_handlers
+- name: apply squid changes now
+  meta: flush_handlers
+  tags: srv_squid_all
 ...

@@ -68,7 +68,7 @@
   user:
     name: "{{ squid_user }}"
     groups: "{{ certbot_group }}"
-    append: yes
+    append: true
   notify: restart squid service
   when: certbot_group is defined
         and squid_letsencrypt_cert != '' # noqa 602

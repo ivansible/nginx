@@ -32,9 +32,10 @@ This setting is used in many places in the squid conifguration file, e.g.:
 `visible_hostname`, `ftp_user` e-mail, `cache_mgr` e-mail
 and for ldap authentication.
 
-    squid_ssl_enable: no
+    squid_ssl_enable: false
 If this flag is truthy, the script will install SSL certificate, configure SSL port in squid and open it in the firewall.
-    squid_allow_unencrypted: yes
+
+    squid_allow_unencrypted: true
 If this flag is truthy, the non-ssl ports will be open in the firewall.
 
     squid_port: 3128
@@ -52,16 +53,16 @@ If this is `squid-ssl`, a custom SSL-enabled package from `llxdev` ppa will be i
     squid_group: proxy
 Daemon will run as this Unix user/group.
 
-    squid_auth_ldap: no
+    squid_auth_ldap: false
 
-    squid_auth_htpasswd: no
+    squid_auth_htpasswd: false
     squid_proxy_users: []
 Example list entry:
 
       - user: username1
         pass: password1
 
-    squid_use_squidguard: no
+    squid_use_squidguard: false
 
     squid_cachemgr_password: secretpass
 
@@ -87,9 +88,9 @@ Example list entry:
       - name: rulename
         domain: onion
         host: tor-proxy.local
-        localhost: yes
+        localhost: true
         port: 8118
-If `localhost` is `true`, the host will be added to `/etc/hosts`
+If `localhost` is `true` then the host will be added to `/etc/hosts`
 
     squid_outgoing_addresses: []
 
@@ -136,7 +137,7 @@ Example list entry:
       roles:
          - role: ivansible.srv_squid
            squid_host: example.domain.com
-           squid_ssl_enable: yes
+           squid_ssl_enable: true
            squid_ssl_port: 443
 
 
@@ -146,4 +147,4 @@ MIT
 
 ## Author Information
 
-Created in 2018 by [IvanSible](https://github.com/ivansible)
+Created in 2018-2020 by [IvanSible](https://github.com/ivansible)

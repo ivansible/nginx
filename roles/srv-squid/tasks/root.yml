@@ -6,7 +6,7 @@
 
 - name: setup squid ssl certificate
   import_tasks: ssl.yml
-  when: squid_ssl_enable | bool
+  when: squid_ssl_enable |bool
   tags: srv_squid_ssl
 
 - name: add local upstream peers to /etc/hosts
@@ -44,20 +44,20 @@
   systemd:
     name: squid
     state: stopped
-    enabled: no
-    daemon_reload: yes
+    enabled: false
+    daemon_reload: true
   when: squid_pkg == 'squid-ssl'
         and squid_ssl_ppa is defined
         and squid_ssl_ppa is changed
-  ignore_errors: yes
+  ignore_errors: true
   tags: srv_squid_service
 
 - name: activate squid-ssl service
   systemd:
     name: "{{ squid_pkg }}"
     state: started
-    enabled: yes
-    daemon_reload: yes
+    enabled: true
+    daemon_reload: true
   tags: srv_squid_service
 
 

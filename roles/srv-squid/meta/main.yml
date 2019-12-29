@@ -20,6 +20,7 @@ galaxy_info:
     - linux
     - server
     - proxy
+    - squid
 
   github_branch: master
 ...

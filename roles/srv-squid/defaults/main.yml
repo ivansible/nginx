@@ -1,5 +1,5 @@
 ---
-# defaults file for ivansible.srv_squid
+# defaults for ivansible.srv_squid
 
 web_domain: "{{ ansible_dns.domain
               | default(ansible_fqdn | regex_replace('^[^.]+[.]', '')) }}"
@@ -11,9 +11,9 @@ web_group: www-data
 
 squid_host: "{{ ansible_fqdn }}"
 squid_port: 3128
-squid_allow_unencrypted: yes
+squid_allow_unencrypted: true
 
-squid_ssl_enable: no
+squid_ssl_enable: false
 squid_ssl_port: 3129
 squid_letsencrypt_cert: ""
 
@@ -22,9 +22,9 @@ squid_pkg: squid-ssl
 squid_user: proxy
 squid_group: proxy
 
-squid_auth_ldap: no
-squid_auth_htpasswd: no
-squid_use_squidguard: no
+squid_auth_ldap: false
+squid_auth_htpasswd: false
+squid_use_squidguard: false
 squid_cloaking: false
 
 squid_proxy_users: []

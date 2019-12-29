@@ -41,7 +41,7 @@
   template:
     src: squid.conf.j2
     dest: "{{ squid_etc_dir }}/squid.conf"
-    backup: yes
+    backup: true
     owner: root
     group: "{{ squid_group }}"
     mode: 0640
@@ -99,7 +99,7 @@
         regexp: 'squid/[1-5]([\d.]+\0)'
         replace: 'nginx/1\1'
         encoding: latin
-        backup: yes
+        backup: true
         validate: 'sh -c "exe=%s && chmod +x $exe && $exe -v"'
       register: patch_binary_result
       notify: restart squid service

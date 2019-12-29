@@ -17,8 +17,8 @@
       - squid
       - squid3
     state: absent
-    purge: yes
-    autoremove: yes
+    purge: true
+    autoremove: true
   when: squid_ssl_ppa is changed
         and squid_pkg == 'squid-ssl'
 
