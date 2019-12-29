@@ -64,18 +64,30 @@
     mode: 0754
   notify: restart sslh service
 
-- name: open tls port for sslh
+
+- name: open tls port for sslh in ufw
   ufw:
     rule: allow
-    port: "443"
+    port: '443'
     proto: tcp
-  no_log: true
+  no_log: "{{ hide_secrets |bool }}"
+  when: lin_firewall == 'ufw'
+
+- name: open tls port for sslh in ferm
+  ferm_port:
+    port: 443
+    proto: tcp
+    # actually 'sslh', but mark as 'nginx' for idempotency
+    comment: nginx
+  tags: skip_ansible_lint
+  when: lin_firewall == 'ferm'
+
 
 - name: enable and start sslh service (will be rescued if it fails)
   systemd:
     name: sslh
     state: started
-    enabled: yes
+    enabled: true
   register: sslh_service_start_result
 
 - name: determine whether nginx service runs (and possibly blocks ssl port)
@@ -108,7 +120,7 @@
         name: sslh
         # perform restart instead of start to override stuck service state
         state: started
-        enabled: yes
+        enabled: true
 
   when: sslh_service_start_result.status.ActiveState != 'active'
         and ansible_facts.services.nginx is defined

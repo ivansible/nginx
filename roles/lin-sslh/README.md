@@ -4,6 +4,7 @@ This role performs:
  - action1;
  - action2;
 
+TODO
 
 ## Requirements
 
@@ -17,12 +18,14 @@ Available variables are listed below, along with default values.
     variable1: 1
     variable2: 2
 
+TODO
 
 ## Tags
 
 - `role1_tag1` -- action1
 - `role1_tag2` -- action2
 
+TODO
 
 ## Dependencies
 
@@ -44,4 +47,4 @@ MIT
 
 ## Author Information
 
-Created in 2019 by [IvanSible](https://github.com/ivansible)
+Created in 2019-2020 by [IvanSible](https://github.com/ivansible)

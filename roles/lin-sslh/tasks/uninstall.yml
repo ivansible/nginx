@@ -3,15 +3,15 @@
   systemd:
     name: sslh
     state: stopped
-    enabled: no
-  ignore_errors: yes
-  no_log: true
+    enabled: false
+  ignore_errors: true
+  no_log: "{{ hide_secrets |bool }}"
 
 - name: remove sslh package
   apt:
     name: sslh
     state: absent
-    purge: yes
+    purge: true
 
 - name: remove sslh configuration files
   file:

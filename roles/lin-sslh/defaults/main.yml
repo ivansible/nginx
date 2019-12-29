@@ -1,5 +1,5 @@
 ---
-# defaults file for ivansible.lin_sslh
+# defaults for ivansible.lin_sslh
 
 #use_sslh: <inherited from ivansible.nxinx_base>
 
@@ -15,7 +15,7 @@ sslh_handle_http: true
 sslh_nonroot: "{{ ansible_kernel is version('4.3', '>') }}"
 
 # Note: transparency fails on OpenVZ
-sslh_transparent: "{{ lin_use_firewall |bool }}"
+sslh_transparent: "{{ lin_firewall in ['ufw', 'ferm'] }}"
 sslh_lookup_table: 100
 sslh_mark_value: 0x01
 
