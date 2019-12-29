@@ -35,13 +35,21 @@
         masked: false
         daemon_reload: true
 
-- name: open nginx ports
+- name: open nginx ports in ufw
   ufw:
     rule: allow
     # force string conversion to prevent module warning
     port: "{{ item |string }}"
     proto: tcp
   loop: "{{ web_ports }}"
-  no_log: true
-  when: lin_use_firewall |bool
+  no_log: "{{ hide_secrets |bool }}"
+  when: lin_firewall == 'ufw'
+
+- name: open nginx ports in ferm
+  ferm_port:
+    port: "{{ web_ports }}"
+    proto: tcp
+    comment: nginx
+  tags: skip_ansible_lint
+  when: lin_firewall == 'ferm'
 ...
