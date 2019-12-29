@@ -1,0 +1,22 @@
+---
+- name: open (or block) unencryped squid port in ferm
+  ferm_port:
+    port: "{{ squid_port }}"
+    proto: tcp
+    domain: "{{ squid_allow_unencrypted |bool |ternary('external','internal') }}"
+    exclusive: true
+    comment: squid unencrypted
+  tags:
+    - skip_ansible_lint
+
+- name: open (or block) squid ssl port in ferm
+  ferm_port:
+    port: "{{ squid_ssl_port }}"
+    proto: tcp
+    domain: external
+    state: "{{ squid_ssl_enable |bool |ternary('present','absent') }}"
+    comment: squid ssl
+  tags:
+    - skip_ansible_lint
+    - srv_squid_ssl
+...

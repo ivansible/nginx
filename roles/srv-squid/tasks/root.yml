@@ -35,9 +35,21 @@
   when: squid_url_rewrite |length > 0
   tags: srv_squid_config
 
-- name: firewall and iptables rules for squid
+
+- name: setup ufw firewall for squid
+  import_tasks: firewall-ufw.yml
+  tags: srv_squid_firewall
+  when: lin_firewall == 'ufw'
+
+- name: setup ferm firewall for squid
+  import_tasks: firewall-ferm.yml
+  tags: srv_squid_firewall
+  when: lin_firewall == 'ferm'
+
+- name: transparent iptables rules for squid
   import_tasks: iptables.yml
-  when: lin_use_firewall |bool
+  tags: srv_squid_iptables
+  when: lin_firewall in ['ufw', 'ferm']
 
 
 - name: stop obsolete squid service (ok to fail, if not found)

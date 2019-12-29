@@ -1,26 +1,8 @@
 ---
-- name: open unencryped squid port, if allowed
-  ufw:
-    rule: "{{ squid_allow_unencrypted | ternary('allow','deny') }}"
-    port: "{{ squid_port |string }}"
-    proto: tcp
-  no_log: "{{ hide_secrets |bool }}"
-  tags: srv_squid_firewall
-
-- name: open squid ssl port
-  ufw:
-    rule: allow
-    port: "{{ squid_ssl_port |string }}"
-    proto: tcp
-  no_log: "{{ hide_secrets |bool }}"
-  when: squid_ssl_enable |bool
-  tags: [srv_squid_firewall, srv_squid_ssl]
-
 - name: ensure directory for iptables transparent rules
   file:
     path: /usr/share/iptables/rules
     state: directory
-  tags: srv_squid_iptables
 
 - name: ensure some iptables transparent rules
   copy:
@@ -28,5 +10,4 @@
     dest: /usr/share/iptables/rules/transparent.rules
     content: ""
     force: false
-  tags: srv_squid_iptables
 ...
