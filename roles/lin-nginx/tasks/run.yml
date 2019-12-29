@@ -2,14 +2,14 @@
 - name: create cache directories before activating nginx
   include_tasks: flush-handlers.yml
 
-- name: start nginx taking care of apache
+- name: start nginx while taking care of apache
   block:
     - name: enable nginx service (will be rescued if it fails)
       systemd:
         name: nginx
         state: started
-        enabled: yes
-        daemon_reload: yes
+        enabled: true
+        daemon_reload: true
 
   rescue:
     # Note: apache2 may come pre-installed on some cheap hostings
@@ -17,10 +17,10 @@
       systemd:
         name: apache2
         state: stopped
-        enabled: no
+        enabled: false
       register: stop_apache2_result
-      ignore_errors: yes
-      no_log: true
+      ignore_errors: true
+      no_log: "{{ hide_secrets |bool }}"
 
     - name: pause a little to let http port go free in background
       pause:
@@ -31,9 +31,9 @@
       systemd:
         name: nginx
         state: started
-        enabled: yes
-        masked: no
-        daemon_reload: yes
+        enabled: true
+        masked: false
+        daemon_reload: true
 
 - name: open nginx ports
   ufw:

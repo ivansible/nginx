@@ -1,21 +1,21 @@
 ---
-# defaults file for ivansible.lin_nginx
+# defaults for ivansible.lin_nginx
 
 nginx_base_domain: "{{ web_domain }}"
 nginx_main_site: ""
 
-nginx_xframe_uri: "https://{{ nginx_main_site }}"  # uri or 'same' or 'none'
-nginx_cache_enable: yes
-nginx_behind_vpn: yes
-nginx_upload_progress: no
+nginx_xframe_uri: "https://{{ nginx_main_site }}"  # URI or 'same' or 'none'
+nginx_cache_enable: true
+nginx_behind_vpn: true
+nginx_upload_progress: false
 nginx_cloudflare_ips: []
 
 # stable or mainline repository?
-nginx_prefer_stable: no
+nginx_prefer_stable: false
 
-nginx_use_resolver: yes
+nginx_use_resolver: true
 # use fallback resolver by default
-#nginx_resolver: 8.8.8.8
+# nginx_resolver: 8.8.8.8
 
 nginx_user: "{{ web_user }}"
 nginx_group: "{{ web_group }}"

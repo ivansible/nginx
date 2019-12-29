@@ -7,7 +7,7 @@
       - "{{ nginx_base_dir }}/nginx.conf"
       - "{{ nginx_base_dir }}/nginx.conf.orig"
     creates: "{{ nginx_base_dir }}/nginx.conf.orig"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: select nginx fallback resolver on xenial
   set_fact:

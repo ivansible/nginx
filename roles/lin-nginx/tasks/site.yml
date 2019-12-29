@@ -34,7 +34,7 @@
 - name: find all configured nginx sites
   find:
     paths: "{{ nginx_site_dir }}"
-    recurse: no
+    recurse: false
     patterns: "*.conf"
   register: all_nginx_sites
 

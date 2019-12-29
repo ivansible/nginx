@@ -1,5 +1,5 @@
 ---
-# handlers file for ivansible.lin_nginx
+# handlers for ivansible.lin_nginx
 # notes:
 # - handler "restart nginx service" is defined in common role nginx_base
 # - handler "reload nginx service" is defined in common role nginx_base
@@ -9,7 +9,7 @@
   systemd:
     name: sslh
     state: restarted
-    daemon_reload: yes
-  become: yes
+    daemon_reload: true
+  become: true
   when: use_sslh |default(false) |bool
 ...

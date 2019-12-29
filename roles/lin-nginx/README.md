@@ -23,9 +23,7 @@ Unix user and group for nginx service.
     web_domain: example.com
 This is used to configure server name for default nginx site.
 
-    web_ports:
-      - 80
-      - 443
+    web_ports: [80, 443]
 These ports will be opened in the firewall.
 
     nginx_conf_dir: /etc/nginx/conf.d
@@ -54,18 +52,18 @@ will redirect to this URL.
     nginx_xframe_uri: nginx_main_site uri or 'same' or 'none'
 This setting will trigger `SAMEORIGIN` frame security policy.
 
-    nginx_cache_enable: yes
+    nginx_cache_enable: true
 This settings triggers creationg and configuration of nginx cache directories.
 
-    nginx_local_resolver: no
+    nginx_local_resolver: false
 If this is set to `true`, nginx will use to localhost dns resolver,
 usually `dnsmasq`.
 
-    nginx_behind_vpn: yes
+    nginx_behind_vpn: true
 This setting affects how nginx reports its web port to upstream services
 such as `uwsgi`.
 
-    nginx_upload_progress: no
+    nginx_upload_progress: false
 This setting activates the `upload_progress` nginx module.
 
     nginx_cloudflare_ips: []
@@ -94,14 +92,14 @@ behind the cloudflare web proxy. See:
 ## Dependencies
 
 - [ivansible.lin_base](https://github.com/ivansible/lin-base)
-  -- common ansible handlers and default parameters
+  -- common ansible handlers, default parameters and custom modules
 - [ivansible.nginx_base](https://github.com/ivansible/nginx-base)
   -- common nginx-related handlers and default parameters
 
 
 ## Example Playbook
 
-    - hosts: vag1
+    - hosts: mysite
       roles:
          - role: ivansible.lin_nginx
            web_domain: mysite.com
@@ -115,4 +113,4 @@ MIT
 
 ## Author Information
 
-Created in 2018 by [IvanSible](https://github.com/ivansible)
+Created in 2018-2020 by [IvanSible](https://github.com/ivansible)

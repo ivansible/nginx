@@ -7,7 +7,7 @@
   apt_repository:
     repo: deb http://nginx.org/packages/{{ repo_path }}/ {{ codename }} nginx
     filename: nginx
-    update_cache: yes
+    update_cache: true
   vars:
     repo_path: "{{ nginx_prefer_stable |bool |ternary('ubuntu', 'mainline/ubuntu') }}"
     codename: "{{ ansible_lsb.codename }}"

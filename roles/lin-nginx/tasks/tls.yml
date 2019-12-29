@@ -23,7 +23,7 @@
   loop:
     - "{{ nginx_ssl_cert }}"
     - "{{ nginx_ssl_key }}"
-  when: nginx_ssl_cert != '' or nginx_ssl_key != '' # noqa 602
+  when: nginx_ssl_cert != '' or nginx_ssl_key != ''  # noqa 602
 
 - name: directory for letsencrypt post-renewal hooks
   file:
