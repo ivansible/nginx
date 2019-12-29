@@ -1,5 +1,5 @@
 ---
-# defaults file for ivansible.srv_chisel
+# defaults for ivansible.srv_chisel
 
 srv_chisel_port: 8888
 srv_chisel_direct: false

@@ -43,11 +43,21 @@
     enabled: true
     daemon_reload: true
 
-- name: open chisel port, if allowed
+- name: open (or block) chisel port in ufw
   ufw:
-    rule: "{{ srv_chisel_direct |ternary('allow','deny') }}"
     port: "{{ srv_chisel_port |string }}"
     proto: tcp
-  no_log: true
-  when: lin_use_firewall |bool
+    rule: "{{ srv_chisel_direct |bool |ternary('allow','deny') }}"
+  no_log: "{{ hide_secrets |bool }}"
+  when: lin_firewall == 'ufw'
+
+- name: open (or block) chisel port in ferm
+  ferm_port:
+    port: "{{ srv_chisel_port }}"
+    proto: tcp
+    domain: "{{ srv_chisel_direct |bool |ternary('external','internal') }}"
+    exclusive: true
+    comment: chisel
+  tags: skip_ansible_lint
+  when: lin_firewall == 'ferm'
 ...

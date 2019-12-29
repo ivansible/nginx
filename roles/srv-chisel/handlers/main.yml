@@ -1,10 +1,10 @@
 ---
-# handlers file for ivansible.srv_chisel
+# handlers for ivansible.srv_chisel
 
 - name: restart chisel service
   systemd:
     name: chisel-server
     state: restarted
-    daemon_reload: yes
-  become: yes
+    daemon_reload: true
+  become: true
 ...
