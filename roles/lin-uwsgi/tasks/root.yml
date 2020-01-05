@@ -35,7 +35,7 @@
       - "{{ uwsgi_ini_file }}"
       - "{{ uwsgi_ini_file }}.orig"
     creates: "{{ uwsgi_ini_file }}.orig"
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: create main uwsgi configuration file
   template:
@@ -69,8 +69,8 @@
   systemd:
     name: uwsgi-emperor
     state: started
-    enabled: yes
-    daemon_reload: yes
+    enabled: true
+    daemon_reload: true
 
 - name: restart uwsgi now
   meta: flush_handlers

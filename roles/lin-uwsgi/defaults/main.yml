@@ -1,5 +1,5 @@
 ---
-# defaults file for ivansible.lin_uwsgi
+# defaults for ivansible.lin_uwsgi
 
 uwsgi_ini_file: "{{ uwsgi_base }}/emperor.ini"
 uwsgi_log_dir: /var/log/uwsgi
