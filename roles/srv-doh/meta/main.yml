@@ -6,7 +6,7 @@ dependencies:
 galaxy_info:
   role_name: srv_doh
   author: "Ivan Andreev"
-  description: "install rust-dog dns proxy on linux"
+  description: "install rust-doh DNS-over-HTTPS proxy on linux"
   company: "IvanSible"
   license: MIT
   min_ansible_version: 2.5
@@ -19,7 +19,10 @@ galaxy_info:
 
   galaxy_tags:
     - linux
-    - ansible
+    - rust
+    - dns
+    - doh
+    - proxy
 
   github_branch: master
 ...

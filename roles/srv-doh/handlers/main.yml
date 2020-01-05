@@ -1,16 +1,16 @@
 ---
-# handlers file for ivansible.srv_doh
+# handlers for ivansible.srv_doh
 
 - name: restart rust-doh service
   systemd:
     name: rust-doh
     state: restarted
-    daemon_reload: yes
-  become: yes
+    daemon_reload: true
+  become: true
 
 - name: remove rust-doh compilation files
   file:
     path: /root/.cargo
     state: absent
-  become: yes
+  become: true
 ...

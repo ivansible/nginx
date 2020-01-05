@@ -1,5 +1,5 @@
 ---
-# defaults file for ivansible.srv_doh
+# defaults for ivansible.srv_doh
 
 srv_doh_upstream_dns: 127.0.0.1
 srv_doh_local_port: 8053

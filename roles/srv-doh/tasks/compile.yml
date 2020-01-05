@@ -13,7 +13,7 @@
   copy:
     src: /root/.cargo/bin/doh-proxy
     dest: "{{ srv_doh_binary }}"
-    remote_src: yes
+    remote_src: true
     mode: 0755
   notify: remove rust-doh compilation files
 ...

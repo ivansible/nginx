@@ -2,7 +2,7 @@
 - name: check that rust-doh binary already exists
   stat:
     path: "{{ srv_doh_binary }}"
-    get_checksum: no
+    get_checksum: false
   register: stat_doh_binary
   tags: srv_doh_install
 
@@ -54,6 +54,6 @@
   systemd:
     name: rust-doh
     state: started
-    enabled: yes
-    daemon_reload: yes
+    enabled: true
+    daemon_reload: true
 ...

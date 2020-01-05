@@ -30,7 +30,7 @@ Available variables are listed below, along with default values.
 
 ## Example Playbook
 
-    - hosts: vagrant-boxes
+    - hosts: server
       roles:
          - role: ivansible.srv_doh
            variable1: 1
@@ -43,4 +43,4 @@ MIT
 
 ## Author Information
 
-Created in 2019 by [IvanSible](https://github.com/ivansible)
+Created in 2019-2020 by [IvanSible](https://github.com/ivansible)
