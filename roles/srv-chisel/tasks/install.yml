@@ -7,6 +7,7 @@
     creates: "{{ srv_chisel_binary }}"
     reinstall: "{{ srv_chisel_allow_reinstall |bool }}"
     template: "{download_url}/chisel_linux_amd64.gz"
+  tags: skip_ansible_lint
   register: latest_chisel_release
 
 - name: download compressed chisel binary

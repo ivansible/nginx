@@ -20,6 +20,7 @@ galaxy_info:
   galaxy_tags:
     - linux
     - proxy
+    - chisel
 
   github_branch: master
 ...
