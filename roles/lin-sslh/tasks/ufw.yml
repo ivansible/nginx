@@ -1,0 +1,17 @@
+---
+- name: install sslh helper for ufw
+  template:
+    src: ufw-helper.sh
+    dest: /usr/local/sbin/sslh-helper-ufw.sh
+    owner: root
+    group: sslh
+    mode: 0754
+  notify: restart sslh service
+
+- name: open tls port for sslh in ufw
+  ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+  no_log: "{{ hide_secrets |bool }}"
+...

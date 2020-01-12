@@ -7,6 +7,17 @@
   ignore_errors: true
   no_log: "{{ hide_secrets |bool }}"
 
+- name: remove sslh snippet from ferm
+  ferm_rule:
+    name: sslh
+    hook: custom
+    state: absent
+    # reload: false
+  tags:
+    - lin_sslh_firewall
+    - skip_ansible_lint
+  when: lin_firewall == 'ferm'
+
 - name: remove sslh package
   apt:
     name: sslh
@@ -22,6 +33,6 @@
     - /etc/sslh.cfg
     - /etc/systemd/system/sslh.service
     - /etc/systemd/system/sslh.service.d
-    - /usr/local/sbin/sslh-helper-proxy-fix.sh
-    - /usr/local/sbin/sslh-helper-transparent.sh
+    - /usr/local/sbin/sslh-helper-ufw.sh
+    - /usr/local/sbin/sslh-helper-iptables.sh  # obsolete
 ...

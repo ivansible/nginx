@@ -1,0 +1,22 @@
+---
+- name: remove sslh helper for ufw
+  file:
+    path: /usr/local/sbin/sslh-helper-ufw.sh
+    state: absent
+
+- name: add sslh snippet to ferm (transparent rules)
+  ferm_rule:
+    name: sslh
+    prio: 40
+    hook: custom
+    rule: "{{ lookup('template', 'sslh.ferm') }}"
+  tags: skip_ansible_lint
+
+- name: open tls port for sslh in ferm
+  ferm_port:
+    port: 443
+    proto: tcp
+    # actually 'sslh', but mark as 'nginx' for idempotency
+    comment: nginx
+  tags: skip_ansible_lint
+...

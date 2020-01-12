@@ -1,0 +1,42 @@
+# SSLH Transparent Routing
+
+@def $sslh_uid  = sslh;
+@def $sslh_mask = 0x0f;
+@def $sslh_mark = {{ sslh_mark_value }};
+@def $sslh_rt   = {{ sslh_lookup_table }};
+
+# Allow sslh to use localhost as destination
+@hook pre "sysctl -q -w net.ipv4.conf.default.route_localnet=1";
+@hook pre "sysctl -q -w net.ipv4.conf.all.route_localnet=1";
+
+domain (ip ip6) {
+  # Drop martian packets as they would have been if route_localnet was zero
+  # Packets not leaving the server aren't affected by this
+  @if @eq($DOMAIN,ip)  @def $lo_ip = 127.0.0.0/8;
+  @if @eq($DOMAIN,ip6) @def $lo_ip = ::1/128;
+  table raw    chain PREROUTING  interface !lo daddr $lo_ip DROP;
+  table mangle chain POSTROUTING outerface !lo saddr $lo_ip DROP;
+
+  # Mark all connections made by sslh for special treatment
+  table nat chain OUTPUT
+        proto tcp syn mod owner uid-owner $sslh_uid
+        CONNMARK set-xmark "$sslh_mark/$sslh_mask";
+
+  # Mark (ctmark -> fwmark) outgoing packets destined to sslh for rerouting
+  table mangle chain OUTPUT
+        proto tcp outerface !lo mod connmark mark "$sslh_mark/$sslh_mask"
+        CONNMARK restore-mark mask $sslh_mask;
+}
+
+# Set routing for marked IPv4/IPv6 packets
+@hook post  "ip -4 route replace local  0/0 dev lo table $sslh_rt";
+@hook post  "ip -6 route replace local ::/0 dev lo table $sslh_rt";
+# Workaround for the absense of "ip rule replace" ($sslh_mark must be hexadecimal)
+@def $sslh_routing = "fwmark $sslh_mark lookup $sslh_rt";
+@hook post  "ip -4 rule ls |grep -q 'from all $sslh_routing' || ip -4 rule add $sslh_routing";
+@hook post  "ip -6 rule ls |grep -q 'from all $sslh_routing' || ip -6 rule add $sslh_routing";
+# Flush route rules
+@hook flush "ip -4 route del local   0/0 dev lo table  $sslh_rt 2>/dev/null";
+@hook flush "ip -6 route del local  ::/0 dev lo table  $sslh_rt 2>/dev/null";
+@hook flush "ip -4 rule  del $sslh_routing 2>/dev/null";
+@hook flush "ip -6 rule  del $sslh_routing 2>/dev/null";

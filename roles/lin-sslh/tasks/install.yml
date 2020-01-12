@@ -15,6 +15,7 @@
     state: present
   when: ansible_lsb.codename == 'bionic'
 
+
 - name: add dual ipv4/ipv6 localhost in /etc/hosts as sslh target
   blockinfile:
     path: /etc/hosts
@@ -37,16 +38,27 @@
     mode: 0640
   notify: restart sslh service
 
-- name: override sslh service settings
-  template:
-    src: sslh.service
-    dest: /etc/systemd/system/sslh.service
-    owner: root
-    group: sslh
-    mode: 0640
-  notify: restart sslh service
 
-- name: configure helper parameters for sslh
+- name: configure ufw firewall for sslh
+  include_tasks: ufw.yml
+  args:
+    apply:
+      become: true
+      tags: lin_sslh_firewall
+  when: lin_firewall == 'ufw'
+  tags: lin_sslh_firewall
+
+- name: configure ferm firewall for sslh
+  include_tasks: ferm.yml
+  args:
+    apply:
+      become: true
+      tags: lin_sslh_firewall
+  when: lin_firewall == 'ferm'
+  tags: lin_sslh_firewall
+
+
+- name: configure sslh service and helper parameters
   template:
     src: sslh.defaults
     dest: /etc/default/sslh
@@ -54,41 +66,27 @@
     group: sslh
     mode: 0640
   notify: restart sslh service
+  tags: lin_sslh_firewall
 
-- name: install iptables helper for sslh
-  copy:
-    src: iptables-helper.sh
-    dest: /usr/local/sbin/sslh-helper-iptables.sh
+- name: override sslh service config
+  template:
+    src: sslh.service
+    dest: /etc/systemd/system/sslh.service
     owner: root
     group: sslh
-    mode: 0754
+    mode: 0640
+  register: sslh_service_config_result
   notify: restart sslh service
-
-
-- name: open tls port for sslh in ufw
-  ufw:
-    rule: allow
-    port: '443'
-    proto: tcp
-  no_log: "{{ hide_secrets |bool }}"
-  when: lin_firewall == 'ufw'
-
-- name: open tls port for sslh in ferm
-  ferm_port:
-    port: 443
-    proto: tcp
-    # actually 'sslh', but mark as 'nginx' for idempotency
-    comment: nginx
-  tags: skip_ansible_lint
-  when: lin_firewall == 'ferm'
-
+  tags: lin_sslh_firewall
 
 - name: enable and start sslh service (will be rescued if it fails)
   systemd:
     name: sslh
     state: started
     enabled: true
+    daemon_reload: "{{ sslh_service_config_result is changed }}"
   register: sslh_service_start_result
+
 
 - name: determine whether nginx service runs (and possibly blocks ssl port)
   service_facts:

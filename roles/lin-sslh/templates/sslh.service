@@ -3,13 +3,16 @@
 Description=SSL/SSH multiplexer improved
 After=network.target
 After=ufw.target
+After=ferm.service
 
 [Service]
 ExecStart=/usr/sbin/sslh -f -F /etc/sslh.cfg
 KillMode=process
+{% if lin_firewall == 'ufw' %}
 EnvironmentFile=/etc/default/sslh
-ExecStartPre=/usr/local/sbin/sslh-helper-iptables.sh restart
-ExecStopPost=/usr/local/sbin/sslh-helper-iptables.sh stop
+ExecStartPre=/usr/local/sbin/sslh-helper-ufw.sh restart
+ExecStopPost=/usr/local/sbin/sslh-helper-ufw.sh stop
+{% endif %}
 
 {% with comment = sslh_nonroot |bool |ternary('','#') %}
 # Note: non-root mode and ambient capabilities require kernel 4.3+

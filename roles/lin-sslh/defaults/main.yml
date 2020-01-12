@@ -17,7 +17,8 @@ sslh_nonroot: "{{ ansible_kernel is version('4.3', '>') }}"
 # Note: transparency fails on OpenVZ
 sslh_transparent: "{{ lin_firewall in ['ufw', 'ferm'] }}"
 sslh_lookup_table: 100
-sslh_mark_value: 0x01
+# Note: the mark must literally match the output of "ip rule ls" (hexadecimal)
+sslh_mark_value: '0x1'
 
 sslh_listen_addresses:
   - "{{ ansible_default_ipv4.address }}"
