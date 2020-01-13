@@ -9,7 +9,7 @@
 @hook pre "sysctl -q -w net.ipv4.conf.default.route_localnet=1";
 @hook pre "sysctl -q -w net.ipv4.conf.all.route_localnet=1";
 
-domain (ip ip6) {
+domain $ip_all {
   # Drop martian packets as they would have been if route_localnet was zero
   # Packets not leaving the server aren't affected by this
   @if @eq($DOMAIN,ip)  @def $lo_ip = 127.0.0.0/8;
@@ -29,14 +29,14 @@ domain (ip ip6) {
 }
 
 # Set routing for marked IPv4/IPv6 packets
-@hook post  "ip -4 route replace local  0/0 dev lo table $sslh_rt";
-@hook post  "ip -6 route replace local ::/0 dev lo table $sslh_rt";
+@if $do_ipv4 @hook post  "ip -4 route replace local  0/0 dev lo table $sslh_rt";
+@if $do_ipv6 @hook post  "ip -6 route replace local ::/0 dev lo table $sslh_rt";
 # Workaround for the absense of "ip rule replace" ($sslh_mark must be hexadecimal)
 @def $sslh_routing = "fwmark $sslh_mark lookup $sslh_rt";
-@hook post  "ip -4 rule ls |grep -q 'from all $sslh_routing' || ip -4 rule add $sslh_routing";
-@hook post  "ip -6 rule ls |grep -q 'from all $sslh_routing' || ip -6 rule add $sslh_routing";
+@if $do_ipv4 @hook post  "ip -4 rule ls |grep -q 'from all $sslh_routing' || ip -4 rule add $sslh_routing";
+@if $do_ipv6 @hook post  "ip -6 rule ls |grep -q 'from all $sslh_routing' || ip -6 rule add $sslh_routing";
 # Flush route rules
-@hook flush "ip -4 route del local   0/0 dev lo table  $sslh_rt 2>/dev/null";
-@hook flush "ip -6 route del local  ::/0 dev lo table  $sslh_rt 2>/dev/null";
-@hook flush "ip -4 rule  del $sslh_routing 2>/dev/null";
-@hook flush "ip -6 rule  del $sslh_routing 2>/dev/null";
+@if $do_ipv4 @hook flush "ip -4 route del local   0/0 dev lo table  $sslh_rt 2>/dev/null";
+@if $do_ipv6 @hook flush "ip -6 route del local  ::/0 dev lo table  $sslh_rt 2>/dev/null";
+@if $do_ipv4 @hook flush "ip -4 rule  del $sslh_routing 2>/dev/null";
+@if $do_ipv6 @hook flush "ip -6 rule  del $sslh_routing 2>/dev/null";
