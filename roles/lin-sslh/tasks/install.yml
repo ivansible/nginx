@@ -74,7 +74,7 @@
     dest: /etc/systemd/system/sslh.service
     owner: root
     group: sslh
-    mode: 0640
+    mode: 0644
   register: sslh_service_config_result
   notify: restart sslh service
   tags: lin_sslh_firewall
