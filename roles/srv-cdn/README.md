@@ -17,21 +17,19 @@ None
 Available variables are listed below, along with default values.
 
     srv_mirror_mirrors:
-      - server: default
+      - server: .mydomain.com
         origin: www.example.com
-`srv_mirror_mirrors` is an array of records with the following fields:
+This is an array of records with the following fields:
+`server` - font server name, can be `full.host.name` or `.domain.name`,
+`origin` - host name of an origin server, which must support https.
 
-    server
-Front server name, which can be `default` (must go first)
-or `full.host.name` or `.domain.name`.
-
-    origin
-Host name of an origin server, which must support https.
+    srv_mirror_default_origin: example.com
+The fallback origin.
 
     srv_mirror_filters:
       - src: ...
         dst: ...
-Apply these replacements to HTML.
+These replacements will be applied to HTML.
 
 
 ## Tags

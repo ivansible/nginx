@@ -1,15 +1,13 @@
 ---
 # defaults for ivansible.srv_mirror
 
-srv_mirror_default_origin: www.example.com
+srv_mirror_default_origin: example.com
 
 srv_mirror_mirrors:
-  # `server` is a front server name, which can be
-  # 'default' (must go first) or full.host.name or .domain.name
-  # `origin` is host name of an origin server, which must support https
-  - server: default
-    origin: "{{ srv_mirror_default_origin }}"
-  # other mirrors go here...
+  ## server - front server name, can be full.host.name or .domain.name
+  ## origin - host name of origin server, which must support https
+  - server: .mydomain.com
+    origin: www.example.com
 
 srv_mirror_filters:
   # fix viewport for mobile devices:
