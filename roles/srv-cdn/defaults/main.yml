@@ -1,3 +1,10 @@
 ---
 # defaults for ivansible.srv_mirror
+
+srv_mirror_mirrors:
+  # `server` is a front server name, which can be
+  # 'default' (must go first) or full.host.name or .domain.name
+  # `origin` is host name of an origin server, which must support https
+  - server: default
+    origin: www.example.com
 ...

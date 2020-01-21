@@ -1,6 +1,20 @@
 ---
-- name: become root and install role
-  import_tasks: root.yml
+- name: directory for nginx backend configurations
+  file:
+    path: /etc/nginx/bastion.d
+    state: directory
   become: true
-  tags: role_all
+  tags: srv_mirror_all
+
+- name: configure site mirroring
+  template:
+    src: mirrors.conf
+    dest: /etc/nginx/sites-enabled/mirrors.conf
+  become: true
+  notify: reload nginx service
+  tags: srv_mirror_all
+
+- name: apply new nginx settings
+  meta: flush_handlers
+  tags: srv_mirror_all
 ...

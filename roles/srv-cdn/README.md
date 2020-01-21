@@ -4,9 +4,7 @@
 [![Travis Test Status](https://travis-ci.org/ivansible/srv-mirror.svg?branch=master)](https://travis-ci.org/ivansible/srv-mirror)
 [![Ansible Galaxy](https://img.shields.io/badge/galaxy-ivansible.srv__mirror-68a.svg?style=flat)](https://galaxy.ansible.com/ivansible/srv_mirror/)
 
-This role will:
- - action1;
- - action2;
+This role configures site mirroring in nginx.
 
 
 ## Requirements
@@ -18,28 +16,35 @@ None
 
 Available variables are listed below, along with default values.
 
-    variable1: 1
-    variable2: 2
+    srv_mirror_mirrors:
+      - server: default
+        origin: www.example.com
+`srv_mirror_mirrors` is an array of records with the following fields:
+
+    server
+Front server name, which can be `default` (must go first)
+or `full.host.name` or `.domain.name`.
+
+    origin
+Host name of an origin server, which must support https.
 
 
 ## Tags
 
-- `role1_tag1` -- action1
-- `role1_tag2` -- action2
+- `srv_mirror_all`
 
 
 ## Dependencies
 
-None
+- `ivansible.nginx_base` - inherit defaults and handlers
+- `ivansible.lin_nginx`  (implicit dependency)
 
 
 ## Example Playbook
 
-    - hosts: vagrant-boxes
+    - hosts: myserver
       roles:
-         - role: srv_mirror
-           variable1: 1
-           variable2: 2
+         - role: ivansible.srv_cdn
 
 
 ## License
