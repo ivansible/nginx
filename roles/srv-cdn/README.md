@@ -28,6 +28,11 @@ or `full.host.name` or `.domain.name`.
     origin
 Host name of an origin server, which must support https.
 
+    srv_mirror_filters:
+      - src: ...
+        dst: ...
+Apply these replacements to HTML.
+
 
 ## Tags
 
