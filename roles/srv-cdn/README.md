@@ -6,6 +6,10 @@
 
 This role configures site mirroring in nginx.
 
+A request can have two optional HTTP headers:
+`X-Mirror-Front` - desired front host, and
+`X-Mirror-Back` - desired origin host.
+
 
 ## Requirements
 
