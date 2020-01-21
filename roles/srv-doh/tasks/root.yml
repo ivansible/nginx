@@ -40,13 +40,13 @@
 
 - name: directory for nginx backend configs
   file:
-    path: /etc/nginx/bastion.d
+    path: /etc/nginx/mixin.d
     state: directory
 
 - name: configure nginx redirector for rust-doh
   template:
     src: rust-doh.nginx.conf
-    dest: /etc/nginx/bastion.d/rust-doh.conf
+    dest: /etc/nginx/mixin.d/rust-doh.conf
     mode: 0644
   notify: reload nginx service
 
