@@ -23,8 +23,7 @@ Available variables are listed below, along with default values.
 
 ## Dependencies
 
-- `ivansible.lin_nginx`
-- `ivansible.srv_ss`
+- `ivansible.srv_cdn`
 
 
 ## Example Playbook

@@ -1,7 +1,6 @@
 ---
 dependencies:
-  - ivansible.lin_nginx
-  - ivansible.srv_ss
+  - ivansible.srv_cdn  # prepare nginx
 
 galaxy_info:
   role_name: srv_chisel

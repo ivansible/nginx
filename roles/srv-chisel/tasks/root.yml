@@ -26,13 +26,13 @@
 
 - name: directory for nginx backend configs
   file:
-    path: /etc/nginx/bastion.d
+    path: /etc/nginx/mixin.d
     state: directory
 
 - name: configure nginx redirector for chisel
   template:
     src: chisel-server.nginx.conf
-    dest: /etc/nginx/bastion.d/chisel.conf
+    dest: /etc/nginx/mixin.d/chisel.conf
     mode: 0644
   notify: reload nginx service
 
