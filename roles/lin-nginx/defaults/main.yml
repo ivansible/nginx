@@ -9,6 +9,7 @@ nginx_cache_enable: true
 nginx_behind_vpn: true
 nginx_upload_progress: false
 nginx_cloudflare_ips: []
+nginx_cloudfront_ips: []
 
 # stable or mainline repository?
 nginx_prefer_stable: false
