@@ -1,8 +1,8 @@
 ---
-- name: configure cloudfront mirrors
+- name: configure cloudfront distributions
   cloudfront_distribution:
-    aws_access_key: "{{ srv_mirror_cloudfront_access_key |default(omit, true) }}"
-    aws_secret_key: "{{ srv_mirror_cloudfront_secret_key |default(omit, true) }}"
+    aws_access_key: "{{ srv_cdn_cloudfront_access_key |default(omit, true) }}"
+    aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |default(omit, true) }}"
 
     caller_reference: "{{ reference }}"
     state: "{{ enabled |ternary('present','absent') }}"
@@ -31,15 +31,15 @@
       viewer_protocol_policy: redirect-to-https
       allowed_methods:
         items: [GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE]
-        cached_methods: "{{ srv_mirror_cloudfront_cached_methods }}"
+        cached_methods: "{{ srv_cdn_cloudfront_cached_methods }}"
       forwarded_values:
         headers: "{{ cache_headers }}"
         cookies:
           forward: all
         query_string: true
       min_ttl: 0
-      max_ttl: "{{ srv_mirror_cloudfront_max_ttl }}"
-      default_ttl: "{{ srv_mirror_cloudfront_default_ttl }}"
+      max_ttl: "{{ srv_cdn_cloudfront_max_ttl }}"
+      default_ttl: "{{ srv_cdn_cloudfront_default_ttl }}"
       smooth_streaming: false
       compress: false
 
@@ -62,79 +62,79 @@
     comment: "{{ '%s - %s%s' % (reference, server, (' - ' + origin) if origin else '') }}"
 
     reference: "{{ item.reference
-                 | default(srv_mirror_cloudfront_default_reference)
+                 | default(srv_cdn_cloudfront_default_reference)
                  | regex_replace('SERVER', server) }}"
 
     enabled: "{{ not(item.delete |default(false) |bool) }}"
-    cache_enabled: "{{ item.cache |default(srv_mirror_cloudfront_default_cache) |bool }}"
+    cache_enabled: "{{ item.cache |default(srv_cdn_cloudfront_default_cache) |bool }}"
     cache_headers: "{{ [] if cache_enabled else ['*'] }}"
 
     ## note: sort headers and skip empty ones to gain idempotence
     headers_dict:
-      X-Mirror-Front: "{{ '' if origin else server }}"
-      X-Mirror-Back: "{{ origin }}"
+      X-CDN-Front: "{{ '' if origin else server }}"
+      X-CDN-Back: "{{ origin }}"
     headers_list: "{{ headers_dict
                     | dict2items(key_name='header_name', value_name='header_value')
                     | selectattr('header_value')
                     | sort(attribute='header_name', reverse=true)
                     | list }}"
 
-  loop: "{{ srv_mirror_cloudfront }}"
-  register: mirror_cloudfront_results
-  until: mirror_cloudfront_results is successful
+  loop: "{{ srv_cdn_cloudfront }}"
+  register: cdn_cloudfront_results
+  until: cdn_cloudfront_results is successful
   ## run on every host to account for per-server distributions
   # run_once: true
   tags:
-    - srv_mirror_cloudfront
-    - srv_mirror_all
+    - srv_cdn_cloudfront
+    - srv_cdn_all
 
 
-- name: gather cloudfront mirror URLs
+- name: gather cloudfront distribution URLs
   set_fact:
-    cloudfront_mirrors: "{{ mirror_cloudfront_results |default({}) |json_query(query) }}"
+    cdn_cloudfront_sites: "{{ cdn_cloudfront_results |default({}) |json_query(query) }}"
   vars:
     fields:
       comment: comment
       id: id
-      origin: 'origins.items[0].custom_headers.items[?header_name==`X-Mirror-Back`]|[0].header_value'
+      origin: 'origins.items[0].custom_headers.items[?header_name==`X-CDN-Back`]|[0].header_value'
       server: 'origins.items[0].domain_name'
       url: domain_name
     ## generate query from output fields on the fly
     query: "results[?!!id].{ {{ fields |dictsort |map('join',': ') |join(', ') }} }"
   tags:
-    - srv_mirror_cloudfront
-    - srv_mirror_nginx
-    - srv_mirror_all
+    - srv_cdn_cloudfront
+    - srv_cdn_nginx
+    - srv_cdn_all
 
-- name: report cloudfront mirror distributions
+- name: report cloudfront distributions
   debug:
-    msg: "{{ cloudfront_mirrors }}"
+    msg: "{{ cdn_cloudfront_sites }}"
   tags:
-    - srv_mirror_cloudfront
-    - srv_mirror_all
+    - srv_cdn_cloudfront
+    - srv_cdn_all
 
 
-- name: create directory for nginx backend configurations
+- name: create directory for nginx mix-in configurations
   file:
-    path: /etc/nginx/bastion.d
+    path: /etc/nginx/mixin.d
     state: directory
   become: true
   tags:
-    - srv_mirror_nginx
-    - srv_mirror_all
+    - srv_cdn_nginx
+    - srv_cdn_all
 
-- name: configure nginx site mirroring
+- name: configure simple nginx CDN
   template:
-    src: mirrors.conf
-    dest: /etc/nginx/sites-enabled/mirrors.conf
+    src: cdn.conf
+    dest: /etc/nginx/sites-enabled/cdn.conf
   become: true
   notify: reload nginx service
   tags:
-    - srv_mirror_nginx
-    - srv_mirror_all
+    - srv_cdn_nginx
+    - srv_cdn_all
 
 - name: apply new nginx settings
   meta: flush_handlers
   tags:
-    - srv_mirror_all
+    - srv_cdn_all
 ...

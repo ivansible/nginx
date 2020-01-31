@@ -4,9 +4,9 @@ dependencies:
   # ivansible.lin_nginx (implicit dependency)
 
 galaxy_info:
-  role_name: srv_mirror
+  role_name: srv_cdn
   author: "Ivan Andreev"
-  description: "implement nginx-based site mirroring"
+  description: "simple nginx-based CDN"
   company: "IvanSible"
   license: MIT
   min_ansible_version: 2.5
@@ -20,6 +20,7 @@ galaxy_info:
   galaxy_tags:
     - linux
     - nginx
+    - cdn
 
   github_branch: master
 ...

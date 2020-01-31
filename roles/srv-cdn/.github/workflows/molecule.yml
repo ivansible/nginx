@@ -10,7 +10,7 @@ on:
   pull_request:
 
 env:
-  ROLE_NAME: ivansible.srv_mirror
+  ROLE_NAME: ivansible.srv_cdn
   ANSIBLE_FORCE_COLOR: true
 
 jobs:

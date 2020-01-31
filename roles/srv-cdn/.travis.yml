@@ -9,7 +9,7 @@ os: linux
 
 env:
   global:
-    - ROLE_NAME=ivansible.srv_mirror
+    - ROLE_NAME=ivansible.srv_cdn
     - IVATEST_SSH_SERVER=true
 
 before_install:
