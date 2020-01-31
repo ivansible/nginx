@@ -1,120 +1,12 @@
 ---
-- name: configure cloudfront distributions
-  cloudfront_distribution:
-    aws_access_key: "{{ srv_cdn_cloudfront_access_key |default(omit, true) }}"
-    aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |default(omit, true) }}"
-
-    caller_reference: "{{ reference }}"
-    state: "{{ enabled |ternary('present','absent') }}"
-    enabled: "{{ enabled }}"
-    comment: "{{ comment }}"
-
-    http_version: http2
-    ipv6_enabled: true
-    price_class: PriceClass_100
-
-    origins:
-      - id: "{{ reference }}"
-        domain_name: "{{ server }}"
-        custom_origin_config:
-          origin_ssl_protocols:
-            items: [TLSv1.2]
-          origin_protocol_policy: https-only
-          origin_read_timeout: 30
-          origin_keepalive_timeout: 5
-          http_port: 80
-          https_port: 443
-        custom_headers: "{{ headers_list }}"
-
-    default_cache_behavior:
-      target_origin_id: "{{ reference }}"
-      viewer_protocol_policy: redirect-to-https
-      allowed_methods:
-        items: [GET, HEAD, POST, OPTIONS, PUT, PATCH, DELETE]
-        cached_methods: "{{ srv_cdn_cloudfront_cached_methods }}"
-      forwarded_values:
-        headers: "{{ cache_headers }}"
-        cookies:
-          forward: all
-        query_string: true
-      min_ttl: 0
-      max_ttl: "{{ srv_cdn_cloudfront_max_ttl }}"
-      default_ttl: "{{ srv_cdn_cloudfront_default_ttl }}"
-      smooth_streaming: false
-      compress: false
-
-    logging:
-      enabled: false
-      include_cookies: false
-      bucket: ""
-      prefix: ""
-
-  delegate_to: localhost
-  ## delegate to ansible's own python on controller
-  ## ansible on controller should use python3
-  ## ansible's python3 should have boto3 installed
-
-  vars:
-    ansible_python_interpreter: python3
-
-    server: "{{ item.server }}"
-    origin: "{{ item.origin |default('', true) }}"
-    comment: "{{ '%s - %s%s' % (reference, server, (' - ' + origin) if origin else '') }}"
-
-    reference: "{{ item.reference
-                 | default(srv_cdn_cloudfront_default_reference)
-                 | regex_replace('SERVER', server) }}"
-
-    enabled: "{{ not(item.delete |default(false) |bool) }}"
-    cache_enabled: "{{ item.cache |default(srv_cdn_cloudfront_default_cache) |bool }}"
-    cache_headers: "{{ [] if cache_enabled else ['*'] }}"
-
-    ## note: sort headers and skip empty ones to gain idempotence
-    headers_dict:
-      X-CDN-Front: "{{ '' if origin else server }}"
-      X-CDN-Back: "{{ origin }}"
-    headers_list: "{{ headers_dict
-                    | dict2items(key_name='header_name', value_name='header_value')
-                    | selectattr('header_value')
-                    | sort(attribute='header_name', reverse=true)
-                    | list }}"
-
-  loop: "{{ srv_cdn_cloudfront }}"
-  register: cdn_cloudfront_results
-  until: cdn_cloudfront_results is successful
-  ## run on every host to account for per-server distributions
-  # run_once: true
+- name: setup cloudfront distributions for cdn
+  import_tasks: cloudfront.yml
+  when: srv_cdn_cloudfront
   tags:
     - srv_cdn_cloudfront
     - srv_cdn_all
 
-
-- name: gather cloudfront distribution URLs
-  set_fact:
-    cdn_cloudfront_sites: "{{ cdn_cloudfront_results |default({}) |json_query(query) }}"
-  vars:
-    fields:
-      comment: comment
-      id: id
-      origin: 'origins.items[0].custom_headers.items[?header_name==`X-CDN-Back`]|[0].header_value'
-      server: 'origins.items[0].domain_name'
-      url: domain_name
-    ## generate query from output fields on the fly
-    query: "results[?!!id].{ {{ fields |dictsort |map('join',': ') |join(', ') }} }"
-  tags:
-    - srv_cdn_cloudfront
-    - srv_cdn_nginx
-    - srv_cdn_all
-
-- name: report cloudfront distributions
-  debug:
-    msg: "{{ cdn_cloudfront_sites }}"
-  tags:
-    - srv_cdn_cloudfront
-    - srv_cdn_all
-
-
-- name: create directory for nginx mix-in configurations
+- name: create directory for nginx mixin configurations
   file:
     path: /etc/nginx/mixin.d
     state: directory
@@ -123,7 +15,7 @@
     - srv_cdn_nginx
     - srv_cdn_all
 
-- name: configure simple nginx CDN
+- name: configure simple cdn in nginx
   template:
     src: cdn.conf
     dest: /etc/nginx/sites-enabled/cdn.conf

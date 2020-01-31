@@ -1,0 +1,38 @@
+---
+- name: initialize array of distribution results
+  set_fact:
+    cdn_cloudfront_sites: []
+
+- name: obtain current cloudfront distributions
+  cloudfront_info:
+    aws_access_key: "{{ srv_cdn_cloudfront_access_key |default(omit, true) }}"
+    aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |default(omit, true) }}"
+  register: cloudfront_facts
+  ## delegate to ansible's own python on controller
+  ## ansible's python should have boto3 installed
+  delegate_to: localhost
+  vars:
+    ## ansible on controller must use python3
+    ansible_python_interpreter: python3
+  run_once: true
+
+- name: update cloudfront distributions
+  include_tasks: distribution.yml
+  args:
+    apply:
+      delegate_to: localhost
+      tags:
+        - srv_cdn_cloudfront
+        - srv_cdn_all
+  vars:
+    ansible_python_interpreter: python3
+  loop: "{{ srv_cdn_cloudfront }}"
+  register: cdn_cloudfront_results
+  ## run on every inventory host to account for per-host distributions
+  # run_once: false
+
+- name: report cloudfront distributions
+  debug:
+    msg: "{{ cdn_cloudfront_sites }}"
+  tags: srv_cdn_nginx
+...

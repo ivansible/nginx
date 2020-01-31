@@ -6,9 +6,10 @@
 
 This role configures simple nginx-based CDN.
 
-Any CDN request can have two optional HTTP headers:
-  - `X-CDN-Front` - desired front host;
-  - `X-CDN-Back` - desired origin host.
+Any CDN request can have few optional HTTP headers:
+  - `X-CDN-Front` - desired front host name, defaults to host name from request.
+  - `X-CDN-Host` - desired server host name, determines origin, defaults to `$cdn_front`.
+  - `X-CDN-Back` - desired origin host name, optional, overrides origin.
 
 
 ## Requirements
@@ -66,7 +67,6 @@ Default name for distribution reference (`SERVER` is replaced by the actual serv
         dst: ...
 ```
 These replacements will be applied to HTML.
-Note that `$cdn_front` in the destination string is an alias for `$http_host`.
 
     srv_cdn_cloudfront_max_ttl: 2592000    # one month
     srv_cdn_cloudfront_default_ttl: 86400  # one day
