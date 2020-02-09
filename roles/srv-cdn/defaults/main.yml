@@ -4,14 +4,32 @@
 srv_cdn_default_origin: example.com
 
 srv_cdn_sites: []
+## main list of sites has such fields:
 ## server - front server name, can be full.host.name or .domain.name (required)
 ## origin - host name of origin server, which must support https (required)
 ## hidden - true defines server-origin mapping but skips server name (defaults to false)
 # - server: .mydomain.com
 #   origin: www.example.com
 
+srv_cdn_cloudflare: []
+## list of per-host cloudflare records has such fields:
+## zone - zone for the record, required
+## name - record name (unqualified hostname), required
+## type - type of record, one of: A AAAA CNAME etc
+## value - optional, record will be skipped if this is empty or falsy
+## proxied - true or false, defaults to false
+# - zone: example.com
+#   name: "{{ inventory_hostname }}"
+#   type: A
+#   value: "{{ ansible_default_ipv4.address |default('') }}"
+#   proxied: false
+
+srv_cdn_cloudflare_email: ~
+srv_cdn_cloudflare_token: ~
+
 srv_cdn_cloudfront: []
 ## path: cloudfront -> server -> origin
+## list of cloudfront distributions has such fields:
 ## server - front server name matching a record from the list of sites (required)
 ## origin - optional, overrides origin from the list of sites
 ## reference - unique cloudfront identifier (optional, defaults to prefixed server)
@@ -30,8 +48,8 @@ srv_cdn_cloudfront_default_ttl: 86400  # one day
 srv_cdn_cloudfront_cached_methods: [GET, HEAD]
 srv_cdn_cloudfront_default_cache: true
 
-srv_cdn_cloudfront_access_key: ""
-srv_cdn_cloudfront_secret_key: ""
+srv_cdn_cloudfront_access_key: ~
+srv_cdn_cloudfront_secret_key: ~
 
 srv_cdn_filters:
   # fix viewport for mobile devices:

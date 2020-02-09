@@ -1,4 +1,30 @@
 ---
+- name: setup dns records in cloudflare for cdn
+  cloudflare_dns:
+    account_email: "{{ srv_cdn_cloudflare_email }}"
+    account_api_token: "{{ srv_cdn_cloudflare_token }}"
+    zone: "{{ item.zone }}"
+    record: "{{ item.name }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    proxied: "{{ item.proxied |default(false) |bool }}"
+  delegate_to: localhost
+  loop: "{{ srv_cdn_cloudflare |default([]) }}"
+  loop_control:
+    loop_var: item
+    label: "{{ item.zone }}/{{ item.name }} {{ item.type }} {{ value_label }} [{{ proxied_label }}]"
+  vars:
+    value_label: "{{ item.value |default('-') }}"
+    proxied_label: "{{ item.proxied |default(false) |bool |ternary('proxied','direct') }}"
+  when: srv_cdn_cloudflare is defined
+        and srv_cdn_cloudflare_email is defined
+        and srv_cdn_cloudflare_token is defined
+        and srv_cdn_cloudflare_token |default('',true)
+        and item.value |default('',true)
+  tags:
+    - srv_cdn_cloudflare
+    - srv_cdn_all
+
 - name: setup cloudfront distributions for cdn
   import_tasks: cloudfront.yml
   when: srv_cdn_cloudfront

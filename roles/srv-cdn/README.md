@@ -26,7 +26,7 @@ Available variables are listed below, along with default values.
       - server: .mydomain.com
         origin: www.example.com
 ```
-This is an array of records with the following fields:
+The main list of sites has records with the following fields:
   - `server` - font server name, can be `full.host.name` or `.domain.name` (required);
   - `origin` - host name of an origin server, which must support https (required);
   - `hidden` - if true, server-to-origin mapping is defined but server name is skipped
@@ -36,6 +36,28 @@ This is an array of records with the following fields:
     srv_cdn_default_origin: example.com
 ```
 The fallback origin.
+
+```
+    srv_cdn_cloudflare: []
+      - zone: example.com
+        name: {{ inventory_hostname }}
+        type: AAAA
+        value: {{ ansible_default_ipv6.address }}
+        proxied: false
+```
+The list of per-host cloudflare records has the following fields:
+  - `zone` - zone for the record (required);
+  - `name` - record name (usually unqualified hostname), required;
+  - `type` - type of record, one of: A AAAA CNAME etc (required);
+  - `value` - optional value, record will be skipped if this is empty or falsy;
+  - `proxied` - true or false, defaults to `false`.
+
+```
+    srv_cdn_cloudflare_email: ~
+    srv_cdn_cloudflare_token: ~
+```
+CloudFlare credentials. If these settings are empty, falsy or undefined,
+then cloudflare tasks will be skipped.
 
 ```
     srv_cdn_cloudfront:
@@ -74,8 +96,8 @@ These replacements will be applied to HTML.
     srv_cdn_cloudfront_default_cache: true
 Various defaults for CloudFront caching.
 
-    srv_cdn_cloudfront_access_key: ""
-    srv_cdn_cloudfront_secret_key: ""
+    srv_cdn_cloudfront_access_key: ~
+    srv_cdn_cloudfront_secret_key: ~
 Amazon CloudFront credentials, required if `srv_cdn_cloudfront` has records,
 optional otherwise. If these settings are empty or undefined, they default to
 the environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
@@ -84,7 +106,8 @@ on the ansible controller host.
 
 ## Tags
 
-- `srv_cdn_cloudfront` - configures cloudfront distributions
+- `srv_cdn_cloudflare` - configures DNS records in CloudFlare
+- `srv_cdn_cloudfront` - configures CloudFront distributions
 - `srv_cdn_nginx` - configures site CDN in nginx
 - `srv_cdn_all` - all of the above
 
