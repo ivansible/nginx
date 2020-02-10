@@ -7,6 +7,7 @@ srv_cdn_sites: []
 ## main list of sites has such fields:
 ## server - front server name, can be full.host.name or .domain.name (required)
 ## origin - host name of origin server, which must support https (required)
+## lecert - name of custom letsencrypt certificate for the server (optional)
 ## hidden - true defines server-origin mapping but skips server name (defaults to false)
 # - server: .mydomain.com
 #   origin: www.example.com
@@ -33,6 +34,7 @@ srv_cdn_cloudfront: []
 ## server - front server name matching a record from the list of sites (required)
 ## origin - optional, overrides origin from the list of sites
 ## reference - unique cloudfront identifier (optional, defaults to prefixed server)
+## lecert - name of custom letsencrypt certificate for the server (optional)
 ## cache - enables cloudfront caching (optional, default to true)
 ## delete - deletes distribution instead of creating/updating (optional, defaults to false)
 # - server: www.mydomain.com
@@ -55,4 +57,8 @@ srv_cdn_filters:
   # fix viewport for mobile devices:
   - src: '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">'
     dst: '<meta name="viewport" content="width=1024">'
+
+srv_cdn_lecert_dir: /etc/letsencrypt/live
+srv_cdn_lecert_crt_path: "{{ srv_cdn_lecert_dir }}/%s/fullchain.pem"
+srv_cdn_lecert_key_path: "{{ srv_cdn_lecert_dir }}/%s/privkey.pem"
 ...

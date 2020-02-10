@@ -25,10 +25,12 @@ Available variables are listed below, along with default values.
     srv_cdn_sites:
       - server: .mydomain.com
         origin: www.example.com
+        lecert: mydomain.com
 ```
 The main list of sites has records with the following fields:
   - `server` - font server name, can be `full.host.name` or `.domain.name` (required);
   - `origin` - host name of an origin server, which must support https (required);
+  - `lecert` - name of custom letsencrypt certificate for the server (optional);
   - `hidden` - if true, server-to-origin mapping is defined but server name is skipped
                (optional, defaults to `false`).
 
@@ -38,7 +40,7 @@ The main list of sites has records with the following fields:
 The fallback origin.
 
 ```
-    srv_cdn_cloudflare: []
+    srv_cdn_cloudflare:
       - zone: example.com
         name: {{ inventory_hostname }}
         type: AAAA
@@ -64,6 +66,7 @@ then cloudflare tasks will be skipped.
       - server: www.mydomain.com
         reference: www.mydomain.com_cdn1
         origin: override.example.com
+        lecert: mydomain.com
         cache: false
 ```
 This array configures CloudFront CDN distributions with full web paths
@@ -73,6 +76,7 @@ like `cloudfront -> server -> origin`, where each record has fields:
   - `origin`    - optional, overrides `origin` from the list of sites above;
   - `reference` - **unique** cloudfront identifier
                   (optional, defaults to the server name with a suffix);
+  - `lecert`    - name of custom letsencrypt certificate for the server (optional);
   - `cache`     - `false` disables cloudfront caching, `true` - enables it
                   (optional, defaults to `srv_cdn_cloudfront_default_cache`);
   - `delete`    - if true, the distribution will be deleted instead of creating/updating

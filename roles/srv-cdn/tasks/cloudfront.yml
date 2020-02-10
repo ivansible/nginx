@@ -34,5 +34,6 @@
 - name: report cloudfront distributions
   debug:
     msg: "{{ cdn_cloudfront_sites }}"
+  when: cdn_cloudfront_sites |default([])
   tags: srv_cdn_nginx
 ...

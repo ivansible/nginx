@@ -34,7 +34,7 @@
 
 - name: create directory for nginx mixin configurations
   file:
-    path: /etc/nginx/mixin.d
+    path: "{{ nginx_root_dir }}/mixin.d"
     state: directory
   become: true
   tags:
@@ -43,10 +43,13 @@
 
 - name: configure simple cdn in nginx
   template:
-    src: cdn.conf
-    dest: /etc/nginx/sites-enabled/cdn.conf
+    src: "{{ item }}"
+    dest: "{{ nginx_site_dir }}/{{ item }}"
   become: true
   notify: reload nginx service
+  loop:
+    - cdn.inc
+    - cdn.conf
   tags:
     - srv_cdn_nginx
     - srv_cdn_all
