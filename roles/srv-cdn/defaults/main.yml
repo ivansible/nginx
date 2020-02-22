@@ -54,9 +54,13 @@ srv_cdn_cloudfront_access_key: ~
 srv_cdn_cloudfront_secret_key: ~
 
 srv_cdn_filters:
-  # fix viewport for mobile devices:
+  ## fix viewport for mobile devices:
   - src: '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">'
     dst: '<meta name="viewport" content="width=1024">'
+
+srv_cdn_filters_trivial:
+  ## trivial strings will be replaced by '$cdn_front' which is alias of $http_host
+  - '//$cdn_back//'
 
 srv_cdn_lecert_dir: /etc/letsencrypt/live
 srv_cdn_lecert_crt_path: "{{ srv_cdn_lecert_dir }}/%s/fullchain.pem"

@@ -24,6 +24,9 @@ location /  {
 {% for filter in srv_cdn_filters %}
     sub_filter '{{ filter.src }}'  '{{ filter.dst }}';
 {% endfor %}
+{% for string in srv_cdn_filters_trivial %}
+    sub_filter '{{ string }}'  '$cdn_front';
+{% endfor %}
     sub_filter_once off;
     sub_filter_last_modified on;
 
