@@ -9,7 +9,7 @@
     value: "{{ item.value }}"
     proxied: "{{ item.proxied |default(false) |bool }}"
   delegate_to: localhost
-  loop: "{{ srv_cdn_cloudflare |default([]) }}"
+  loop: "{{ srv_cdn_cloudflare |default([]) |flatten }}"
   loop_control:
     loop_var: item
     label: "{{ item.zone }}/{{ item.name }} {{ item.type }} {{ value_label }} [{{ proxied_label }}]"
