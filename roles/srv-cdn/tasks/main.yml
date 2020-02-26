@@ -41,16 +41,26 @@
     - srv_cdn_nginx
     - srv_cdn_all
 
-- name: configure simple cdn in nginx
+- name: configure cdn mappings in nginx
   template:
-    src: "{{ item }}"
-    dest: "{{ nginx_site_dir }}/{{ item }}"
+    src: cdn.conf
+    dest: "{{ nginx_site_dir }}/cdn.conf"
+    mode: 0644
   become: true
   notify: reload nginx service
-  loop:
-    - cdn.inc
-    - cdn.conf
   tags:
+    - srv_cdn_nginx
+    - srv_cdn_all
+
+- name: configure simple cdn site in nginx
+  template:
+    src: cdn.inc
+    dest: "{{ nginx_site_dir }}/cdn.inc"
+    mode: 0644
+  become: true
+  notify: reload nginx service
+  tags:
+    - srv_cdn_nginx_site
     - srv_cdn_nginx
     - srv_cdn_all
 

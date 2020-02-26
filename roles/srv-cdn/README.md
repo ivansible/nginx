@@ -112,7 +112,8 @@ on the ansible controller host.
 
 - `srv_cdn_cloudflare` - configures DNS records in CloudFlare
 - `srv_cdn_cloudfront` - configures CloudFront distributions
-- `srv_cdn_nginx` - configures site CDN in nginx
+- `srv_cdn_nginx` - configures CDN site and mappings in nginx
+- `srv_cdn_nginx_site` - configures common CDN site settings in nginx
 - `srv_cdn_all` - all of the above
 
 
