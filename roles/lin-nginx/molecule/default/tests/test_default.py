@@ -31,4 +31,4 @@ def test_https_port(host):
 def test_https_html(host):
     if os.environ.get('IVATEST_CHECK_HTTPS_HTML', 'true') == 'true':
         html = host.check_output("curl -k https://localhost")
-        assert '>Welcome!</p>' in html
+        assert 'href="/favicon.ico"' in html
