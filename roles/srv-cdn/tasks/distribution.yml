@@ -42,21 +42,43 @@
       tls_policy: "{{ cfg }}.OriginProtocolPolicy"
       tls_proto: "{{ cfg }}.OriginSslProtocols.Items"
 
-- name: create (or destroy) cloudfront distribution "{{ cfront_dist_reference }}"
-  cloudfront_distribution:
-    aws_access_key: "{{ srv_cdn_cloudfront_access_key |default(omit, true) }}"
-    aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |default(omit, true) }}"
+- block:
+    - name: create (or destroy) cloudfront distribution "{{ cfront_dist_reference }}" (can be rescued)
+      cloudfront_distribution:
+        aws_access_key: "{{ srv_cdn_cloudfront_access_key |default(omit, true) }}"
+        aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |default(omit, true) }}"
 
-    caller_reference: "{{ cfront_dist_reference }}"
-    state: "{{ cfront_dist_enabled |ternary('present','absent') }}"
-    enabled: "{{ cfront_dist_enabled }}"
-    ## This request must not change distribution, but omitted ipv6 state
-    ## is treated as false by the module, so include it explicitly.
-    ipv6_enabled: true
-  register: cfront_dist_anew
-  until: cfront_dist_anew is successful
-  when: not cfront_dist_curr
+        caller_reference: "{{ cfront_dist_reference }}"
+        state: "{{ cfront_dist_enabled |ternary('present','absent') }}"
+        enabled: "{{ cfront_dist_enabled }}"
 
+        ## This request must not change distribution, but omitted ipv6 state
+        ## is treated as false by the module, so include it explicitly.
+        ipv6_enabled: true
+      register: cfront_dist_anew
+      until: cfront_dist_anew is successful
+      when: not cfront_dist_curr
+
+  rescue:
+    - name: first-time create cloudfront distribution "{{ cfront_dist_reference }}"
+      cloudfront_distribution:
+        aws_access_key: "{{ srv_cdn_cloudfront_access_key |default(omit, true) }}"
+        aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |default(omit, true) }}"
+
+        caller_reference: "{{ cfront_dist_reference }}"
+        ## FIXME we should run this step only when creating distribution!
+        state: "{{ cfront_dist_enabled |ternary('present','absent') }}"
+        enabled: "{{ cfront_dist_enabled }}"
+
+        ## set default origin in case it was missing (due to idempotence)
+        default_origin_domain_name: "{{ cfront_dist_server }}"
+
+        ## This request must not change distribution, but omitted ipv6 state
+        ## is treated as false by the module, so include it explicitly.
+        ipv6_enabled: true
+      register: cfront_dist_anew
+      until: cfront_dist_anew is successful
+      when: not cfront_dist_curr
 
 - name: update cloudfront distribution "{{ cfront_dist_reference }}"
   cloudfront_distribution:
