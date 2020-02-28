@@ -44,6 +44,8 @@
     regexp: 'listen\s+(127\.0\.0\.1:|0\.0\.0\.0:|)443\s+ssl(\s+http2)?'
     replace: "{{ nginx_conf_listen_ssl_ipv4 }}"
   loop: "{{ all_nginx_sites.files }}"
+  loop_control:
+    label: "{{ item.path |basename }}"
   notify:
     - restart nginx service
     # detect changed binding of https port
@@ -55,6 +57,8 @@
     regexp: 'listen\s+\[::1?\]:443\s+ssl(\s+http2)?'
     replace: "{{ nginx_conf_listen_ssl_ipv6 }}"
   loop: "{{ all_nginx_sites.files }}"
+  loop_control:
+    label: "{{ item.path |basename }}"
   notify:
     - restart nginx service
     # detect changed binding of https port
