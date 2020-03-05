@@ -6,8 +6,11 @@
       become: true
       tags:
         - sslh_all
+        - lin_sslh_all
         - sslh_install
-  tags: sslh_all
+  tags:
+    - sslh_all
+    - lin_sslh_all
   when: use_sslh |bool
 
 - name: disable sslh on host (if use_sslh is false)
@@ -17,7 +20,10 @@
       become: true
       tags:
         - sslh_all
+        - lin_sslh_all
         - sslh_uninstall
-  tags: sslh_all
+  tags:
+    - sslh_all
+    - lin_sslh_all
   when: not use_sslh |bool
 ...
