@@ -27,7 +27,7 @@
 
 - name: setup cloudfront distributions for cdn
   import_tasks: cloudfront.yml
-  when: srv_cdn_cloudfront
+  when: srv_cdn_cloudfront |default([],true)
   tags:
     - srv_cdn_cloudfront
     - srv_cdn_all
