@@ -15,6 +15,13 @@
     state: present
   when: ansible_lsb.codename == 'bionic'
 
+- name: remove apache2 packages pulled by sslh on bionic
+  apt:
+    name: apache2
+    state: absent
+    purge: true
+    autoremove: true
+  when: ansible_lsb.codename == 'bionic'
 
 - name: add dual ipv4/ipv6 localhost in /etc/hosts as sslh target
   blockinfile:
@@ -93,12 +100,21 @@
   # note: condition "ActiveState == 'failed'" is not enough
   when: sslh_service_start_result.status.ActiveState != 'active'
 
+- name: completely disable apache2 service to unblock ssl port
+  systemd:
+    name: apache2
+    state: stop
+    enabled: false
+  ignore_errors: true
+  when: ansible_facts.services.apache2 is defined
+        and ansible_facts.services.apache2.state == 'running'
+
 - name: let sslh service start when nginx blocks ssl port due to stale settings
   block:
     - name: prevent pending sslh restart before nginx gets reconfigured
       meta: flush_handlers
 
-    - name: stop nginx to unblock bound ssl port (will restart after reconfiguration)
+    - name: stop nginx to unblock ssl port (will restart after reconfiguration)
       systemd:
         name: nginx
         state: stopped
