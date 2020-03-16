@@ -56,7 +56,7 @@
     port: "{{ srv_chisel_port }}"
     proto: tcp
     domain: "{{ srv_chisel_direct |bool |ternary('external','internal') }}"
-    exclusive: true
+    solo: true
     comment: chisel
   tags: skip_ansible_lint
   when: lin_firewall == 'ferm'
