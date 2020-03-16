@@ -4,7 +4,7 @@
     port: "{{ squid_port }}"
     proto: tcp
     domain: "{{ squid_allow_unencrypted |bool |ternary('external','internal') }}"
-    exclusive: true
+    solo: true
     comment: squid unencrypted
   tags:
     - skip_ansible_lint
