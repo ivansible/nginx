@@ -1,0 +1,37 @@
+{
+  "logging": {
+    "loglevel": "warning"
+  },
+  "inbounds": [{
+    "port": {{ srv_v2ray_port }},
+    "listen": "0.0.0.0",
+    "protocol": "vmess",
+    "settings": {
+      "clients": [{
+          "id": "{{ srv_v2ray_uuid }}",
+          "level": 1,
+          "alterId": {{ srv_v2ray_altids }}
+      }]
+    },
+    "streamSettings": {
+      "network": "ws",
+      "wsSettings": {
+        "path": "{{ srv_v2ray_web_path }}"
+      }
+    }
+  }],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {},
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "rules": []
+  }
+}

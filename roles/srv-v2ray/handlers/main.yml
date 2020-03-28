@@ -1,3 +1,11 @@
 ---
 # handlers for ivansible.srv_v2ray
+
+- name: restart v2ray service
+  systemd:
+    name: v2ray-server
+    state: restarted
+    enabled: true
+    daemon_reload: true
+  become: true
 ...

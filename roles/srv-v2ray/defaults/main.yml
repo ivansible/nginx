@@ -1,3 +1,13 @@
 ---
 # defaults for ivansible.srv_v2ray
+
+srv_v2ray_direct: false
+srv_v2ray_port: 65001
+srv_v2ray_web_path: /v2ray
+
+srv_v2ray_uuid: aaa-111-222-333-4444
+srv_v2ray_altids: 4
+srv_v2ray_security: aes-128-gcm
+
+srv_v2ray_upgrade: false
 ...

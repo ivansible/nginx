@@ -1,5 +1,109 @@
 ---
-- name: root task1
-  debug:
-    msg: task1
+- name: create directory for v2ray-core files
+  file:
+    path: /usr/local/v2ray
+    state: directory
+  tags: srv_v2ray_install
+
+- name: detect latest v2ray-core release
+  github_release:
+    repository: v2ray/v2ray-core
+    release: latest
+    template: '{download_url}/v2ray-linux-64.zip'
+    creates: /usr/local/v2ray/v2ray
+    reinstall: "{{ srv_v2ray_upgrade |bool }}"
+  register: latest_v2ray_core_release
+  notify: restart v2ray service
+  tags:
+    - skip_ansible_lint
+    - srv_v2ray_install
+
+- name: download and unpack v2ray-core archive
+  unarchive:
+    remote_src: true
+    src: "{{ latest_v2ray_core_release.url }}"
+    dest: /usr/local/v2ray
+  when: latest_v2ray_core_release is changed
+  notify: restart v2ray service
+  tags: srv_v2ray_install
+
+
+- name: directory for v2ray config files
+  file:
+    path: /etc/v2ray
+    state: directory
+  tags: srv_v2ray_config
+
+- name: update v2ray configuration
+  template:
+    src: v2ray.config.json
+    dest: /etc/v2ray/config.json
+    owner: root
+    group: proxy
+    mode: 0640
+  notify: restart v2ray service
+  tags: srv_v2ray_config
+
+
+- name: directory for nginx backend configs (including v2ray)
+  file:
+    path: /etc/nginx/mixin.d
+    state: directory
+  tags: srv_v2ray_nginx
+
+- name: configure nginx redirector for v2ray
+  template:
+    src: v2ray.nginx.conf
+    dest: /etc/nginx/mixin.d/v2ray.conf
+    mode: 0644
+  notify:
+    - restart v2ray service
+    - reload nginx service
+  tags: srv_v2ray_nginx
+
+
+- name: create group for proxy processes (including v2ray)
+  group:
+    name: proxy
+    gid: 13
+  tags: srv_v2ray_service
+
+- name: setup v2ray systemd service
+  template:
+    src: v2ray.service
+    dest: /etc/systemd/system/v2ray-server.service
+    mode: 0644
+  notify: restart v2ray service
+  register: v2ray_systemd_service_result
+  tags: srv_v2ray_service
+
+- name: activate v2ray systemd service
+  systemd:
+    name: v2ray-server
+    state: started
+    enabled: true
+    daemon_reload: "{{ v2ray_systemd_service_result is changed }}"
+  tags: srv_v2ray_service
+
+
+- name: open/block v2ray port in ufw
+  ufw:
+    port: "{{ srv_v2ray_port |string }}"
+    proto: tcp
+    rule: "{{ srv_v2ray_direct |bool |ternary('allow','deny') }}"
+  no_log: "{{ hide_secrets |bool }}"
+  when: lin_firewall == 'ufw'
+  tags: srv_v2ray_firewall
+
+- name: open/block v2ray port in ferm
+  ferm_port:
+    port: "{{ srv_v2ray_port }}"
+    proto: tcp
+    domain: "{{ srv_v2ray_direct |bool |ternary('external','internal') }}"
+    solo: true
+    comment: v2ray
+  tags:
+    - skip_ansible_lint
+    - srv_v2ray_firewall
+  when: lin_firewall == 'ferm'
 ...

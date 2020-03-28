@@ -1,0 +1,22 @@
+# v2ray service
+# ansible-managed
+
+[Unit]
+Description=V2Ray service
+After=network.target
+Wants=network.target
+
+[Service]
+{# Run service as nobody for security concerns. #}
+{# See https://github.com/v2ray/v2ray-core/issues/1011 #}
+User=nobody
+{# set group to "proxy" to activate sslh iptables fix #}
+Group=proxy
+Type=simple
+ExecStart=/usr/local/v2ray/v2ray -config /etc/v2ray/config.json
+Restart=on-failure
+{# Don't restart in the case of configuration error #}
+RestartPreventExitStatus=23
+
+[Install]
+WantedBy=multi-user.target
