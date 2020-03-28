@@ -2,5 +2,5 @@
 - name: prepare
   hosts: all
   roles:
-    - role: ivansible.lin_system
+    - role: ivansible.lin_core
 ...
