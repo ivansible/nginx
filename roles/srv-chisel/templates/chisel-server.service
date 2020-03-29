@@ -1,6 +1,7 @@
 # ansible-managed
 [Unit]
 Description=chisel server
+After=network.target
 
 [Service]
 {# set group to "proxy" to activate sslh iptables fix #}
