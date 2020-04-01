@@ -7,4 +7,5 @@ uwsgi_user: "{{ web_user }}"
 uwsgi_group: "{{ web_group }}"
 uwsgi_vassal_dirs:
   - "{{ ansible_user_dir }}/etc/uwsgi"
+uwsgi_listen_backlog: 1024
 ...

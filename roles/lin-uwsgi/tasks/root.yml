@@ -22,9 +22,10 @@
 - name: tune kernel for uwsgi listen backlog
   sysctl:
     name: net.core.somaxconn
-    value: 1024
+    value: "{{ uwsgi_listen_backlog |string }}"
     state: present
     sysctl_file: /etc/sysctl.d/77-uwsgi.conf
+  when: uwsgi_listen_backlog |int
 
 
 - name: backup vanilla uwsgi configuration (optional, so ok to fail)
@@ -64,6 +65,16 @@
     dest: "{{ uwsgi_vassals }}/log"
     state: link
 
+- name: enable/disable uwsgi log compression
+  replace:
+    path: /etc/logrotate.d/uwsgi-emperor
+    regexp: "{{ lookbehind }}(compress|delaycompress)"
+    replace: "{{ commentout }}\\1"
+  vars:
+    lookbehind: "{{ lin_compress_logs |bool |ternary('(?:#\\s*)','(?<!#)') }}"
+    commentout: "{{ lin_compress_logs |bool |ternary('','#') }}"
+  when: lin_compress_logs is not none
+
 
 - name: activate uwsgi service
   systemd:
@@ -71,7 +82,4 @@
     state: started
     enabled: true
     daemon_reload: true
-
-- name: restart uwsgi now
-  meta: flush_handlers
 ...

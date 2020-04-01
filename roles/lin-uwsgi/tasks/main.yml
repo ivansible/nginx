@@ -3,4 +3,8 @@
   import_tasks: root.yml
   become: true
   tags: lin_uwsgi_all
+
+- name: restart uwsgi now
+  meta: flush_handlers
+  tags: lin_uwsgi_all
 ...
