@@ -22,4 +22,8 @@
 - name: activate nginx service
   import_tasks: run.yml
   tags: lin_nginx_run
+
+- name: fine-tune nginx logs
+  import_tasks: logs.yml
+  tags: lin_nginx_logs
 ...

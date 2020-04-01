@@ -1,13 +1,4 @@
 ---
-- name: limit number of nginx logs
-  lineinfile:
-    path: /etc/logrotate.d/nginx
-    regexp: '^(\s*rotate)\s+\d+'
-    line: '\1 {{ nginx_max_logs }}'
-    backrefs: true
-    backup: true
-  when: nginx_max_logs |default(0) |int
-
 - name: create nginx cache directories
   file:
     path: "{{ nginx_cache_dir }}"

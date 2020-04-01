@@ -89,15 +89,18 @@ behind the cloudflare web proxy. See:
                      and generate diffie-helman parameters for tls
 - `lin_nginx_site` -- configure default site and upload www files
 - `lin_nginx_run` -- enable service and open ports in firewall
+- `lin_nginx_logs` -- fine-tune nginx logs
 - `lin_nginx_all` -- all of the above
 
 
 ## Dependencies
 
 - [ivansible.lin_base](https://github.com/ivansible/lin-base)
-  -- common ansible handlers, default parameters and custom modules
+  - common ansible handlers, default parameters and custom modules
+  - global flag `lin_compress_logs`,
+    which enables or disables compression of rotated logs
 - [ivansible.nginx_base](https://github.com/ivansible/nginx-base)
-  -- common nginx-related handlers and default parameters
+  - common nginx-related handlers and default parameters
 
 
 ## Example Playbook
