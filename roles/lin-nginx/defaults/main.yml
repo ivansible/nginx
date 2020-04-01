@@ -18,6 +18,8 @@ nginx_use_resolver: true
 # use fallback resolver by default
 # nginx_resolver: 8.8.8.8
 
+nginx_max_logs: ~
+
 nginx_user: "{{ web_user }}"
 nginx_group: "{{ web_group }}"
 nginx_workers: auto   # 2

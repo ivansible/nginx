@@ -66,6 +66,9 @@ such as `uwsgi`.
     nginx_upload_progress: false
 This setting activates the `upload_progress` nginx module.
 
+    nginx_max_logs: ~
+If set, this limits maximum number of rotated nginx logs by given number.
+
     nginx_cloudflare_ips: []
 A list of IP subnets. Nginx will correctly expose its IP address when run
 behind the cloudflare web proxy. See:
