@@ -12,5 +12,5 @@ srv_chisel_fingerprint: xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx
 
 srv_chisel_version: latest
 srv_chisel_binary: /usr/local/sbin/chisel
-srv_chisel_allow_reinstall: false
+srv_chisel_upgrade: false
 ...
