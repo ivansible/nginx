@@ -123,12 +123,17 @@ Example list entry:
 - `srv_squid_iptables` -- ensure that some iptables rules exist
 - `srv_squid_service` -- activate squid service
 - `srv_squid_pac` -- generate example pac files
+- `srv_squid_logs` -- fine-tune squid logs
 - `srv_squid_all` -- all of the above
 
 
 ## Dependencies
 
-`ivansible.lin_tor`
+- [ivansible.lin_base](https://github.com/ivansible/lin-base)
+  - common ansible handlers, default parameters and custom modules
+  - global flag `lin_compress_logs`,
+    which enables or disables compression of rotated logs
+- [ivansible.lin_tor](https://github.com/ivansible/lin-tor)
 
 
 ## Example Playbook
