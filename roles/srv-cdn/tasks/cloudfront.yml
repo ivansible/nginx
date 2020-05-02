@@ -16,7 +16,7 @@
     ansible_python_interpreter: python3
   run_once: true
 
-- name: update cloudfront distributions
+- name: update cloudfront distributions (skip in check mode)
   include_tasks: distribution.yml
   args:
     apply:
@@ -27,6 +27,10 @@
   vars:
     ansible_python_interpreter: python3
   loop: "{{ srv_cdn_cloudfront }}"
+  loop_control:
+    label: "{{ item.reference |default(item.server) |replace('SERVER', item.server) }} -> {{ item.origin |default('.') }}"
+  ## this task fails in check mode
+  when: not ansible_check_mode
   register: cdn_cloudfront_results
   ## run on every inventory host to account for per-host distributions
   # run_once: false

@@ -41,13 +41,15 @@
     - srv_cdn_nginx
     - srv_cdn_all
 
-- name: configure cdn mappings in nginx
+- name: configure cdn mappings in nginx (skip in check mode)
   template:
     src: cdn.conf
     dest: "{{ nginx_site_dir }}/cdn.conf"
     mode: 0644
   become: true
   notify: reload nginx service
+  ## this task depends on "cloudfront distributions" failing in check mode
+  when: not ansible_check_mode
   tags:
     - srv_cdn_nginx
     - srv_cdn_all
