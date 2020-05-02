@@ -23,7 +23,8 @@
     autoremove: true
   when: ansible_lsb.codename == 'bionic'
 
-- name: add dual ipv4/ipv6 localhost in /etc/hosts as sslh target
+## OpenVZ mangles comments in /etc/hosts, and this step might report as changed
+- name: add dual ipv4/ipv6 localhost in /etc/hosts as sslh target (skip in check mode on openvz)
   blockinfile:
     path: /etc/hosts
     block: |
