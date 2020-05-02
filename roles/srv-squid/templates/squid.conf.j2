@@ -41,6 +41,7 @@ acl localnet src 192.168.0.0/16 # RFC1918 possible internal network
 {#acl localnet src fc00::/7       # RFC 4193 local private network range#}
 {#acl localnet src fe80::/10      # RFC 4291 link-local (directly plugged) machines#}
 
+{# NOTE: this line depends on interfaces created by other roles! #}
 acl ourhost src{% for ip in ansible_all_ipv4_addresses|sort %} {{ip}}/32{% endfor %}
 
 acl ournets src{% for subnet in squid_local_subnets %} {{subnet}}{% endfor %}

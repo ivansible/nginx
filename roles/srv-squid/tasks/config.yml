@@ -37,7 +37,7 @@
   when: squid_pkg != 'squid-ssl'
   tags: srv_squid_config
 
-- name: create squid configuration
+- name: create squid configuration (depends on interfaces created by other roles)
   template:
     src: squid.conf.j2
     dest: "{{ squid_etc_dir }}/squid.conf"
