@@ -3,8 +3,8 @@
   ferm_port:
     port: "{{ squid_port }}"
     proto: tcp
-    domain: "{{ squid_allow_unencrypted |bool |ternary('external','internal') }}"
-    solo: true
+    zone: "{{ squid_allow_unencrypted |bool |ternary('external','internal') }}"
+    solo_zone: true
     comment: squid unencrypted
   tags:
     - skip_ansible_lint
@@ -13,7 +13,7 @@
   ferm_port:
     port: "{{ squid_ssl_port }}"
     proto: tcp
-    domain: external
+    zone: external
     state: "{{ squid_ssl_enable |bool |ternary('present','absent') }}"
     comment: squid ssl
   tags:
