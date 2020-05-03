@@ -99,8 +99,8 @@
   ferm_port:
     port: "{{ srv_v2ray_port }}"
     proto: tcp
-    domain: "{{ srv_v2ray_direct |bool |ternary('external','internal') }}"
-    solo: true
+    zone: "{{ srv_v2ray_direct |bool |ternary('external','internal') }}"
+    solo_zone: true
     comment: v2ray
   tags:
     - skip_ansible_lint
