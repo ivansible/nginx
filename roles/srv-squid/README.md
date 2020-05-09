@@ -119,6 +119,7 @@ Example list entry:
 - `srv_squid_install` -- install squid package
 - `srv_squid_ssl` -- setup ssl certificates
 - `srv_squid_config` -- configure squid
+- `srv_squid_cloaking` -- perform squid cloaking
 - `srv_squid_firewall` -- open squid ports
 - `srv_squid_iptables` -- ensure that some iptables rules exist
 - `srv_squid_service` -- activate squid service

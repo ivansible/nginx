@@ -22,10 +22,10 @@ redirect_children 1
 {% endif %}
 
 auth_param basic realm Secure access
-{% if squid_auth_ldap | bool %}
+{% if squid_auth_ldap |bool %}
 auth_param basic program {{squid_lib_dir}}/basic_ldap_auth{{squid_helper_suffix}} -b "ou=users,dc={{squid_domain}}" -f "uid=%s" -D "cn=browse,dc={{squid_domain}}"
 {% endif %}
-{% if squid_auth_htpasswd | bool %}
+{% if squid_auth_htpasswd |bool %}
 auth_param basic program {{squid_lib_dir}}/basic_ncsa_auth{{squid_helper_suffix}} {{squid_etc_dir}}/users.db
 {% endif %}
 auth_param basic children 2
@@ -52,8 +52,9 @@ acl {{ network.name }} src{% for range in network.ranges %} {{range}}{% endfor %
 {% endfor %}
 
 # ad block
-{% for rule in [ 'dstdomain', 'dstdom_regex', 'url_regex' ] %}
-acl adblock{{loop.index}} dstdomain -i "{{squid_etc_dir}}/adblock/{{rule}}.deny"
+{% for rule in ['dstdomain', 'dstdom_regex', 'url_regex'] %}
+{% set opts = ' -i' if rule.endswith('regex') else '' %}
+acl adblock{{ loop.index }} {{rule}}{{opts}} "{{squid_etc_dir}}/adblock/{{rule}}.deny"
 http_access deny adblock{{loop.index}}
 {% endfor %}
 
@@ -83,7 +84,7 @@ http_access allow ournets
 http_access allow {{ network.name }}
 {% endfor %}
 
-{% if squid_auth_ldap | bool or squid_auth_htpasswd | bool %}
+{% if squid_auth_ldap |bool or squid_auth_htpasswd |bool %}
 # allow anybody with authentication
 acl authenticated proxy_auth REQUIRED
 http_access allow authenticated
@@ -93,12 +94,18 @@ http_access allow authenticated
 http_access deny all
 
 http_port {{squid_port}}
-{% if squid_ssl_enable | bool %}
-{% if squid_letsencrypt_cert == '' %}
-https_port {{squid_ssl_port}} cert={{squid_etc_dir}}/ssl.crt key={{squid_etc_dir}}/ssl.key
-{% else %}
-https_port {{squid_ssl_port}} cert=/etc/letsencrypt/live/{{squid_letsencrypt_cert}}/fullchain.pem key=/etc/letsencrypt/live/{{squid_letsencrypt_cert}}/privkey.pem
-{% endif %}
+{% if squid_ssl_enable |bool %}
+{%   set gnutls_options = 'tls-min-version=1.2 tls-options=NORMAL' %}
+{%   if squid_from_ppa and self_signed %}
+https_port {{squid_ssl_port}} cert={{ss_cert}}.crt key={{ss_cert}}.key
+{%   elif squid_from_ppa and not self_signed %}
+https_port {{squid_ssl_port}} cert={{lecert_dir}}/fullchain.pem key={{lecert_dir}}/privkey.pem
+{%   elif self_signed %}
+{# squid 4.x on ubuntu 20.04+ is built with GnuTLS and uses single tls-cert option instead of cert and key #}
+https_port {{squid_ssl_port}} tls-cert={{ss_cert}}.bundle.pem {{gnutls_options}}
+{%   else %}
+https_port {{squid_ssl_port}} tls-cert={{lecert_bundle}} {{gnutls_options}}
+{%   endif %}
 {% endif %}
 
 {% for rule in squid_domain_rules %}
@@ -114,10 +121,10 @@ tcp_outgoing_address {{rule.via}} to_{{rule.name}}
 {% endfor %}
 {% endif %}
 
-{% if squid_outgoing_ipv4 != '' %}
+{% if squid_outgoing_ipv4 %}
 tcp_outgoing_address {{ squid_outgoing_ipv4 }} !to_ipv6
 {% endif %}
-{% if squid_outgoing_ipv6 != '' %}
+{% if squid_outgoing_ipv6 %}
 tcp_outgoing_address {{ squid_outgoing_ipv6 }} to_ipv6
 {% endif %}
 

@@ -22,16 +22,18 @@
       - "{{ squid_lib_dir }}/url-rewrite-custom.py"
   notify: restart squid service
 
-- name: harden url-rewrite-custom.pyc permissions
+- name: harden permissions on url-rewrite-custom
   when: url_rewrite_py is changed
   shell: >
     if [ -f {{ item }} ]; then
-      chown root:{{ squid_group }} {{ item }} &&
+      chown root:{{ squid_group }} {{ item }}
       chmod 0640 {{ item }}
     fi
   loop:
     - "{{ squid_lib_dir }}/url-rewrite-custom.pyc"
     - "{{ squid_lib_dir }}/__pycache__/url-rewrite-custom.*pyc"
+  loop_control:
+    label: "{{ item |basename }}"
   notify: restart squid service
 
 - name: remove obsolete url-rewrite log

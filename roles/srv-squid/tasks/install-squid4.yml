@@ -1,0 +1,7 @@
+---
+- name: install squid 4.x from universe
+  apt:
+    name: squid
+    state: present
+    # state: latest  # triggers galaxy warning
+...

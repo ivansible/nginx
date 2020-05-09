@@ -2,6 +2,12 @@
 - name: become root and install squid
   import_tasks: root.yml
   become: true
+  vars:
+    lecert_name: "{{ squid_letsencrypt_cert |default('',true) }}"
+    lecert_dir: "/etc/letsencrypt/live/{{ lecert_name }}"
+    lecert_bundle: "{{ squid_etc_dir }}/ssl-letsencrypt.pem"
+    self_signed: "{{ lecert_name == '' }}"  # noqa 602
+    ss_cert: "{{ squid_etc_dir }}/ssl-selfsigned"
   tags: srv_squid_all
 
 - name: apply squid changes now

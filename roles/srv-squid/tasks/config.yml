@@ -1,16 +1,13 @@
 ---
 - name: install ansible passlib bindings
   apt:
-    name:
-      - python-passlib
-      - python-pip
-      - python3-passlib
-      - python3-pip
+    name: "{{ lin_use_python2 |bool |ternary(packages_pythons, packages_python3) }}"
     state: present
+  vars:
+    packages_pythons: python3-passlib,python3-pip,python-passlib,python-pip
+    packages_python3: python3-passlib,python3-pip
 
 - name: configure squid authentication
-  no_log: "{{ hide_secrets |bool }}"
-  when: squid_auth_htpasswd |bool
   # crypt_scheme is MD5 because squid does not support SHA
   htpasswd:
     path: "{{ squid_etc_dir }}/users.db"
@@ -20,10 +17,13 @@
     owner: root
     group: "{{ squid_group }}"
     mode: 0640
+  notify: restart squid service
+  ignore_errors: "{{ ansible_check_mode }}"
+  no_log: "{{ hide_secrets |bool }}"
   loop: "{{ squid_proxy_users }}"
   loop_control:
     label: "{{ item.user }}"
-  notify: restart squid service
+  when: squid_auth_htpasswd |bool
 
 
 - name: backup vanilla squid configuration
@@ -34,10 +34,10 @@
       - "{{ squid_etc_dir }}/squid.conf"
       - "{{ squid_etc_dir }}/squid.conf.orig"
     creates: "{{ squid_etc_dir }}/squid.conf.orig"
-  when: squid_pkg != 'squid-ssl'
+  ignore_errors: true
   tags: srv_squid_config
 
-- name: create squid configuration (depends on interfaces created by other roles)
+- name: configure squid (depends on interfaces created by other roles!)
   template:
     src: squid.conf.j2
     dest: "{{ squid_etc_dir }}/squid.conf"
@@ -50,8 +50,8 @@
 
 - name: upload squid error pages
   unarchive:
-    src: errorpages-{{ squid_cloaking | bool | ternary('cloaked', 'plain') }}.tar.gz
-    dest: "{{ squid_etc_dir }}"  # /errorpages
+    src: "errorpages-{{ squid_cloaking |bool |ternary('cloaked', 'plain') }}.tar.gz"
+    dest: "{{ squid_etc_dir }}"
     owner: root
     group: "{{ squid_group }}"
   notify: restart squid service
@@ -63,49 +63,4 @@
     owner: root
     group: "{{ squid_group }}"
   notify: restart squid service
-
-
-- name: perform squid cloaking
-  block:
-    - name: backup original page icon
-      command: cp -a "{{ file }}" "{{ file }}.orig"
-      args:
-        creates: "{{ file }}.orig"
-      vars:
-        file: /usr/share/squid-ssl/icons/SN.png
-
-    - name: reset error page stylesheet and icon
-      copy:
-        dest: "{{ item }}"
-        content: ""
-      loop:
-        - /etc/squid-ssl/errorpage.css
-        - /usr/share/squid-ssl/icons/SN.png
-      register: reset_stylesheet_result
-      notify: restart squid service
-
-    - name: stop squid service before patching the binary
-      systemd:
-        name: squid-ssl
-        state: stopped
-      # assume that binary needs patching if stylesheet was patched
-      when: reset_stylesheet_result is changed
-
-    - name: patch version signature in the squid binary
-      # replace string "squid/3.5.x" by "nginx/1.5.x"
-      # must keep replaced string length unchanged!
-      replace:
-        path: /usr/sbin/squid-ssl
-        regexp: 'squid/[1-5]([\d.]+\0)'
-        replace: 'nginx/1\1'
-        encoding: latin
-        backup: true
-        validate: 'sh -c "exe=%s && chmod +x $exe && $exe -v"'
-      register: patch_binary_result
-      notify: restart squid service
-
-    - name: disable squid upgrades to keep binary patched
-      command: apt-mark hold squid-ssl
-      when: patch_binary_result is changed
-  when: squid_cloaking |bool
 ...

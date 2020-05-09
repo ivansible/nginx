@@ -17,8 +17,6 @@ squid_ssl_enable: false
 squid_ssl_port: 3129
 squid_letsencrypt_cert: ""
 
-squid_pkg: squid-ssl
-
 squid_user: proxy
 squid_group: proxy
 
@@ -30,12 +28,15 @@ squid_cloaking: false
 squid_proxy_users: []
 squid_cachemgr_password: secretpass
 
-squid_etc_dir: /etc/{{ squid_pkg }}
-squid_lib_dir: /usr/lib/{{ squid_pkg }}
-squid_spool_dir: /var/spool/{{ squid_pkg }}
-squid_log_dir: /var/log/{{ squid_pkg }}
+squid_from_ppa: "{{ ansible_lsb.release is version('20.04', '<') }}"
+squid_pkg: "{{ squid_from_ppa |ternary('squid-ssl', 'squid') }}"
+squid_helper_suffix: "{{ squid_from_ppa |ternary('-ssl', '') }}"
 
-squid_helper_suffix: "{{ '-ssl' if squid_pkg == 'squid-ssl' else '' }}"
+squid_etc_dir: "/etc/{{ squid_pkg }}"
+squid_lib_dir: "/usr/lib/{{ squid_pkg }}"
+squid_share_dir: "/usr/share/{{ squid_pkg }}"
+squid_spool_dir: "/var/spool/{{ squid_pkg }}"
+squid_log_dir: "/var/log/{{ squid_pkg }}"
 
 squid_safe_ports:
   - 80
