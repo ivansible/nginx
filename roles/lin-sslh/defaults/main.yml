@@ -23,4 +23,7 @@ sslh_mark_value: '0x1'
 sslh_listen_addresses:
   - "{{ ansible_default_ipv4.address }}"
   - "{{ ansible_default_ipv6.address |default('') }}"
+
+sslh_bionic_deb: http://mirrors.kernel.org/ubuntu/pool/universe/s/sslh/sslh_1.18-1_amd64.deb
+sslh_focal_deb: http://mirrors.kernel.org/ubuntu/pool/universe/s/sslh/sslh_1.20-1_amd64.deb
 ...

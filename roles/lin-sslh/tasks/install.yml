@@ -1,19 +1,24 @@
 ---
-- name: install sslh package 1.18 from bionic on xenial
+- name: install sslh v1.18 from bionic on xenial
   # with original xenial's sslh 1.17 an attempt of ssh transparent
   # proxying for a local process (e.g. shadowsocks) fails with error
   # "bind:98:Address already in use"
   # issue description: https://github.com/yrutschle/sslh/issues/64
   # fixed in sslh 1.18 by PR https://github.com/yrutschle/sslh/pull/69
   apt:
-    deb: http://mirrors.kernel.org/ubuntu/pool/universe/s/sslh/sslh_1.18-1_amd64.deb
+    deb: "{{ sslh_bionic_deb }}"
   when: ansible_lsb.codename in ['xenial']
 
-- name: install sslh package on bionic+
+- name: install sslh v1.20 from focal on bionic
+  apt:
+    deb: "{{ sslh_focal_deb }}"
+  when: ansible_lsb.codename in ['bionic', 'eoan']
+
+- name: install native sslh package on focal+
   apt:
     name: sslh
     state: present
-  when: ansible_lsb.release is version('16.04','>')
+  when: ansible_lsb.release is version('20.04','>=')
 
 - name: remove apache2 packages pulled by sslh on bionic+
   apt:
