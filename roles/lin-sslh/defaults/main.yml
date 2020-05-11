@@ -3,12 +3,19 @@
 
 #use_sslh: <inherited from ivansible.nxinx_base>
 
+sslh_tls_port: 443
 sslh_ssh_port: 22
 sslh_ssh_fork: false
 sslh_ssh_timeout: 16
 sslh_openvpn_port: 0
 sslh_socks5_port: 0
 sslh_anyprot_port: 443
+
+sslh_sni_servers: []
+## list of SNI forwards:
+#  - {comment: COMMENT1, hostname: SNI_HOSTNAME_1, port: LOCAL_PORT_1}
+#  - {comment: COMMENT2, hostname: SNI_HOSTNAME_2, port: LOCAL_PORT_2}
+## ...
 
 sslh_verbose: false
 sslh_handle_http: true
