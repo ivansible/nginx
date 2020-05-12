@@ -86,9 +86,12 @@ behind the cloudflare web proxy. See:
  - https://stackoverflow.com/q/26983893
 
 ```
+    nginx_own_default_server: true
+```
+Set this to false if you provide your own default server.
+
     nginx_sni_mux_port: 3443
     nginx_sni_servers: []
-```
 These optional settings control stream module multiplexing TLS ports
 behind nginx. The incoming TLS traffic will be accepted on port
 `nginx_sni_mux_port` and multiplexed based on the records in the

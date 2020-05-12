@@ -17,6 +17,8 @@ nginx_sni_servers: []
 #   hostname: host1.example.com
 #   port: 9999
 
+nginx_own_default_server: true
+
 # stable or mainline repository?
 nginx_prefer_stable: false
 
