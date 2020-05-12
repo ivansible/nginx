@@ -55,11 +55,16 @@ squid_outgoing_addresses: []
 squid_outgoing_ipv4: "{{ ansible_default_ipv4.address |default('') }}"
 squid_outgoing_ipv6: "{{ ansible_default_ipv6.address |default('') }}"
 
+squid_nginx_redirect: false
+squid_nginx_use_streams: true
+squid_nginx_own_default_server: false
+squid_nginx_accel_port: "{{ squid_port + 1 }}"
+
 squid_pac_types:
   - name: http
     url: "PROXY {{ squid_host }}:{{ squid_port }}"
   - name: ssl
-    url: "HTTPS {{ squid_host }}:{{ squid_ssl_port }}"
+    url: "HTTPS {{ squid_host }}:{{ squid_nginx_redirect |bool |ternary(nginx_ssl_port, squid_ssl_port) }}"
 squid_pac:
   pac_types: "{{ squid_pac_types }}"
   direct_nets:

@@ -53,6 +53,12 @@ If this is `squid-ssl`, a custom SSL-enabled package from `llxdev` ppa will be i
     squid_group: proxy
 Daemon will run as this Unix user/group.
 
+    squid_nginx_redirect: false
+    squid_nginx_use_streams: true
+Enables or removes Nginx redirector for Squid.
+By default Nginx redirector uses Nginx streams,
+but you can opt for GET-only proxy.
+
     squid_auth_ldap: false
 
     squid_auth_htpasswd: false
@@ -126,6 +132,7 @@ Example list entry:
 - `srv_squid_pac` -- generate example pac files
 - `srv_squid_logs` -- fine-tune squid logs
 - `srv_squid_cloudflare` -- setup dns records in cloudflare
+- `srv_squid_nginx` -- setup nginx redirector for squid
 - `srv_squid_all` -- all of the above
 
 

@@ -40,7 +40,7 @@
   tags: srv_squid_config
 
 
-- name: perform squid cloaking
+- name: setup squid cloaking
   import_tasks: cloaking.yml
   when: squid_cloaking |bool
   tags: srv_squid_cloaking
@@ -82,6 +82,23 @@
     enabled: true
     daemon_reload: "{{ squid_from_ppa |bool }}"
   tags: srv_squid_service
+
+
+- name: setup nginx redirector for squid
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_site_dir }}/squid.conf"
+  notify: reload nginx service
+  when: squid_nginx_redirect |bool
+  tags: srv_squid_nginx
+
+- name: remove squid redirector from nginx
+  file:
+    path: "{{ nginx_site_dir }}/squid.conf"
+    state: absent
+  notify: reload nginx service
+  when: not squid_nginx_redirect |bool
+  tags: srv_squid_nginx
 
 
 - name: directory for distributed pac files

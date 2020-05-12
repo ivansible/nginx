@@ -94,6 +94,9 @@ http_access allow authenticated
 http_access deny all
 
 http_port {{squid_port}}
+{% if squid_nginx_redirect |bool and not squid_nginx_use_streams |bool %}
+http_port {{squid_nginx_accel_port}} accel allow-direct
+{% endif %}
 {% if squid_ssl_enable |bool %}
 {%   set gnutls_options = 'tls-min-version=1.2 tls-options=NORMAL' %}
 {%   if squid_from_ppa and self_signed %}

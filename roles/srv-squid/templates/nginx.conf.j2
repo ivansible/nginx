@@ -1,0 +1,54 @@
+# Nginx redirector for Squid
+# ansible-managed
+
+# Notes:
+{% if squid_nginx_use_streams |bool %}
+{%   set default_server = '' %}
+# Using Nginx streams or SSLH, CONNECT method will work.
+{% else %}
+{%   if squid_nginx_own_default_server |bool %}
+{%     set default_server = ' default_server' %}
+# Please set nginx_own_default_server = false
+{%   else %}
+{%     set default_server = '' %}
+# GET method won't work yet. Please use Nginx streams, SSLH
+# or set squid_nginx_own_default_server = true
+{%     endif %}
+# This configuration doesn't support CONNECT method,
+# you should use Nginx streams or SSLH for that.
+{% endif %}
+
+server {
+    server_name {{ squid_host }};
+    listen {{ nginx_http_port }}{{ default_server }};
+    listen [::]:{{ nginx_http_port }}{{ default_server }};
+{% if squid_ssl_enable |bool %}
+    {{ nginx_conf_listen_ssl_ipv4 }}{{ default_server }};
+{%   if nginx_bind_ipv6 |bool %}
+    {{ nginx_conf_listen_ssl_ipv6 }}{{ default_server }};
+{%   endif %}
+{%   if self_signed %}
+    ssl_certificate     {{ ss_cert }}.crt;
+    ssl_certificate_key {{ ss_cert }}.key;
+{%   else %}
+    ssl_certificate     {{ lecert_dir }}/fullchain.pem;
+    ssl_certificate_key {{ lecert_dir }}/privkey.pem;
+{%   endif %}
+{% endif %}
+    location /  {
+        if ( $https != "on" ) { return 301 "https://$host$uri"; }
+        if ( $http_x_forwarded_proto !~ "^(https)?$" ) { return 301 "https://$host$uri"; }
+{% if not squid_nginx_use_streams |bool %}
+
+{#      # Sending full scheme doesn't work! #}
+{#      proxy_pass http://localhost:{{ squid_nginx_accel_port }}/$scheme://$host$uri; #}
+        proxy_pass http://localhost:{{ squid_nginx_accel_port }};
+        proxy_set_header Host $host;
+        proxy_set_header Request-URI $request_uri;
+{#      # For yet unknown reasons Squid ignores proxy-auth but requires basic-auth #}
+        proxy_set_header Authorization $http_proxy_authorization;
+
+{% endif %}
+        root {{ nginx_def_site_dir }};
+    }
+}
