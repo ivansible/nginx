@@ -11,6 +11,12 @@ nginx_upload_progress: false
 nginx_cloudflare_ips: []
 nginx_cloudfront_ips: []
 
+nginx_sni_mux_port: 3443
+nginx_sni_servers: []
+# - comment: server1
+#   hostname: host1.example.com
+#   port: 9999
+
 # stable or mainline repository?
 nginx_prefer_stable: false
 

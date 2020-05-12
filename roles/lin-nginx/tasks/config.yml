@@ -60,4 +60,10 @@
     src: proxies.conf
     dest: "{{ nginx_conf_dir }}/proxies.conf"
   notify: restart nginx service
+
+- name: configure nginx stream multiplexor
+  template:
+    src: tlsmux.conf
+    dest: "{{ nginx_stream_dir }}/tlsmux.conf"
+  notify: restart nginx service
 ...

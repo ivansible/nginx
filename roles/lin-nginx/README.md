@@ -26,11 +26,18 @@ This is used to configure server name for default nginx site.
     web_ports: [80, 443]
 These ports will be opened in the firewall.
 
+    nginx_http_port: 80
+    nginx_ssl_port: 443
+These ports are used in configuration snippets.
+
     nginx_conf_dir: /etc/nginx/conf.d
 Extra configuration will be put here.
 
     nginx_site_dir: /etc/nginx/sites-enabled
 The default nginx site configuration will be put here.
+
+    nginx_stream_dir: /etc/nginx/streams.d
+Stream module snippets will be put here.
 
     nginx_def_site_dir: /var/www/dummy
 The default nginx site files will be put here.
@@ -77,6 +84,22 @@ behind the cloudflare web proxy. See:
  - https://www.cloudflare.com/ips
  - https://www.babaei.net/blog/getting-real-ip-addresses-using-nginx-and-cloudflare
  - https://stackoverflow.com/q/26983893
+
+```
+    nginx_sni_mux_port: 3443
+    nginx_sni_servers: []
+```
+These optional settings control stream module multiplexing TLS ports
+behind nginx. The incoming TLS traffic will be accepted on port
+`nginx_sni_mux_port` and multiplexed based on the records in the
+`nginx_sni_servers` list. Every record has the following fields:
+ - `comment` -- comment for the record
+ - `hostname` -- SNI hostname to pick on
+ - `port` -- target port on localhost
+
+All traffic that is not captured by listed host names will be redirected
+to default port `nginx_ssl_port`, which is normally served by the Nginx
+core http module.
 
 
 ## Tags

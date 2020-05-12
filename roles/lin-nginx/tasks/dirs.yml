@@ -14,15 +14,14 @@
     dest: /etc/tmpfiles.d/nginx.conf
   notify: update system temp files
 
-- name: directory for included nginx configuration files
+- name: directories for nginx configuration snippets
   file:
-    path: "{{ nginx_conf_dir }}"
+    path: "{{ item }}"
     state: directory
-
-- name: directory for included nginx site configurations
-  file:
-    path: "{{ nginx_site_dir }}"
-    state: directory
+  loop:
+    - "{{ nginx_conf_dir }}"
+    - "{{ nginx_site_dir }}"
+    - "{{ nginx_stream_dir }}"
 
 - name: directory for nginx password files
   file:
