@@ -125,6 +125,7 @@ Example list entry:
 - `srv_squid_service` -- activate squid service
 - `srv_squid_pac` -- generate example pac files
 - `srv_squid_logs` -- fine-tune squid logs
+- `srv_squid_cloudflare` -- setup dns records in cloudflare
 - `srv_squid_all` -- all of the above
 
 
@@ -135,6 +136,9 @@ Example list entry:
   - global flag `lin_compress_logs`,
     which enables or disables compression of rotated logs
 - [ivansible.lin_tor](https://github.com/ivansible/lin-tor)
+  - optional dependency
+- [ivansible.srv_cdn](https://github.com/ivansible/srv-cdn)
+  - for cloudflare task (implicit dependency)
 
 
 ## Example Playbook

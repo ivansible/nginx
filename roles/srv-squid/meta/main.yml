@@ -1,6 +1,7 @@
 ---
 dependencies:
   - ivansible.lin_base  # for lin_firewall, ferm_port module and more
+  # - ivansible.srv_cdn  # for cloudflare task (implicit dependency)
 
 galaxy_info:
   role_name: srv_squid
