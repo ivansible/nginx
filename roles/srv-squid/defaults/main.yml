@@ -20,6 +20,8 @@ squid_letsencrypt_cert: ""
 squid_user: proxy
 squid_group: proxy
 
+squid_upgrade: false
+
 squid_auth_ldap: false
 squid_auth_htpasswd: false
 squid_use_squidguard: false

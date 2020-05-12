@@ -19,11 +19,4 @@
     state: absent
     purge: true
     autoremove: true
-
-- name: install squid-ssl package
-  apt:
-    name: squid-ssl
-    state: present
-    # state: latest  # triggers galaxy warning
-    install_recommends: false
 ...

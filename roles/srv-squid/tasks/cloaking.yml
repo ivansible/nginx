@@ -39,10 +39,7 @@
     encoding: latin
     backup: true
     validate: 'sh -c "exe=%s && chmod +x $exe && $exe -v"'
-  register: patch_binary_result
-  notify: restart squid service
-
-- name: disable squid upgrades to keep binary patched
-  command: apt-mark hold "{{ squid_pkg }}"
-  when: patch_binary_result is changed
+  notify:
+    - restart squid service
+    - hold squid upgrades
 ...

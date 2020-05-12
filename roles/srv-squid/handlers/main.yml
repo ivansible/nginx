@@ -6,4 +6,8 @@
     name: "{{ squid_pkg }}"
     state: restarted
   become: true
+
+- name: hold squid upgrades
+  command: apt-mark hold "{{ squid_pkg }}"
+  become: true
 ...

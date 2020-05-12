@@ -4,9 +4,20 @@
   when: squid_from_ppa |bool
   tags: srv_squid_install
 
-- name: install squid4 with from universe
-  import_tasks: install-squid4.yml
-  when: not squid_from_ppa |bool
+- name: unhold package before upgrade
+  command: apt-mark unhold "{{ squid_pkg }}"
+  when: squid_upgrade |bool
+  register: unhold_squid_result
+  changed_when: unhold_squid_result.stdout |default('') is search('Canceled hold')
+  notify: hold squid upgrades
+  ignore_errors: true
+  tags: srv_squid_install
+
+- name: install (upgrade) squid package
+  apt:
+    name: "{{ squid_pkg }}"
+    state: "{{ squid_upgrade |ternary('latest','present') }}"
+    install_recommends: false
   tags: srv_squid_install
 
 

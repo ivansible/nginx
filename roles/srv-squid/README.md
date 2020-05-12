@@ -49,6 +49,10 @@ Used as common name in self-signed ssl certificate.
 If this is `squid`, a package from universe will be installed.
 If this is `squid-ssl`, a custom SSL-enabled package from `llxdev` ppa will be installed. Please note that this PPA does not yet provide packages for _bionic_. As a workaround, _xenial_ packages are installed in that case.
 
+    squid_upgrade: false
+Allows to upgrade already installed squid package.
+By default, squid binary is patched and package is put on hold.
+
     squid_user: proxy
     squid_group: proxy
 Daemon will run as this Unix user/group.
