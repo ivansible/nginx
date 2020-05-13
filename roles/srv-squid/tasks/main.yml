@@ -6,7 +6,7 @@
     lecert_name: "{{ squid_letsencrypt_cert |default('',true) }}"
     lecert_dir: "/etc/letsencrypt/live/{{ lecert_name }}"
     lecert_bundle: "{{ squid_etc_dir }}/ssl-letsencrypt.pem"
-    self_signed: "{{ lecert_name == '' }}"  # noqa 602
+    self_signed: "{{ lecert_name in ['', 'example.com'] }}"
     ss_cert: "{{ squid_etc_dir }}/ssl-selfsigned"
   tags: srv_squid_all
 

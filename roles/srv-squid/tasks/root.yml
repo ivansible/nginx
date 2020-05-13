@@ -23,15 +23,17 @@
 
 - name: setup self-signed ssl certificate for squid
   import_tasks: ssl-selfsigned.yml
-  when: squid_ssl_enable |bool
-        and self_signed
+  when:
+    - squid_ssl_enable |bool
+    - self_signed
   tags: srv_squid_ssl
 
 - name: configure letsencrypt certificate for squid
   import_tasks: ssl-letsencrypt.yml
-  when: squid_ssl_enable |bool
-        and not self_signed
-        and certbot_group |default('')
+  when:
+    - squid_ssl_enable |bool
+    - not self_signed
+    - certbot_group |d('')
   tags: srv_squid_ssl
 
 
