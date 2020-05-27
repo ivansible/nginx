@@ -27,7 +27,7 @@
       file:
         path: /tmp/doh-proxy-linux-x86_64
         state: absent
-  when: srv_doh_zip_url != ''  # noqa 602
+  when: srv_doh_zip_url |default('')
 
 
 - name: install rust-doh from package (not recommended)
@@ -37,11 +37,15 @@
     # warning: apt remembers broken dependencies in package cache
     #          making other apt installs fail, please avoid!
     force: true
-  when: srv_doh_zip_url == '' and srv_doh_deb_url != ''  # noqa 602
+  when:
+    - srv_doh_zip_url == ''  # noqa 602
+    - srv_doh_deb_url != ''  # noqa 602
 
 
 - name: compile and install rust-doh binary (very long)
   # warning: rust compilation takes 20+ minutes!
   import_tasks: compile.yml
-  when: srv_doh_zip_url == '' and srv_doh_deb_url == ''  # noqa 602
+  when:
+    - srv_doh_zip_url == ''  # noqa 602
+    - srv_doh_deb_url == ''  # noqa 602
 ...

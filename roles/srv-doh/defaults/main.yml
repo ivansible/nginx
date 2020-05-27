@@ -11,5 +11,5 @@ srv_doh_deb_url: ""
 srv_doh_zip_url: ""
 
 srv_doh_binary: /usr/bin/doh-proxy
-srv_doh_allow_reinstall: false
+srv_doh_upgrade: false
 ...

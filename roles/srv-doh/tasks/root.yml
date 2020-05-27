@@ -14,7 +14,7 @@
         - srv_doh_install
         - srv_doh_all
       become: true
-  when: srv_doh_allow_reinstall |bool or not stat_doh_binary.stat.exists
+  when: srv_doh_upgrade |bool or not stat_doh_binary.stat.exists
   tags: srv_doh_install
 
 - name: create group for proxy processes
