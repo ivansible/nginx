@@ -8,10 +8,12 @@
   copy:
     src: www/{{ item }}
     dest: "{{ nginx_def_site_dir }}/{{ item }}"
+    force: true
   loop:
     - favicon.ico
     - index.html
     - robots.txt
+  tags: lin_nginx_site_files
 
 - name: remove obsolete default nginx sites
   file:
