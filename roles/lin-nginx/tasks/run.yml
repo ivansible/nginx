@@ -52,4 +52,15 @@
     comment: nginx
   tags: skip_ansible_lint
   when: lin_firewall == 'ferm'
+
+- name: open internal nginx ports in ferm
+  ferm_port:
+    port:
+      - "{{ nginx_http_port_internal |default('',true) }}"
+      - "{{ nginx_ssl_port_internal |default('',true) }}"
+    proto: tcp
+    zone: internal
+    comment: nginx internal
+  tags: skip_ansible_lint
+  when: lin_firewall == 'ferm'
 ...
