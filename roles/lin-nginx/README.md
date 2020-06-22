@@ -39,7 +39,7 @@ The default nginx site configuration will be put here.
     nginx_stream_dir: /etc/nginx/streams.d
 Stream module snippets will be put here.
 
-    nginx_def_site_dir: /var/www/dummy
+    nginx_def_site_dir: /var/www/default
 The default nginx site files will be put here.
 
     nginx_ssl_cert: <derived from letsencrypt setting>
