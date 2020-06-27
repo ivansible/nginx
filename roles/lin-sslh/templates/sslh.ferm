@@ -15,16 +15,16 @@
         # Packets not leaving the server aren't affected by this
         @if @eq($DOMAIN,ip)  @def $lo_ip = 127.0.0.0/8;
         @if @eq($DOMAIN,ip6) @def $lo_ip = ::1/128;
-        table raw    chain PREROUTING  interface !lo daddr $lo_ip DROP;
-        table mangle chain POSTROUTING outerface !lo saddr $lo_ip DROP;
+        table raw    chain $PREROUTING  interface !lo daddr $lo_ip DROP;
+        table mangle chain $POSTROUTING outerface !lo saddr $lo_ip DROP;
 
         # Mark all connections made by sslh for special treatment
-        table nat chain OUTPUT
+        table nat chain $OUTPUT
               proto tcp syn mod owner uid-owner $sslh_uid
               CONNMARK set-xmark "$sslh_mark/$sslh_mask";
 
         # Mark (ctmark -> fwmark) outgoing packets destined to sslh for rerouting
-        table mangle chain OUTPUT
+        table mangle chain $OUTPUT
               proto tcp outerface !lo mod connmark mark "$sslh_mark/$sslh_mask"
               CONNMARK restore-mark mask $sslh_mask;
     }
