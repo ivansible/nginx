@@ -6,9 +6,10 @@
 
 - name: upload www files for default nginx site
   copy:
-    src: www/{{ item }}
+    src: "www/{{ item }}"
     dest: "{{ nginx_def_site_dir }}/{{ item }}"
     force: true
+    mode: 0644
   loop:
     - favicon.ico
     - index.html
@@ -28,9 +29,10 @@
   template:
     src: default-site.conf
     dest: "{{ nginx_site_dir }}/default.conf"
+    mode: 0644
   notify:
     - restart nginx service
-    # detect changed binding of https port
+    ## detect changed binding of https port
     - restart sslh service
 
 - name: find all configured nginx sites
@@ -50,7 +52,7 @@
     label: "{{ item.path |basename }}"
   notify:
     - restart nginx service
-    # detect changed binding of https port
+    ## detect changed binding of https port
     - restart sslh service
 
 - name: update ipv6 bind interface on existing nginx sites
@@ -63,6 +65,6 @@
     label: "{{ item.path |basename }}"
   notify:
     - restart nginx service
-    # detect changed binding of https port
+    ## detect changed binding of https port
     - restart sslh service
 ...

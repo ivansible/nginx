@@ -3,13 +3,14 @@
   template:
     src: security.conf
     dest: "{{ nginx_conf_dir }}/security.conf"
+    mode: 0644
   notify: restart nginx service
 
 - name: generate diffie-helman parameters for nginx tls (may take a while)
   openssl_dhparam:
     path: "{{ nginx_conf_dir }}/ssl-dhparam.pem"
-    # default 4096 bits can take too long
-    # normally this step takes some 4 minutes
+    ## default 4096 bits can take too long
+    ## normally this step takes some 4 minutes
     size: 2048
     owner: root
     group: "{{ nginx_group }}"
@@ -23,13 +24,14 @@
   loop:
     - "{{ nginx_ssl_cert }}"
     - "{{ nginx_ssl_key }}"
-  when: nginx_ssl_cert != '' or nginx_ssl_key != ''  # noqa 602
+  when: nginx_ssl_cert |d('')
+     or nginx_ssl_key |d('')
 
 - name: directory for letsencrypt post-renewal hooks
   file:
     path: /etc/letsencrypt/renewal-hooks/post
     state: directory
-  when: "'/letsencrypt/' in nginx_ssl_cert"
+  when: nginx_ssl_cert is search('/letsencrypt/')
 
 - name: add letsencrypt post-renewal hook for nginx
   copy:
@@ -42,5 +44,5 @@
       # nginx certificate update hook
       # ansible-managed
       systemctl reload nginx
-  when: "'/letsencrypt/' in nginx_ssl_cert"
+  when: nginx_ssl_cert is search('/letsencrypt/')
 ...

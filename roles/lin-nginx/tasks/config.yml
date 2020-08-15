@@ -13,24 +13,30 @@
   set_fact:
     # assume installed dnsmasq or bind9
     nginx_fallback_resolver: 127.0.0.1
-  when: ansible_lsb.codename in ['xenial'] and nginx_fallback_resolver is not defined
+  when:
+    - ansible_lsb.codename in ['xenial']
+    - nginx_fallback_resolver is not defined
 
 - name: select nginx fallback resolver on bionic+
   set_fact:
     # fallback to systemd-resolved on bionic+
     nginx_fallback_resolver: 127.0.0.53
-  when: ansible_lsb.codename not in ['xenial'] and nginx_fallback_resolver is not defined
+  when:
+    - ansible_lsb.codename not in ['xenial']
+    - nginx_fallback_resolver is not defined
 
 - name: create main nginx configuration file
   template:
     src: nginx.conf
     dest: "{{ nginx_base_dir }}/nginx.conf"
+    mode: 0644
   notify: restart nginx service
 
 - name: uwsgi parameters for nginx behind balancer
   template:
     src: uwsgi_params
     dest: "{{ nginx_base_dir }}/uwsgi_params"
+    mode: 0644
   notify: restart nginx service
 
 - name: comment for extra mime types
@@ -59,11 +65,13 @@
   template:
     src: proxies.conf
     dest: "{{ nginx_conf_dir }}/proxies.conf"
+    mode: 0644
   notify: restart nginx service
 
 - name: configure nginx stream multiplexor
   template:
     src: tlsmux.conf
     dest: "{{ nginx_stream_dir }}/tlsmux.conf"
+    mode: 0644
   notify: restart nginx service
 ...

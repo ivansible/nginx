@@ -12,6 +12,8 @@
   copy:
     content: "d    {{ nginx_cache_dir }}    0750    {{ web_user }}    root    -       -"
     dest: /etc/tmpfiles.d/nginx.conf
+    force: true
+    mode: 0644
   notify: update system temp files
 
 - name: directories for nginx configuration snippets
