@@ -4,7 +4,7 @@
 [![Travis Test Status](https://travis-ci.org/ivansible/srv-v2ray.svg?branch=master)](https://travis-ci.org/ivansible/srv-v2ray)
 [![Ansible Galaxy](https://img.shields.io/badge/galaxy-ivansible.srv__v2ray-68a.svg?style=flat)](https://galaxy.ansible.com/ivansible/srv_v2ray/)
 
-This role deploys [v2ray](https://github.com/v2ray/v2ray-core/) server on Linux.
+This role deploys [v2ray](https://github.com/v2fly/v2ray-core/) server on Linux.
 
 
 ## Requirements
