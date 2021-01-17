@@ -31,6 +31,7 @@
   file:
     path: "{{ certbot_post_dir }}"
     state: directory
+    mode: 0755
   when: nginx_ssl_cert is search('/letsencrypt/')
 
 - name: add letsencrypt post-renewal hook for nginx
@@ -39,6 +40,7 @@
     owner: root
     group: root
     mode: 0750
+    force: true
     content: |
       #!/bin/sh
       # nginx certificate update hook
