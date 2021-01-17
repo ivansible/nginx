@@ -29,13 +29,13 @@
 
 - name: directory for letsencrypt post-renewal hooks
   file:
-    path: /etc/letsencrypt/renewal-hooks/post
+    path: "{{ certbot_post_dir }}"
     state: directory
   when: nginx_ssl_cert is search('/letsencrypt/')
 
 - name: add letsencrypt post-renewal hook for nginx
   copy:
-    dest: /etc/letsencrypt/renewal-hooks/post/nginx
+    dest: "{{ certbot_post_dir }}/nginx"
     owner: root
     group: root
     mode: 0750
