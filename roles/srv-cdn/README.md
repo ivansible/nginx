@@ -1,7 +1,6 @@
 # ivansible.srv_cdn
 
-[![Github Test Status](https://github.com/ivansible/srv-cdn/workflows/Molecule%20test/badge.svg?branch=master)](https://github.com/ivansible/srv-cdn/actions)
-[![Travis Test Status](https://travis-ci.org/ivansible/srv-cdn.svg?branch=master)](https://travis-ci.org/ivansible/srv-cdn)
+[![Github Test Status](https://github.com/ivansible/srv-cdn/workflows/test/badge.svg?branch=master)](https://github.com/ivansible/srv-cdn/actions)
 [![Ansible Galaxy](https://img.shields.io/badge/galaxy-ivansible.srv__cdn-68a.svg?style=flat)](https://galaxy.ansible.com/ivansible/srv_cdn/)
 
 This role configures simple nginx-based CDN.
@@ -137,4 +136,4 @@ MIT
 
 ## Author Information
 
-Created in 2020 by [IvanSible](https://github.com/ivansible)
+Created in 2020-2021 by [IvanSible](https://github.com/ivansible)
