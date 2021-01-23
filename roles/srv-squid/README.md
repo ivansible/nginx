@@ -126,6 +126,8 @@ Example list entry:
 
 ## Tags
 
+- `etc_hosts` -- modify `/etc/hosts`
+
 - `srv_squid_install` -- install squid package
 - `srv_squid_ssl` -- setup ssl certificates
 - `srv_squid_config` -- configure squid
