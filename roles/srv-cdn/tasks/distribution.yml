@@ -140,11 +140,14 @@
   ## As a workaround, we pick critical fields in deterministic order
   ## and compare manually.
   changed_when:
-    cfront_dist_result is changed
-    and (cfront_dist_result.diff.before |json_query(query_changed) |to_json)
-     != (cfront_dist_result.diff.after  |json_query(query_changed) |to_json)
+    - cfront_dist_result is changed
+    - crit_fields_before != crit_fields_after
+    - not srv_cdn_cloudfront_silent_changes |bool
 
   vars:
+    crit_fields_before: "{{ cfront_dist_result.diff.before |json_query(query_changed) |to_json }}"
+    crit_fields_after:  "{{ cfront_dist_result.diff.after  |json_query(query_changed) |to_json }}"
+
     query_changed: "{ {{ cfront_dist_important_fields |dictsort |map('join',': ') |join(',') }} }"
 
     cache_enabled: "{{ item.cache |default(srv_cdn_cloudfront_default_cache) |bool }}"

@@ -43,6 +43,11 @@ srv_cdn_cloudfront: []
 #   cache: false
 #   delete: true
 
+## Module `cloudfront_distribution` frequently reports
+## lame changes because it does not sort json blobs
+## before comparison. Here is workaround for that.
+srv_cdn_cloudfront_silent_changes: false
+
 srv_cdn_cloudfront_default_reference: SERVER_cdn
 
 srv_cdn_cloudfront_max_ttl: 2592000    # one month
