@@ -24,6 +24,7 @@ TODO
 
 - `role1_tag1` -- action1
 - `role1_tag2` -- action2
+- `etc_hosts` -- modify `/etc/hosts`
 
 TODO
 

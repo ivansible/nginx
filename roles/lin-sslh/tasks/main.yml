@@ -13,6 +13,15 @@
     - lin_sslh_all
   when: use_sslh |bool
 
+## separately include /etc/hosts task due to tags filtering
+- name: modify hosts (if use_sslh is true)
+  include_tasks: hosts.yml
+  tags:
+    - etc_hosts
+    - sslh_all
+    - lin_sslh_all
+  when: use_sslh |bool
+
 - name: disable sslh on host (if use_sslh is false)
   include_tasks: uninstall.yml
   args:
