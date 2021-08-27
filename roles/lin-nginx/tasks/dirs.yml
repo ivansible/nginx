@@ -33,4 +33,11 @@
     owner: root
     group: "{{ web_group }}"
     mode: 0750
+
+- name: directory for nginx modules
+  file:
+    path: "{{ nginx_base_dir }}/modules-enabled"
+    state: directory
+    owner: root
+    mode: 0755
 ...
