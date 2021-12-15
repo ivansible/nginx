@@ -2,7 +2,7 @@
 - name: open (or block) unencryped squid port in ufw
   ufw:
     port: "{{ squid_port |string }}"
-    rule: "{{ squid_allow_unencrypted |bool |ternary('allow','deny') }}"
+    rule: "{{ squid_allow_plain |bool |ternary('allow','deny') }}"
     proto: tcp
   no_log: "{{ hide_secrets |bool }}"
 

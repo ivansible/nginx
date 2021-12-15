@@ -2,7 +2,7 @@
 
 This role installs `squid` with ssl support on linux:
  - install custom package with ssl support from the [llxdev ppa](https://launchpad.net/~llxdev/+archive/ubuntu/xenial/);
- - configure incoming port for unencrypted http access;
+ - configure incoming port for plain http access;
  - configure port and ssl certificate for incoming ssl access;
    currently, self-signed certificate is installed,
    but _letsencrypt_ integration is planned;
@@ -35,7 +35,7 @@ and for ldap authentication.
     squid_ssl_enable: false
 If this flag is truthy, the script will install SSL certificate, configure SSL port in squid and open it in the firewall.
 
-    squid_allow_unencrypted: true
+    squid_allow_plain: true
 If this flag is truthy, the non-ssl ports will be open in the firewall.
 
     squid_port: 3128

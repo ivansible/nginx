@@ -11,7 +11,7 @@ web_group: www-data
 
 squid_host: "{{ ansible_fqdn }}"
 squid_port: 3128
-squid_allow_unencrypted: true
+squid_allow_plain: true
 
 squid_ssl_enable: false
 squid_ssl_port: 3129

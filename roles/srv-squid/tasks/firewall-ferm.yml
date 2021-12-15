@@ -3,9 +3,9 @@
   ferm_port:
     port: "{{ squid_port }}"
     proto: tcp
-    zone: "{{ squid_allow_unencrypted |bool |ternary('external','internal') }}"
+    zone: "{{ squid_allow_plain |bool |ternary('external','internal') }}"
     solo_zone: true
-    comment: squid unencrypted
+    comment: squid plain
   tags:
     - skip_ansible_lint
 
