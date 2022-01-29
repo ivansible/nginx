@@ -8,6 +8,8 @@
     lecert_bundle: "{{ squid_etc_dir }}/ssl-letsencrypt.pem"
     self_signed: "{{ lecert_name in ['', 'example.com'] }}"
     ss_cert: "{{ squid_etc_dir }}/ssl-selfsigned"
+  ## llxdev ppa does not provide arm64 package
+  when: not (squid_from_ppa |bool and lin_apt_arch == 'arm64')
   tags: srv_squid_all
 
 - name: apply squid changes now
