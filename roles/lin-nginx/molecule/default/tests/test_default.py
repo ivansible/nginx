@@ -20,7 +20,7 @@ def test_http_port(host):
 
 def test_http_html(host):
     html = host.check_output("curl http://localhost")
-    assert ('<h1>Welcome to nginx!</h1>' in html) or ('>Welcome!</p>' in html)
+    assert ('Welcome to nginx!' in html) or ('Site is suspended.' in html)
 
 
 def test_https_port(host):
