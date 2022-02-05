@@ -5,7 +5,7 @@
 
 - name: add nginx apt repository
   apt_repository:
-    repo: "deb [arch=amd64] http://nginx.org/packages/{{ repo_path }}/ {{ codename }} nginx"
+    repo: "deb [arch={{ lin_apt_arch }}] http://nginx.org/packages/{{ repo_path }}/ {{ codename }} nginx"
     filename: nginx
     mode: 0644
     update_cache: true
