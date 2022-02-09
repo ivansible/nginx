@@ -146,7 +146,7 @@
 
   vars:
     crit_fields_before: "{{ cfront_dist_result.diff.before |json_query(query_changed) |to_json }}"
-    crit_fields_after:  "{{ cfront_dist_result.diff.after  |json_query(query_changed) |to_json }}"
+    crit_fields_after: "{{ cfront_dist_result.diff.after  |json_query(query_changed) |to_json }}"
 
     query_changed: "{ {{ cfront_dist_important_fields |dictsort |map('join',': ') |join(',') }} }"
 
