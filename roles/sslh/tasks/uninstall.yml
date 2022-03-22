@@ -8,7 +8,7 @@
   no_log: "{{ hide_secrets |bool }}"
 
 - name: remove sslh snippet from ferm
-  ferm_rule:
+  ivansible.base.ferm_rule:
     name: sslh
     hook: custom
     state: absent

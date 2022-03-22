@@ -6,7 +6,7 @@
   tags: srv_v2ray_install
 
 - name: detect latest v2ray-core release
-  github_release:
+  ivansible.base.github_release:
     repository: v2fly/v2ray-core
     release: latest
     template: '{download_url}/v2ray-linux-64.zip'
@@ -96,7 +96,7 @@
   tags: srv_v2ray_firewall
 
 - name: open/block v2ray port in ferm
-  ferm_port:
+  ivansible.base.ferm_port:
     port: "{{ srv_v2ray_port }}"
     proto: tcp
     zone: "{{ srv_v2ray_direct |bool |ternary('external','internal') }}"

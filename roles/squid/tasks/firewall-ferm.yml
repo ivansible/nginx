@@ -1,6 +1,6 @@
 ---
 - name: open (or block) unencryped squid port in ferm
-  ferm_port:
+  ivansible.base.ferm_port:
     port: "{{ squid_port }}"
     proto: tcp
     zone: "{{ squid_allow_plain |bool |ternary('external','internal') }}"
@@ -10,7 +10,7 @@
     - skip_ansible_lint
 
 - name: open (or block) squid ssl port in ferm
-  ferm_port:
+  ivansible.base.ferm_port:
     port: "{{ squid_ssl_port }}"
     proto: tcp
     zone: external

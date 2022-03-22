@@ -97,7 +97,7 @@
     - cgpro_firewall
 
 - name: open cgpro ports in ferm
-  ferm_port:
+  ivansible.base.ferm_port:
     port: "{{ cgpro_open_ports }}"
     proto: tcp
     comment: cgpro

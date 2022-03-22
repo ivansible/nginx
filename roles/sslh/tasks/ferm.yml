@@ -5,7 +5,7 @@
     state: absent
 
 - name: add sslh snippet to ferm (transparent rules)
-  ferm_rule:
+  ivansible.base.ferm_rule:
     name: sslh
     prio: 40
     hook: custom
@@ -13,7 +13,7 @@
   tags: skip_ansible_lint
 
 - name: open tls port for sslh in ferm
-  ferm_port:
+  ivansible.base.ferm_port:
     port: 443
     proto: tcp
     # actually 'sslh', but mark as 'nginx' for idempotency

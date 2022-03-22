@@ -1,6 +1,6 @@
 ---
 - name: detect latest dyndns-go release
-  github_release:
+  ivansible.base.github_release:
     repository: ivansible/srv-dyndns
     release: latest
     template: '{download_url}/dyndns'

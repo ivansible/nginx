@@ -46,7 +46,7 @@
   when: lin_firewall == 'ufw'
 
 - name: open nginx ports in ferm
-  ferm_port:
+  ivansible.base.ferm_port:
     port: "{{ web_ports }}"
     proto: tcp
     comment: nginx
@@ -54,7 +54,7 @@
   when: lin_firewall == 'ferm'
 
 - name: open internal nginx ports in ferm
-  ferm_port:
+  ivansible.base.ferm_port:
     port:
       - "{{ nginx_http_port_internal |default('',true) }}"
       - "{{ nginx_ssl_port_internal |default('',true) }}"

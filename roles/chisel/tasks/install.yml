@@ -1,6 +1,6 @@
 ---
 - name: detect latest chisel release
-  github_release:
+  ivansible.base.github_release:
     repository: jpillora/chisel
     release: "{{ srv_chisel_version }}"
     strip_v: true

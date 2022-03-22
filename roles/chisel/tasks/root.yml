@@ -52,7 +52,7 @@
   when: lin_firewall == 'ufw'
 
 - name: open (or block) chisel port in ferm
-  ferm_port:
+  ivansible.base.ferm_port:
     port: "{{ srv_chisel_port }}"
     proto: tcp
     zone: "{{ srv_chisel_direct |bool |ternary('external','internal') }}"

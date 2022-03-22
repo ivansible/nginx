@@ -57,7 +57,7 @@
   when: lin_firewall == 'ufw'
 
 - name: open shadowsocks port in ferm [{{ args.name }}]
-  ferm_port:
+  ivansible.base.ferm_port:
     port: "{{ args.port }}"
     zone: "{{ args.direct |bool |ternary('external','internal') }}"
     solo_zone: true
