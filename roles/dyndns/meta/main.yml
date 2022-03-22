@@ -1,6 +1,6 @@
 ---
 dependencies:
-  - ivansible.srv_cdn
+  - ivansible.nginx.cdn
 
 galaxy_info:
   role_name: srv_dyndns

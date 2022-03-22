@@ -1,14 +1,14 @@
 ---
 dependencies:
-  - ivansible.lin_base       # for common settings and modules
-  - ivansible.nginx_base     # for ssl certificate and nginx config snippets
-  - ivansible.backup_base    # for unarchive_encrypted.yml
-  - ivansible.cert_base      # for common certbot settings
-  # the following roles are imported directly from tasks:
-  # - ivansible.lin_nginx
+  - ivansible.base.linux     # for common settings and modules
+  - ivansible.base.nginx     # for ssl certificate and nginx config snippets
+  - ivansible.base.backup    # for unarchive_encrypted.yml
+  - ivansible.base.cert      # for common certbot settings
+  ## the following roles are imported directly from tasks:
+  # - ivansible.nginx.nginx
 
 galaxy_info:
-  role_name: srv_cgpro
+  role_name: cgpro
   author: "Ivan Andreev"
   description: "deploy CommuniGate Pro server on a linux host"
   company: "IvanSible"

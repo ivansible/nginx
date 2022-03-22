@@ -1,7 +1,7 @@
 ---
 dependencies:
-  - ivansible.lin_base
-  - ivansible.nginx_base
+  - ivansible.base.linux
+  - ivansible.base.nginx
 
 galaxy_info:
   role_name: lin_uwsgi

@@ -1,7 +1,7 @@
 ---
 dependencies:
-  - ivansible.srv_cdn   # prepare nginx
-  - ivansible.lin_base  # common settings and handlers
+  - ivansible.nginx.cdn   # prepare nginx
+  - ivansible.base.linux  # common settings and handlers
 
 galaxy_info:
   role_name: srv_ss

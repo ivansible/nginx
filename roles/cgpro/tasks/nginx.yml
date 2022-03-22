@@ -9,7 +9,7 @@
   # Condition for this step will be rarely true.
   # Prefer include (vs import) to avoid lots of skip messages.
   include_role:
-    name: ivansible.lin_nginx
+    name: ivansible.nginx.nginx
     apply:
       tags: [cgpro_nginx, cgpro_all]
   when: not check_nginx_site_dir.stat.exists

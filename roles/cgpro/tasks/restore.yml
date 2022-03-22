@@ -7,7 +7,7 @@
 
 - name: restore cgpro data from backup archives
   include_role:
-    name: ivansible.backup_base
+    name: ivansible.base.backup
     tasks_from: unarchive_encrypted.yml
   vars:
     backup_url: "{{ item }}"

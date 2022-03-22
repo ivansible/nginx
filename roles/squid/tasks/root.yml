@@ -151,7 +151,7 @@
 
 - name: setup dns records in cloudflare for squid
   import_role:
-    name: ivansible.srv_cdn
+    name: ivansible.nginx.cdn
     tasks_from: cloudflare.yml
   vars:
     records: "{{ squid_cloudflare_dns }}"
