@@ -3,14 +3,17 @@
   import_tasks: cloudflare.yml
   vars:
     records: "{{ srv_cdn_cloudflare |default([]) }}"
-  when: srv_cdn_cloudflare is defined
+  when:
+    - srv_cdn_cloudflare is defined
   tags:
     - srv_cdn_cloudflare
     - srv_cdn_all
 
 - name: setup cloudfront distributions for cdn
   import_tasks: cloudfront.yml
-  when: srv_cdn_cloudfront |default([],true)
+  when:
+    - srv_cdn_cloudfront |d([],true)
+    - not (srv_cdn_cloudfront_disable |bool)
   tags:
     - srv_cdn_cloudfront
     - srv_cdn_all
@@ -25,7 +28,7 @@
     - srv_cdn_nginx
     - srv_cdn_all
 
-- name: configure cdn mappings in nginx (skip in check mode)
+- name: configure cdn mappings in nginx (will skip in check mode)
   template:
     src: cdn.conf
     dest: "{{ nginx_site_dir }}/cdn.conf"

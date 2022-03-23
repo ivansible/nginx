@@ -28,6 +28,9 @@ srv_cdn_cloudflare: []
 srv_cdn_cloudflare_email: ~
 srv_cdn_cloudflare_token: ~
 
+## this switch will unconditionally disable cloudfront distributions
+srv_cdn_cloudfront_disable: false
+
 srv_cdn_cloudfront: []
 ## path: cloudfront -> server -> origin
 ## list of cloudfront distributions has such fields:
