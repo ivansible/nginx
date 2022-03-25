@@ -9,6 +9,8 @@ squid_domain: "{{ web_domain }}"
 
 web_group: www-data
 
+squid_enable: true
+
 squid_host: "{{ ansible_fqdn }}"
 squid_port: 3128
 squid_allow_plain: true
