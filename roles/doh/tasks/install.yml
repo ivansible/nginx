@@ -11,7 +11,8 @@
         exclude: README.md
 
     - name: move rust-doh binary in place
-      command: mv /tmp/doh-proxy-linux-x86_64/doh-proxy "{{ srv_doh_binary }}"
+      ## ansible_architecture: x86_64 | aarch64
+      command: mv /tmp/doh-proxy-linux-{{ ansible_architecture }}/doh-proxy "{{ srv_doh_binary }}"
       args:
         creates: "{{ srv_doh_binary }}"
 
@@ -22,10 +23,12 @@
         owner: root
         group: root
         mode: 0755
+      when: not ansible_check_mode
 
     - name: remove temporary directory after unzipping rust-doh
       file:
-        path: /tmp/doh-proxy-linux-x86_64
+        ## ansible_architecture: x86_64 | aarch64
+        path: /tmp/doh-proxy-linux-{{ ansible_architecture }}
         state: absent
   when: srv_doh_zip_url |default('')
 
