@@ -4,7 +4,7 @@
     repository: jpillora/chisel
     release: "{{ srv_chisel_version }}"
     strip_v: true
-    template: '{download_url}/chisel_{ver}_linux_amd64.gz'
+    template: '{download_url}/chisel_{ver}_linux_{goarch}.gz'
     creates: "{{ srv_chisel_binary }}"
     reinstall: "{{ srv_chisel_upgrade |bool }}"
   tags: skip_ansible_lint
