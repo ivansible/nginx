@@ -10,11 +10,15 @@
   ivansible.base.github_release:
     repository: v2fly/v2ray-core
     release: latest
-    template: '{download_url}/v2ray-linux-64.zip'
+    template: "{download_url}/{{ tarball_name }}"
     creates: /usr/local/v2ray/v2ray
     reinstall: "{{ srv_v2ray_upgrade |bool }}"
   register: latest_v2ray_core_release
   notify: restart v2ray service
+  vars:
+    tarball_amd64: v2ray-linux-64.zip
+    tarball_arm64: v2ray-linux-arm64-v8a.zip
+    tarball_name: "{{ tarball_arm64 if ansible_architecture == 'aarch64' else tarball_amd64 }}"
   tags:
     - skip_ansible_lint
     - srv_v2ray_install
