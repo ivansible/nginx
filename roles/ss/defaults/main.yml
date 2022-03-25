@@ -3,6 +3,9 @@
 
 srv_ss_configs: []
 
+## shadowsocks launchpad ppa lacks arm64 builds
+srv_ss_enable: "{{ ansible_architecture == 'x86_64' }}"
+
 srv_ss_defaults:
   name: default
   password: secret

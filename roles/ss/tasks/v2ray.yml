@@ -3,7 +3,7 @@
   ivansible.base.github_release:
     repository: shadowsocks/v2ray-plugin
     release: "{{ srv_ss_v2ray_version }}"
-    template: "{download_url}/v2ray-plugin-linux-amd64-{ver}.tar.gz"
+    template: "{download_url}/v2ray-plugin-linux-{goarch}-{ver}.tar.gz"
     creates: "{{ srv_ss_v2ray_binary }}"
     reinstall: "{{ srv_ss_v2ray_upgrade |bool }}"
   register: _ss_v2ray_release

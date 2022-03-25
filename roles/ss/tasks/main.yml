@@ -2,6 +2,7 @@
 - name: use import to become root globally
   import_tasks: root.yml
   become: true
+  when: srv_ss_enable |bool
   tags:
     - srv_ss_all
     - srv_shadowsocks_all
