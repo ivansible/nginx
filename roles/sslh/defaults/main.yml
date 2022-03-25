@@ -1,7 +1,5 @@
 ---
-# defaults for ivansible.lin_sslh
-
-#use_sslh: <inherited from ivansible.nxinx_base>
+# use_sslh: <inherited from ivansible.nxinx_base>
 
 sslh_tls_port: 443
 sslh_ssh_port: 22
@@ -21,10 +19,10 @@ sslh_verbose: false
 sslh_handle_http: true
 sslh_nonroot: "{{ ansible_kernel is version('4.3', '>') }}"
 
-# Note: transparency fails on OpenVZ
+## note: transparency fails on OpenVZ
 sslh_transparent: "{{ lin_firewall in ['ufw', 'ferm'] }}"
 sslh_lookup_table: 100
-# Note: the mark must literally match the output of "ip rule ls" (hexadecimal)
+## note: the mark must literally match the output of "ip rule ls" (hexadecimal)
 sslh_mark_value: '0x1'
 
 sslh_listen_addresses:

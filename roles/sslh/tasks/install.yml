@@ -101,9 +101,10 @@
     name: apache2
     state: stop
     enabled: false
-  ignore_errors: true
-  when: ansible_facts.services.apache2 is defined
-        and ansible_facts.services.apache2.state == 'running'
+  failed_when: false
+  when:
+    - ansible_facts.services.apache2 is defined
+    - ansible_facts.services.apache2.state == 'running'
 
 - name: let sslh service start when nginx blocks ssl port due to stale settings
   block:

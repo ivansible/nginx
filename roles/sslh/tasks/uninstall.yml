@@ -4,7 +4,7 @@
     name: sslh
     state: stopped
     enabled: false
-  ignore_errors: true
+  failed_when: false
   no_log: "{{ hide_secrets |bool }}"
 
 - name: remove sslh snippet from ferm
