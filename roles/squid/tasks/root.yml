@@ -71,8 +71,9 @@
 
 - name: transparent iptables rules for squid from ppa
   import_tasks: iptables.yml
-  when: lin_firewall in ['ufw', 'ferm']
-        and squid_from_ppa |bool
+  when:
+    - lin_firewall in ['ufw', 'ferm']
+    - squid_from_ppa |bool
   tags: srv_squid_iptables
 
 
@@ -82,10 +83,11 @@
     state: stopped
     enabled: false
     daemon_reload: true
-  when: squid_from_ppa |bool
-        and squid_ssl_ppa is defined
-        and squid_ssl_ppa is changed
-  ignore_errors: true
+  when:
+    - squid_from_ppa |bool
+    - squid_ssl_ppa is defined
+    - squid_ssl_ppa is changed
+  failed_when: false
   tags: srv_squid_service
 
 - name: activate squid service
@@ -101,6 +103,7 @@
   template:
     src: nginx.conf.j2
     dest: "{{ nginx_site_dir }}/squid.conf"
+    mode: 0644
   notify: reload nginx service
   when: squid_nginx_redirect |bool
   tags: srv_squid_nginx

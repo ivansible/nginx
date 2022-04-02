@@ -3,11 +3,13 @@
   file:
     path: /usr/share/iptables/rules
     state: directory
+    mode: 0755
 
 - name: ensure some iptables transparent rules
   copy:
-    # /etc/init.d/squid-ssl won't start squid if this file is absent
+    ## /etc/init.d/squid-ssl won't start squid if this file is absent
     dest: /usr/share/iptables/rules/transparent.rules
     content: ""
     force: false
+    mode: 0644
 ...

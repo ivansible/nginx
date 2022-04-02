@@ -34,7 +34,7 @@
       - "{{ squid_etc_dir }}/squid.conf"
       - "{{ squid_etc_dir }}/squid.conf.orig"
     creates: "{{ squid_etc_dir }}/squid.conf.orig"
-  ignore_errors: true
+  failed_when: false
   tags: srv_squid_config
 
 - name: configure squid (depends on interfaces created by other roles!)
@@ -62,5 +62,6 @@
     dest: "{{ squid_etc_dir }}"
     owner: root
     group: "{{ squid_group }}"
+    mode: 0644
   notify: restart squid service
 ...

@@ -20,6 +20,7 @@
   file:
     path: "{{ certbot_hook_dir }}"
     state: directory
+    mode: 0755
 
 - name: link a letsencrypt post-renewal hook for squid
   file:
