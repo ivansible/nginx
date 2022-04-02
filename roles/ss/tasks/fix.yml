@@ -8,6 +8,7 @@
   file:
     path: /etc/systemd/system/shadowsocks-libev.service.d
     state: directory
+    mode: 0755
 
 - name: link directory for additional services snap-in
   file:

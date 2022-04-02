@@ -50,12 +50,14 @@
   file:
     path: /etc/nginx/mixin.d
     state: directory
+    mode: 0755
   tags: srv_ss_nginx
 
 - name: configure nginx for shadowsocks fronting
   template:
     src: nginx-backend.conf
     dest: /etc/nginx/mixin.d/shadowsocks-{{ backend.name }}.conf
+    mode: 0644
   vars:
     backend: "{{ srv_ss_defaults | combine(backend_entries[0]) }}"
   notify: reload nginx service
