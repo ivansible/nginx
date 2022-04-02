@@ -3,6 +3,7 @@
   file:
     path: /usr/local/v2ray
     state: directory
+    mode: 0755
   tags: srv_v2ray_install
 
 - name: detect latest v2ray-core release
@@ -32,6 +33,7 @@
   file:
     path: /etc/v2ray
     state: directory
+    mode: 0755
   tags: srv_v2ray_config
 
 - name: update v2ray configuration
@@ -49,6 +51,7 @@
   file:
     path: /etc/nginx/mixin.d
     state: directory
+    mode: 0755
   tags: srv_v2ray_nginx
 
 - name: configure nginx redirector for v2ray
