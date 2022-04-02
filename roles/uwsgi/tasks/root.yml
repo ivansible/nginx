@@ -13,6 +13,7 @@
   copy:
     content: "d    /run/uwsgi.php-sess    0750    {{ web_user }}    {{ web_group }}    -       -"
     dest: /etc/tmpfiles.d/uwsgi.php-sess.conf
+    mode: 0644
   notify: update system temp files
 
 - name: create cache directories before activating uwsgi
@@ -36,18 +37,20 @@
       - "{{ uwsgi_ini_file }}"
       - "{{ uwsgi_ini_file }}.orig"
     creates: "{{ uwsgi_ini_file }}.orig"
-  ignore_errors: true
+  failed_when: false
 
 - name: create main uwsgi configuration file
   template:
     src: emperor.ini.j2
     dest: "{{ uwsgi_ini_file }}"
+    mode: 0644
   notify: restart uwsgi service
 
 - name: create base includes for uwsgi vassals
   template:
     src: common.inc.j2
     dest: "{{ uwsgi_vassals }}/common.inc"
+    mode: 0644
   notify: restart uwsgi service
 
 
