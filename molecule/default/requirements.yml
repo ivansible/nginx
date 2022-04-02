@@ -1,0 +1,7 @@
+---
+collections:
+  - git+https://github.com/ivansible/base
+  - git+https://github.com/ivansible/linux
+  ## ivansible.devel.go is required by ivansible.nginx.dyndns
+  - git+https://github.com/ivansible/devel
+...
