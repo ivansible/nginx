@@ -141,15 +141,8 @@
   tags: srv_squid_pac
 
 
-- name: enable/disable compression of squid logs
-  replace:
-    path: "/etc/logrotate.d/{{ squid_pkg }}"
-    regexp: "{{ lookbehind }}(compress|delaycompress)"
-    replace: "{{ commentout }}\\1"
-  vars:
-    lookbehind: "{{ lin_compress_logs |bool |ternary('(?:#\\s*)','(?<!#)') }}"
-    commentout: "{{ lin_compress_logs |bool |ternary('','#') }}"
-  when: lin_compress_logs is not none
+- name: configure squid logging
+  import_tasks: syslog.yml
   tags: srv_squid_logs
 
 - name: setup dns records in cloudflare for squid

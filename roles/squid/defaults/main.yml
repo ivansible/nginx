@@ -1,10 +1,10 @@
 ---
-# defaults for ivansible.srv_squid
+## defaults for ivansible.nginx.squid
 
 web_domain: "{{ ansible_dns.domain
               | default(ansible_fqdn | regex_replace('^[^.]+[.]', '')) }}"
-# web_domain is shared with many web roles.
-# squid_domain is specific to this role.
+## web_domain is shared with many web roles.
+## squid_domain is specific to this role.
 squid_domain: "{{ web_domain }}"
 
 web_group: www-data
@@ -41,6 +41,9 @@ squid_lib_dir: "/usr/lib/{{ squid_pkg }}"
 squid_share_dir: "/usr/share/{{ squid_pkg }}"
 squid_spool_dir: "/var/spool/{{ squid_pkg }}"
 squid_log_dir: "/var/log/{{ squid_pkg }}"
+
+squid_log_file: "/var/log/{{ squid_pkg }}.log"
+squid_use_rsyslog: "{{ lin_use_rsyslog |bool }}"
 
 squid_safe_ports:
   - 80

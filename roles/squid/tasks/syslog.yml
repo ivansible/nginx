@@ -1,0 +1,50 @@
+---
+- name: configure syslog for a separate squid service logfile
+  copy:
+    dest: "/etc/rsyslog.d/34-{{ squid_pkg }}.conf"
+    content: |
+      :programname,isequal,"squid" {{ squid_log_file }}
+      & stop
+    force: true
+    mode: 0644
+  notify: restart syslog service
+  when:
+    - squid_use_rsyslog |bool
+
+- name: rotate squid service logfile
+  copy:
+    dest: /etc/logrotate.d/{{ squid_pkg }}-syslog
+    content: |
+      {{ squid_log_file }} {
+          weekly
+          maxsize 1M
+          missingok
+          rotate 4
+          notifempty
+          {{ commentout }}compress
+          {{ commentout }}delaycompress
+          sharedscripts
+          postrotate
+              invoke-rc.d rsyslog rotate > /dev/null 2> /dev/null
+          endscript
+      }
+    force: true
+    mode: 0644
+  vars:
+    commentout: "{{ compress |ternary('','#') }}"
+    compress: "{{ lin_compress_logs |bool or lin_compress_logs is none }}"
+  when:
+    - squid_use_rsyslog |bool
+    - lin_compress_logs is not none
+
+- name: control compression of native squid logs
+  replace:
+    path: "/etc/logrotate.d/{{ squid_pkg }}"
+    regexp: "{{ lookbehind }}(compress|delaycompress)"
+    replace: "{{ commentout }}\\1"
+  vars:
+    lookbehind: "{{ lin_compress_logs |bool |ternary('(?:#\\s*)','(?<!#)') }}"
+    commentout: "{{ lin_compress_logs |bool |ternary('','#') }}"
+  when:
+    - lin_compress_logs is not none
+...

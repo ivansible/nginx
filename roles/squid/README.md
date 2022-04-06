@@ -57,6 +57,9 @@ By default, squid binary is patched and package is put on hold.
     squid_group: proxy
 Daemon will run as this Unix user/group.
 
+    squid_use_rsyslog: true
+Allows to route squid service syslog to a separate log file
+
     squid_nginx_redirect: false
     squid_nginx_use_streams: true
 Enables or removes Nginx redirector for Squid.
