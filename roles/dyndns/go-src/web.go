@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -16,6 +17,7 @@ var (
 	webPort   int
 	webTrust  bool
 	webServer *http.Server
+	webWaiter sync.WaitGroup
 )
 
 func setupWebServer() error {
@@ -31,8 +33,13 @@ func setupWebServer() error {
 		Handler: http.HandlerFunc(handleWebRequest),
 	}
 	var err error
+	webWaiter.Add(1)
 	go func() {
 		err = webServer.ListenAndServe()
+		if err != nil {
+			logError("server finished with error %v", err)
+		}
+		webWaiter.Done()
 	}()
 	time.Sleep(time.Millisecond)
 	if err != nil {
@@ -40,6 +47,12 @@ func setupWebServer() error {
 	}
 	logDebug("server listening on port %d ...", webPort)
 	return err
+}
+
+func waitWebServerDone() {
+	if webServer != nil {
+		webWaiter.Wait()
+	}
 }
 
 func handleWebRequest(w http.ResponseWriter, r *http.Request) {

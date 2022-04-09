@@ -86,6 +86,9 @@ func main() {
 		freeMem()
 		pollService()
 	}
+	if webActive {
+		waitWebServerDone()
+	}
 }
 
 func updateOnce() error {
