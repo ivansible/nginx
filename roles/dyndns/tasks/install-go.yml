@@ -1,9 +1,9 @@
 ---
 - name: detect latest dyndns-go release
   ivansible.base.github_release:
-    repository: ivansible/srv-dyndns
+    repository: ivansible/nginx
     release: latest
-    template: '{download_url}/dyndns'
+    template: '{download_url}/dyndns.{goarch}'
   tags: skip_ansible_lint
   register: latest_dyndns_release
   changed_when: false
