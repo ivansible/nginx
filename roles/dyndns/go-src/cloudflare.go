@@ -11,6 +11,7 @@ import (
 var (
 	api    *cloudflare.API
 	zoneID string
+	dummy  bool
 )
 
 func setupCloudflare() (err error) {
@@ -20,6 +21,10 @@ func setupCloudflare() (err error) {
 	domain := cfg.Domain
 	email := paramStr("cloudflare_email", Required)
 	token := paramStr("cloudflare_token", Required)
+	if email == "dummy" {
+		dummy = true
+		return nil
+	}
 	api, err = cloudflare.New(token, email)
 	if err != nil {
 		return errors.Wrap(err, "failed to setup cloudflare")
@@ -32,6 +37,9 @@ func setupCloudflare() (err error) {
 }
 
 func updateHost(host, addr string, ipv6 bool) (bool, error) {
+	if dummy {
+		return false, nil
+	}
 	if api == nil || zoneID == "" {
 		if err := setupCloudflare(); err != nil {
 			return false, errors.Wrap(err, "cloudflare setup failed")
