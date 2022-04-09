@@ -10,6 +10,9 @@ import (
 )
 
 func dropPrivileges() error {
+	if paramBool("run_as_root", "false") {
+		return nil
+	}
 	if unix.Getuid() != 0 {
 		return nil
 	}

@@ -74,6 +74,15 @@ func paramInt(name string, def string) int {
 	return val
 }
 
+func paramBool(name string, def string) bool {
+	str := paramStr(name, def)
+	val, err := strconv.ParseBool(str)
+	if err != nil {
+		logFatal("failed to read config value: %s", name)
+	}
+	return val
+}
+
 func paramSeconds(name string, def string) time.Duration {
 	return time.Duration(paramInt(name, def)) * time.Second
 }

@@ -15,6 +15,7 @@ srv_dyndns_web_pass: supersecret
 
 srv_dyndns_poll_enable: false
 srv_dyndns_poll_interval: 3600
+srv_dyndns_run_as_root: ~
 
 srv_dyndns_restart_limit: 5
 srv_dyndns_restart_interval: 600

@@ -19,4 +19,5 @@ all:
         lin_core_system_locale: en_US.UTF-8
 
         srv_dyndns_cloudflare_email: dummy
+        srv_dyndns_run_as_root: true
 ...
