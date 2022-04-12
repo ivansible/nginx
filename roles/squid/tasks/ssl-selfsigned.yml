@@ -17,7 +17,7 @@
       changed_when: false
   rescue:
     - name: upgrade ansible openssl bindings
-      command:
+      command:  # noqa no-changed-when
         argv:
           - "{{ ansible_python.executable }}"
           - -m
