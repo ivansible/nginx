@@ -1,7 +1,7 @@
 ---
-# This step requires:
-# curl - to upload skin tarball to the server
-# unzip - to unpack skin archive
+## This step requires:
+## curl - to upload skin tarball to the server
+## unzip - to unpack skin archive
 
 - name: check md5 sum of the {{ skin.name }} skin check file
   stat:
@@ -83,7 +83,7 @@
         src: "{{ skin.url }}"
         remote_src: true
         dest: "{{ temp_skin_dir.path }}"
-      # fix intermittent network failures
+      ## fix intermittent network failures
       register: download_skin_result
       until: "'timed out' not in download_skin_result.msg |default('')"
 
@@ -93,11 +93,12 @@
         state: file
 
     - name: upload skin tarball to cgpro
-      # uri module in ansible before 2.7 cannot upload files
-      # uri module in ansible 2.7+ has "src" option for uploading a file,
-      # but it cannot be used together with "body" option.
-      # workaround: curl
-      command:
+      ## uri module in ansible before 2.7 cannot upload files
+      ## uri module in ansible 2.7+ has "src" option for uploading a file,
+      ## but it cannot be used together with "body" option.
+      ## workaround: curl
+      ## note: the step will run with block only when checksum mismatched
+      command:  # noqa no-changed-when
         curl
           --url "{{ webskins_page.url }}&SubSkin={{ skin.name }}"
           --noproxy '*'
@@ -139,8 +140,8 @@
       changed_when: true
       notify: restart cgpro service
 
-  # end of block
-  # no checksum provided - install always, checksum mismatch - upgrade skin
+  ## end of block
+  ## no checksum provided - install always, checksum mismatch - upgrade skin
   when: checksum_result is skipped or checksum_result is changed
   tags: cgpro_skin
 ...
