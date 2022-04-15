@@ -11,7 +11,7 @@
   register: latest_chisel_release
 
 - name: download compressed chisel binary
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ latest_chisel_release.url }}"
     dest: "{{ srv_chisel_binary }}.gz"
     mode: 0755
@@ -20,6 +20,7 @@
   register: get_chisel_result
 
 - name: uncompress chisel binary
-  command: gunzip -f "{{ srv_chisel_binary }}.gz"
+  ansible.builtin.command:
+    cmd: gunzip -f "{{ srv_chisel_binary }}.gz"
   when: get_chisel_result is changed
 ...

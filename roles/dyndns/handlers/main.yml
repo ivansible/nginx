@@ -1,8 +1,8 @@
 ---
-# handlers for ivansible.srv_dyndns
+## handlers for ivansible.srv_dyndns
 
 - name: restart dyndns service
-  systemd:
+  ansible.builtin.systemd:
     name: dyndns
     state: restarted
     enabled: true

@@ -1,12 +1,12 @@
 ---
 - name: ensure directory for iptables transparent rules
-  file:
+  ansible.builtin.file:
     path: /usr/share/iptables/rules
     state: directory
     mode: 0755
 
 - name: ensure some iptables transparent rules
-  copy:
+  ansible.builtin.copy:
     ## /etc/init.d/squid-ssl won't start squid if this file is absent
     dest: /usr/share/iptables/rules/transparent.rules
     content: ""

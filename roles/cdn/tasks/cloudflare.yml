@@ -1,6 +1,6 @@
 ---
 - name: setup dns records in cloudflare
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     account_email: "{{ srv_cdn_cloudflare_email }}"
     account_api_token: "{{ srv_cdn_cloudflare_token }}"
     zone: "{{ item.zone }}"
@@ -16,8 +16,9 @@
   vars:
     value_label: "{{ item.value |default('-') }}"
     proxied_label: "{{ item.proxied |default(false) |bool |ternary('proxied','direct') }}"
-  when: item.value |default('',true)
-        and srv_cdn_cloudflare_email is defined
-        and srv_cdn_cloudflare_token is defined
-        and srv_cdn_cloudflare_token |default('',true)
+  when:
+    - item.value |d('',true)
+    - srv_cdn_cloudflare_email is defined
+    - srv_cdn_cloudflare_token is defined
+    - srv_cdn_cloudflare_token |d('',true)
 ...

@@ -4,7 +4,7 @@
 ## unzip - to unpack skin archive
 
 - name: check md5 sum of the {{ skin.name }} skin check file
-  stat:
+  ansible.builtin.stat:
     path: "{{ cgpro_dir }}/Accounts/WebSkins/{{ skin.name }}/{{ skin.check_file }}"
     get_checksum: true
     checksum_algorithm: md5
@@ -20,7 +20,7 @@
 
 - block:
     - name: get list of installed cgpro skins
-      uri:
+      ansible.builtin.uri:
         url: &url_webskins
           "{{ cgpro_curl_url }}/Domains/WebSkinsDomain.html?domainName={{ cgpro_main_domain }}"
         user: postmaster
@@ -32,7 +32,7 @@
       register: webskins_page
 
     - name: create custom unnamed skin (cgpro requires it before creating named skins)
-      uri:
+      ansible.builtin.uri:
         url: *url_webskins
         headers:
           Referer: *url_webskins
@@ -49,7 +49,7 @@
       when: webskins_page.content.find('value="Create Custom Unnamed Skin"') != -1
 
     - name: create skin {{ skin.name }} in cgpro (it's empty unless tarball is uploaded)
-      uri:
+      ansible.builtin.uri:
         url: *url_webskins
         headers:
           Referer: *url_webskins
@@ -72,14 +72,14 @@
 
 
     - name: reserve temporary directory for cgpro skin files
-      tempfile:
+      ansible.builtin.tempfile:
         state: directory
         prefix: ansible-temp.cgpro-skin.
       register: temp_skin_dir
       notify: remove temporary cgpro skin files
 
     - name: unarchive cgpro skin to the temporary directory
-      unarchive:
+      ansible.builtin.unarchive:
         src: "{{ skin.url }}"
         remote_src: true
         dest: "{{ temp_skin_dir.path }}"
@@ -88,7 +88,7 @@
       until: "'timed out' not in download_skin_result.msg |default('')"
 
     - name: verify that skin tarball file exists
-      file:
+      ansible.builtin.file:
         path: "{{ temp_skin_dir.path }}/{{ skin.name }}.tar"
         state: file
 
@@ -98,7 +98,7 @@
       ## but it cannot be used together with "body" option.
       ## workaround: curl
       ## note: the step will run with block only when checksum mismatched
-      command:  # noqa no-changed-when
+      ansible.builtin.command:  # noqa no-changed-when
         curl
           --url "{{ webskins_page.url }}&SubSkin={{ skin.name }}"
           --noproxy '*'
@@ -115,13 +115,13 @@
       failed_when: curl_result.stdout != '200'
 
     - name: remove temporary cgpro skin files now
-      file:
+      ansible.builtin.file:
         path: "{{ temp_skin_dir.path }}"
         state: absent
 
 
     - name: flush cached skin files in cgpro
-      uri:
+      ansible.builtin.uri:
         url: "{{ webskins_page.url }}&SubSkin={{ skin.name }}"
         headers:
           Referer: "{{ webskins_page.url }}&SubSkin={{ skin.name }}"
@@ -142,6 +142,7 @@
 
   ## end of block
   ## no checksum provided - install always, checksum mismatch - upgrade skin
-  when: checksum_result is skipped or checksum_result is changed
+  when: checksum_result is skipped
+        or checksum_result is changed
   tags: cgpro_skin
 ...

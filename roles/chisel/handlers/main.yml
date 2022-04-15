@@ -1,8 +1,8 @@
 ---
-# handlers for ivansible.srv_chisel
+## handlers for ivansible.srv_chisel
 
 - name: restart chisel service
-  systemd:
+  ansible.builtin.systemd:
     name: chisel-server
     state: restarted
     daemon_reload: true

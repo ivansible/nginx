@@ -1,6 +1,6 @@
 ---
 - name: add squid-ssl ppa repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     ## (no longer maintained) https://launchpad.net/~notartom/+archive/ubuntu/squid-ssl
     ## (ok) https://launchpad.net/~llxdev/+archive/ubuntu/xenial (bionic)
     # repo: ppa:notartom/squid-ssl
@@ -14,7 +14,7 @@
   until: squid_ssl_ppa is successful
 
 - name: remove stock squid package
-  apt:
+  ansible.builtin.apt:
     name: squid,squid3
     state: absent
     purge: true

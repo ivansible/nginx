@@ -1,7 +1,7 @@
 ---
 - name: backup original page icon
-  command: cp -a "{{ item }}" "{{ item }}.orig"
-  args:
+  ansible.builtin.command:
+    cmd: cp -a "{{ item }}" "{{ item }}.orig"
     creates: "{{ item }}.orig"
   loop:
     - "{{ squid_etc_dir }}/errorpage.css"
@@ -10,7 +10,7 @@
     label: "{{ item |basename }}"
 
 - name: reset error page stylesheet and icon
-  copy:
+  ansible.builtin.copy:
     dest: "{{ item }}"
     content: ""
     force: true
@@ -24,16 +24,16 @@
   notify: restart squid service
 
 - name: stop squid service before patching the binary
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ squid_pkg }}"
     state: stopped
-  # assume that binary needs patching if stylesheet was patched
+  ## assume that binary needs patching if stylesheet was patched
   when: reset_stylesheet_result is changed
 
 - name: patch version signature in the squid binary
-  # replace string "squid/3.5.x" by "nginx/1.5.x"
-  # must keep replaced string length unchanged!
-  replace:
+  ## replace string "squid/3.5.x" by "nginx/1.5.x"
+  ## must keep replaced string length unchanged!
+  ansible.builtin.replace:
     path: "/usr/sbin/{{ squid_pkg }}"
     regexp: 'squid/[1-5]([\d.]+\0)'
     replace: 'nginx/1\1'

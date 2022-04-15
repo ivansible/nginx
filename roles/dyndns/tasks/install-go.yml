@@ -9,7 +9,7 @@
   changed_when: false
 
 - name: download and install dyndns go binary
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ latest_dyndns_release.url }}"
     dest: /usr/local/sbin/dyndns
     owner: root

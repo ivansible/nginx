@@ -1,6 +1,6 @@
 ---
 - name: installation overview
-  debug:
+  ansible.builtin.debug:
     msg:
       - "domains: {{ cgpro_domains | join(' ') }}"
       - "certificate: {{ cgpro_ssl_cert }}"
@@ -11,13 +11,13 @@
     - srv_cgpro_all
 
 - name: perform cgpro tasks as root
-  import_tasks: root.yml
+  ansible.builtin.import_tasks: root.yml
   become: true
-  when: lin_apt_arch == 'amd64'  ## unavailable on arm
+  when: lin_apt_arch == 'amd64'  ## cgpro is unavailable on arm
   tags:
     - cgpro_all
     - srv_cgpro_all
 
 - name: flush handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 ...

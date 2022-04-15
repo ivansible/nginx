@@ -1,6 +1,6 @@
 ---
 - name: setup dns records in cloudflare for cdn
-  import_tasks: cloudflare.yml
+  ansible.builtin.import_tasks: cloudflare.yml
   vars:
     records: "{{ srv_cdn_cloudflare |default([]) }}"
   when:
@@ -10,7 +10,7 @@
     - srv_cdn_all
 
 - name: setup cloudfront distributions for cdn
-  import_tasks: cloudfront.yml
+  ansible.builtin.import_tasks: cloudfront.yml
   when:
     - srv_cdn_cloudfront |d([],true)
     - not (srv_cdn_cloudfront_disable |bool)
@@ -19,7 +19,7 @@
     - srv_cdn_all
 
 - name: create directory for nginx mixin configurations
-  file:
+  ansible.builtin.file:
     path: "{{ nginx_root_dir }}/mixin.d"
     state: directory
     mode: 0755
@@ -29,7 +29,7 @@
     - srv_cdn_all
 
 - name: configure cdn mappings in nginx (will skip in check mode)
-  template:
+  ansible.builtin.template:
     src: cdn.conf
     dest: "{{ nginx_site_dir }}/cdn.conf"
     mode: 0644
@@ -42,7 +42,7 @@
     - srv_cdn_all
 
 - name: configure simple cdn site in nginx
-  template:
+  ansible.builtin.template:
     src: cdn.inc
     dest: "{{ nginx_site_dir }}/cdn.inc"
     mode: 0644
@@ -54,7 +54,7 @@
     - srv_cdn_all
 
 - name: apply new nginx settings
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
   tags:
     - srv_cdn_all
 ...

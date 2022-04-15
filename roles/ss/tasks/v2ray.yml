@@ -9,14 +9,14 @@
   register: _ss_v2ray_release
 
 - name: download archived v2ray plugin binary
-  unarchive:
+  ansible.builtin.unarchive:
     remote_src: true
     src: "{{ _ss_v2ray_release.url }}"
     dest: "{{ srv_ss_v2ray_binary |dirname }}"
   when: _ss_v2ray_release is changed
 
 - name: move v2ray plugin binary in-place
-  command:
+  ansible.builtin.command:
     argv:
       - mv
       - "{{ srv_ss_v2ray_binary }}_linux_amd64"

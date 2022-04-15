@@ -1,10 +1,10 @@
 ---
-# Reconfiguring cgpro via PWD protocol is obsolete
-# You should use HTTP method from configure.yml
+## Reconfiguring cgpro via PWD protocol is obsolete
+## You should use HTTP method from configure.yml
 
 - block:
     - name: enable clear-text PWD login for postmaster
-      uri:
+      ansible.builtin.uri:
         url: &url_account1
           "{{ cgpro_curl_url }}/Domains/AccountSettings.html?domainName={{ cgpro_main_domain }}&accountName=postmaster"
         headers:
@@ -15,7 +15,7 @@
         body_format: form-urlencoded
         body:
           Update: Update
-          # SecureOnly: Default=-1 No=0 Yes=1 RequireTLS=2
+          ## SecureOnly: Default=-1 No=0 Yes=1 RequireTLS=2
           RequireAPOP: 0
         follow_redirects: all
         return_content: false
@@ -23,13 +23,13 @@
       environment: {no_proxy: '*'}
 
     - name: set cgpro internal ports and aliases of main domain via PWD
-      # Accessing cgpro via PWD protocol requires cleartext password.
+      ## Accessing cgpro via PWD protocol requires cleartext password.
       no_log: "{{ hide_secrets |bool }}"
-      shell:
-        # Without `cmd` argument (undocumented), ansible would render non-first
-        # lines with leading spaces, and shell would miss the __EOF__ marker.
-        # See: https://stackoverflow.com/a/40230416/3279769
-        #      https://github.com/ansible/ansible/issues/12034
+      ansible.builtin.shell:
+        ## Without `cmd` argument (undocumented), ansible would render non-first
+        ## lines with leading spaces, and shell would miss the __EOF__ marker.
+        ## See: https://stackoverflow.com/a/40230416/3279769
+        ##      https://github.com/ansible/ansible/issues/12034
         cmd: |
           nc -C -w5 localhost 106 <<__EOF__
           User postmaster
@@ -46,19 +46,19 @@
         domain_alias_list: "{{ cgpro_domains[1:] | join(', ')  }}"
       register: netcat_result
       failed_when:
-        netcat_result.stdout !=
-        netcat_result.stdout | regex_replace('(failed|Invalid|incorrect)')
-      when: cgpro_port_ldap is defined
-            and cgpro_port_ldap_ssl is defined
-            and cgpro_port_sip is defined
-            and cgpro_port_sip_ssl is defined
+        netcat_result.stdout |d('') is search('(failed|Invalid|incorrect)')
+      when:
+        - cgpro_port_ldap is defined
+        - cgpro_port_ldap_ssl is defined
+        - cgpro_port_sip is defined
+        - cgpro_port_sip_ssl is defined
       changed_when: true
       notify:
         - disable clear-text PWD login for postmaster (restore security)
         - restart cgpro service
 
     - name: disable clear-text PWD login for postmaster (restore security)
-      uri:
+      ansible.builtin.uri:
         url: &url_account2
           "{{ cgpro_curl_url }}/Domains/AccountSettings.html?domainName={{ cgpro_main_domain }}&accountName=postmaster"
         headers:
@@ -69,13 +69,13 @@
         body_format: form-urlencoded
         body:
           Update: Update
-          # SecureOnly: Default=-1 No=0 Yes=1 RequireTLS=2
+          ## SecureOnly: Default=-1 No=0 Yes=1 RequireTLS=2
           RequireAPOP: 1
         follow_redirects: all
         return_content: false
         use_proxy: false
       environment: {no_proxy: '*'}
 
-  # end of block
+  ## end of block
   tags: cgpro_configure_pwd
 ...

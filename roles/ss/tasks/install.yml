@@ -1,6 +1,6 @@
 ---
 - name: add shadowsocks-libev ppa on xenial
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: ppa:max-c-lv/shadowsocks-libev
     ## see: https://launchpad.net/~max-c-lv/+archive/ubuntu/shadowsocks-libev
     filename: shadowsocks-libev
@@ -9,18 +9,18 @@
   register: xenial_shadowsocks_ppa_result
 
 - name: update apt cache on xenial for shadowsocks ppa
-  apt:
+  ansible.builtin.apt:
     update_cache: true
   when: xenial_shadowsocks_ppa_result is changed
 
 - name: install shadowsocks-libev package
-  apt:
+  ansible.builtin.apt:
     name: shadowsocks-libev
   register: ss_install_result
 
 
 - name: send shadowsocks syslog to dedicated log
-  copy:
+  ansible.builtin.copy:
     src: rsyslog.conf
     dest: /etc/rsyslog.d/33-shadowsocks.conf
     force: true
@@ -28,7 +28,7 @@
   notify: restart syslog service
 
 - name: rotate shadowsocks log
-  template:
+  ansible.builtin.template:
     src: logrotate.conf
     dest: /etc/logrotate.d/shadowsocks
     mode: 0644

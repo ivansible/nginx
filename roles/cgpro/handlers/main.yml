@@ -1,15 +1,15 @@
 ---
-# handlers for ivansible.srv_cgpro
+## handlers for ivansible.srv_cgpro
 
 - name: remove temporary cgpro skin files
-  file:
+  ansible.builtin.file:
     path: "{{ temp_skin_dir.path }}"
     state: absent
   become: true
   when: temp_skin_dir is defined
 
 - name: disable clear-text PWD login for postmaster (restore security)
-  uri:
+  ansible.builtin.uri:
     url: &url_account2
       "{{ cgpro_curl_url }}/Domains/AccountSettings.html?domainName={{ cgpro_main_domain }}&accountName=postmaster"
     headers:
@@ -20,13 +20,13 @@
     body_format: form-urlencoded
     body:
       Update: Update
-      # SecureOnly: Default=-1 No=0 Yes=1 RequireTLS=2
+      ## SecureOnly: Default=-1 No=0 Yes=1 RequireTLS=2
       RequireAPOP: 1
     follow_redirects: all
     return_content: false
 
 - name: restart cgpro service
-  systemd:
+  ansible.builtin.systemd:
     name: cgpro
     state: restarted
   become: true

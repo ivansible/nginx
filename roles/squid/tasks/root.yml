@@ -1,20 +1,21 @@
 ---
 - name: install squid with ssl support from ppa
-  import_tasks: install-ppa.yml
+  ansible.builtin.import_tasks: install-ppa.yml
   when: squid_from_ppa |bool
   tags: srv_squid_install
 
 - name: unhold package before upgrade
-  command: apt-mark unhold "{{ squid_pkg }}"
+  ansible.builtin.command:
+    cmd: apt-mark unhold "{{ squid_pkg }}"
   when: squid_upgrade |bool
   register: unhold_squid_result
-  changed_when: unhold_squid_result.stdout |default('') is search('Canceled hold')
+  changed_when: unhold_squid_result.stdout |d('') is search('Canceled hold')
   notify: hold squid upgrades
   ignore_errors: true
   tags: srv_squid_install
 
 - name: install (upgrade) squid package
-  apt:
+  ansible.builtin.apt:
     name: "{{ squid_pkg }}"
     state: "{{ squid_upgrade |ternary('latest','present') }}"
     install_recommends: false
@@ -22,14 +23,14 @@
 
 
 - name: setup self-signed ssl certificate for squid
-  import_tasks: ssl-selfsigned.yml
+  ansible.builtin.import_tasks: ssl-selfsigned.yml
   when:
     - squid_ssl_enable |bool
     - self_signed
   tags: srv_squid_ssl
 
 - name: configure letsencrypt certificate for squid
-  import_tasks: ssl-letsencrypt.yml
+  ansible.builtin.import_tasks: ssl-letsencrypt.yml
   when:
     - squid_ssl_enable |bool
     - not self_signed
@@ -38,39 +39,39 @@
 
 
 - name: add squid hosts for upstream peers
-  import_tasks: hosts.yml
+  ansible.builtin.import_tasks: hosts.yml
   tags:
     - srv_squid_config
     - srv_squid_hosts
 
 - name: configure squid
-  import_tasks: config.yml
+  ansible.builtin.import_tasks: config.yml
   tags: srv_squid_config
 
 - name: url-rewrite for squid
-  import_tasks: url-rewrite.yml
-  when: squid_url_rewrite |default([],true) |length > 0
+  ansible.builtin.import_tasks: url-rewrite.yml
+  when: squid_url_rewrite |d([],true) |length > 0
   tags: srv_squid_config
 
 
 - name: setup squid cloaking
-  import_tasks: cloaking.yml
+  ansible.builtin.import_tasks: cloaking.yml
   when: squid_cloaking |bool
   tags: srv_squid_cloaking
 
 
 - name: setup ufw firewall for squid
-  import_tasks: firewall-ufw.yml
+  ansible.builtin.import_tasks: firewall-ufw.yml
   when: lin_firewall == 'ufw'
   tags: srv_squid_firewall
 
 - name: setup ferm firewall for squid
-  import_tasks: firewall-ferm.yml
+  ansible.builtin.import_tasks: firewall-ferm.yml
   when: lin_firewall == 'ferm'
   tags: srv_squid_firewall
 
 - name: transparent iptables rules for squid from ppa
-  import_tasks: iptables.yml
+  ansible.builtin.import_tasks: iptables.yml
   when:
     - lin_firewall in ['ufw', 'ferm']
     - squid_from_ppa |bool
@@ -78,7 +79,7 @@
 
 
 - name: stop obsolete squid service (ok to fail, if not found)
-  systemd:
+  ansible.builtin.systemd:
     name: squid
     state: stopped
     enabled: false
@@ -91,7 +92,7 @@
   tags: srv_squid_service
 
 - name: activate squid service
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ squid_pkg }}"
     state: started
     enabled: true
@@ -100,7 +101,7 @@
 
 
 - name: setup nginx redirector for squid
-  template:
+  ansible.builtin.template:
     src: nginx.conf.j2
     dest: "{{ nginx_site_dir }}/squid.conf"
     mode: 0644
@@ -109,7 +110,7 @@
   tags: srv_squid_nginx
 
 - name: remove squid redirector from nginx
-  file:
+  ansible.builtin.file:
     path: "{{ nginx_site_dir }}/squid.conf"
     state: absent
   notify: reload nginx service
@@ -118,7 +119,7 @@
 
 
 - name: directory for distributed pac files
-  file:
+  ansible.builtin.file:
     path: "{{ squid_etc_dir }}/pac"
     state: directory
     owner: root
@@ -128,7 +129,7 @@
   tags: srv_squid_pac
 
 - name: generate pac files
-  template:
+  ansible.builtin.template:
     src: squid.pac.j2
     dest: "{{ squid_etc_dir }}/pac/{{ item.name }}.pac"
     owner: root
@@ -142,11 +143,11 @@
 
 
 - name: configure squid logging
-  import_tasks: syslog.yml
+  ansible.builtin.import_tasks: syslog.yml
   tags: srv_squid_logs
 
 - name: setup dns records in cloudflare for squid
-  import_role:
+  ansible.builtin.import_role:
     name: ivansible.nginx.cdn
     tasks_from: cloudflare.yml
   vars:

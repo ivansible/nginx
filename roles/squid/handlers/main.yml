@@ -1,13 +1,13 @@
 ---
-# handlers for ivansible.srv_squid
+## handlers for ivansible.srv_squid
 
 - name: restart squid service
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ squid_pkg }}"
     state: restarted
   become: true
 
 - name: hold squid upgrades
-  command: apt-mark hold "{{ squid_pkg }}"
+  ansible.builtin.command: apt-mark hold "{{ squid_pkg }}"
   become: true
 ...

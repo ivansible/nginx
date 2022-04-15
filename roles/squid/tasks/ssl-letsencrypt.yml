@@ -1,13 +1,13 @@
 ---
 - name: verify that squid ssl certificate and key are readable
-  file:
+  ansible.builtin.file:
     path: "{{ lecert_dir }}/{{ item }}"
     state: file
   loop: [fullchain.pem, privkey.pem]
 
 - name: grant squid-ssl the direct access to letsencrypt cert
   ## squid-ssl v3.x from PPA is built with OpenSSL, uses split cert/key
-  user:
+  ansible.builtin.user:
     name: "{{ squid_user }}"
     groups: "{{ certbot_group }}"
     append: true
@@ -16,7 +16,7 @@
 
 - name: setup letsencrypt cert/key bundle for squid4
   ## squid v4.x is built with GnuTLS and uses cert/key bundle
-  import_tasks: ssl-letsencrypt-bundle.yml
+  ansible.builtin.import_tasks: ssl-letsencrypt-bundle.yml
   when: not squid_from_ppa |bool
   vars:
     ssl_cert: "{{ lecert_dir }}/fullchain.pem"

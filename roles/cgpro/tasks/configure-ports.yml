@@ -1,10 +1,10 @@
 ---
-# Configure non-standard ports
-# Solve a problem with Module SIP, TCP listener on [0.0.0.0]:5061: failed to start.
-# Error Code=network address/port is already in use
+## Configure non-standard ports
+## Solve a problem with Module SIP, TCP listener on [0.0.0.0]:5061: failed to start.
+## Error Code=network address/port is already in use
 
 - name: set cgpro ports (SMTP)
-  uri:
+  ansible.builtin.uri:
     url: &url_smtp_tcp "{{ cgpro_curl_url }}/Settings/SMTPListener.html"
     headers:
       Referer: *url_smtp_tcp
@@ -15,13 +15,13 @@
     body:
       Update: Update
       Ports: [0, 1]
-      # Port 0 (SMTP TCP)
+      ## Port 0 (SMTP TCP)
       p0: "{{ cgpro_port_smtp }}"
       a0: "[0.0.0.0]"
       s0: "off"
       r0: "None"
       d0: ""
-      # Port 1 (SMTP SSL)
+      ## Port 1 (SMTP SSL)
       p1: "{{ cgpro_port_smtp_ssl }}"
       a1: "[0.0.0.0]"
       s1: "on"
@@ -31,12 +31,13 @@
     return_content: false
     use_proxy: false
   environment: {no_proxy: '*'}
-  when: cgpro_port_smtp is defined
-        and cgpro_port_smtp_ssl is defined
+  when:
+    - cgpro_port_smtp is defined
+    - cgpro_port_smtp_ssl is defined
 
 
 - name: set cgpro ports (IMAP)
-  uri:
+  ansible.builtin.uri:
     url: &url_imap_tcp
       "{{ cgpro_curl_url }}/Settings/AccessListener.html?moduleName=IMAP&isTCP=1"
     headers:
@@ -48,13 +49,13 @@
     body:
       Update: Update
       Ports: [0, 1]
-      # Port 0 (IMAP TCP)
+      ## Port 0 (IMAP TCP)
       p0: "{{ cgpro_port_imap }}"
       a0: "[0.0.0.0]"
       s0: "off"
       r0: "None"
       d0: ""
-      # Port 1 (IMAP SSL)
+      ## Port 1 (IMAP SSL)
       p1: "{{ cgpro_port_imap_ssl }}"
       a1: "[0.0.0.0]"
       s1: "on"
@@ -64,12 +65,13 @@
     return_content: false
     use_proxy: false
   environment: {no_proxy: '*'}
-  when: cgpro_port_imap is defined
-        and cgpro_port_imap_ssl is defined
+  when:
+    - cgpro_port_imap is defined
+    - cgpro_port_imap_ssl is defined
 
 
 - name: set cgpro ports (LDAP)
-  uri:
+  ansible.builtin.uri:
     url: &url_ldap_tcp
       "{{ cgpro_curl_url }}/Settings/ServiceListener.html?moduleName=LDAP&isTCP=1"
     headers:
@@ -81,13 +83,13 @@
     body:
       Update: Update
       Ports: [0, 1]
-      # Port 0 (LDAP TCP)
+      ## Port 0 (LDAP TCP)
       p0: "{{ cgpro_port_ldap }}"
       a0: "[0.0.0.0]"
       s0: "off"
       r0: "None"
       d0: ""
-      # Port 1 (LDAP SSL)
+      ## Port 1 (LDAP SSL)
       p1: "{{ cgpro_port_ldap_ssl }}"
       a1: "[0.0.0.0]"
       s1: "on"
@@ -97,12 +99,13 @@
     return_content: false
     use_proxy: false
   environment: {no_proxy: '*'}
-  when: cgpro_port_ldap is defined
-        and cgpro_port_ldap_ssl is defined
+  when:
+    - cgpro_port_ldap is defined
+    - cgpro_port_ldap_ssl is defined
 
 
 - name: set cgpro ports (SIP TCP)
-  uri:
+  ansible.builtin.uri:
     url: &url_sip_tcp "{{ cgpro_curl_url }}/Settings/SIPTCPListener.html"
     headers:
       Referer: *url_sip_tcp
@@ -113,13 +116,13 @@
     body:
       Update: Update
       Ports: [0, 1]
-      # Port 0 (SIP TCP)
+      ## Port 0 (SIP TCP)
       p0: "{{ cgpro_port_sip }}"
       a0: "[0.0.0.0]"
       s0: "off"
       r0: "None"
       d0: ""
-      # Port 1 (SIP SSL)
+      ## Port 1 (SIP SSL)
       p1: "{{ cgpro_port_sip_ssl }}"
       a1: "[0.0.0.0]"
       s1: "on"
@@ -129,12 +132,13 @@
     return_content: false
     use_proxy: false
   environment: {no_proxy: '*'}
-  when: cgpro_port_sip is defined
-        and cgpro_port_sip_ssl is defined
+  when:
+    - cgpro_port_sip is defined
+    - cgpro_port_sip_ssl is defined
 
 
 - name: set cgpro ports (SIP UDP)
-  uri:
+  ansible.builtin.uri:
     url: &url_sip_udp "{{ cgpro_curl_url }}/Settings/SIPUDPListener.html"
     headers:
       Referer: *url_sip_udp
@@ -145,7 +149,7 @@
     body:
       Update: Update
       Ports: 0
-      # Port 0 (SIP UDP)
+      ## Port 0 (SIP UDP)
       p0: "{{ cgpro_port_sip }}"
       a0: "[0.0.0.0]"
       r0: "None"

@@ -1,22 +1,22 @@
 ---
 - name: install dyndns-python
-  import_tasks: install-python.yml
+  ansible.builtin.import_tasks: install-python.yml
   when: srv_dyndns_python |bool
   tags: srv_dyndns_install
 
 - name: install dyndns-go
-  import_tasks: install-go.yml
+  ansible.builtin.import_tasks: install-go.yml
   when: not srv_dyndns_python |bool
   tags: srv_dyndns_install
 
 - block:
     - name: detect home directory of dyndns user
-      user:
+      ansible.builtin.user:
         name: "{{ srv_dyndns_service_user }}"
       register: dyndns_user
 
     - name: make directory for dyndns ssh key
-      file:
+      ansible.builtin.file:
         path: "{{ dyndns_user.home }}/.ssh"
         state: directory
         owner: "{{ dyndns_user.name }}"
@@ -24,7 +24,7 @@
         mode: 0700
 
     - name: install ssh key for dyndns login
-      copy:
+      ansible.builtin.copy:
         src: "{{ srv_dyndns_ssh_keyfile }}"
         dest: "{{ dyndns_user.home }}/.ssh/dyndns.key"
         owner: "{{ dyndns_user.name }}"
@@ -37,14 +37,14 @@
   tags: srv_dyndns_keyfile
 
 - name: configure dyndns service
-  template:
+  ansible.builtin.template:
     src: dyndns.conf
     dest: /etc/dyndns.conf
     mode: 0640
     owner: "{{ srv_dyndns_service_user |d('root', true) }}"
     group: sudo
   vars:
-    ssh_url: "{{ srv_dyndns_ssh_url |default('',true) }}"
+    ssh_url: "{{ srv_dyndns_ssh_url |d('',true) }}"
     got_keyfile: "{{ srv_dyndns_service_user and srv_dyndns_ssh_keyfile }}"
     keyfile: "{{ '~/.ssh/dyndns.key' if got_keyfile else '' }}"
   notify: restart dyndns service
@@ -54,7 +54,7 @@
     - srv_dyndns_service
 
 - name: setup dyndns systemd service
-  template:
+  ansible.builtin.template:
     src: dyndns.service
     dest: /etc/systemd/system/dyndns.service
     mode: 0644
@@ -63,7 +63,7 @@
   tags: srv_dyndns_service
 
 - name: activate dyndns systemd service
-  systemd:
+  ansible.builtin.systemd:
     name: dyndns
     state: started
     enabled: true
@@ -71,14 +71,14 @@
   tags: srv_dyndns_service
 
 - name: directory for nginx dyndns mixin
-  file:
+  ansible.builtin.file:
     path: /etc/nginx/mixin.d
     state: directory
     mode: 0755
   tags: srv_dyndns_nginx
 
 - name: configure nginx redirector for dyndns
-  template:
+  ansible.builtin.template:
     src: dyndns.nginx.conf
     dest: /etc/nginx/mixin.d/dyndns.conf
     mode: 0644

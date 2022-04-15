@@ -1,6 +1,6 @@
 ---
 - name: create script for updating squid ssl bundle
-  copy:
+  ansible.builtin.copy:
     dest: "{{ cert_update_script }}"
     owner: root
     group: root
@@ -17,20 +17,20 @@
   register: _squid_cert_script
 
 - name: directory for letsencrypt post-renewal hooks
-  file:
+  ansible.builtin.file:
     path: "{{ certbot_hook_dir }}"
     state: directory
     mode: 0755
 
 - name: link a letsencrypt post-renewal hook for squid
-  file:
+  ansible.builtin.file:
     state: link
     src: "{{ cert_update_script }}"
     dest: "{{ certbot_hook_dir }}/squid"
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: find modification times of squid ssl files
-  stat:
+  ansible.builtin.stat:
     path: "{{ item }}"
   loop:
     - "{{ lecert_bundle }}"
@@ -39,14 +39,15 @@
   register: _squid_lecert
 
 - name: update squid pem file if it's stale
-  shell: cat "{{ ssl_cert }}" "{{ ssl_key }}" > "{{ lecert_bundle }}"
+  ansible.builtin.shell:
+    cmd: cat "{{ ssl_cert }}" "{{ ssl_key }}" > "{{ lecert_bundle }}"
   when: _squid_cert_script is changed
         or not _squid_lecert.results.0.stat.exists
         or _squid_lecert.results.0.stat.ctime < _squid_lecert.results.1.stat.ctime
         or _squid_lecert.results.0.stat.ctime < _squid_lecert.results.2.stat.ctime
 
 - name: ensure squid pem file permissions
-  file:
+  ansible.builtin.file:
     path: "{{ lecert_bundle }}"
     state: file
     owner: root

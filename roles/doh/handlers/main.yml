@@ -1,15 +1,15 @@
 ---
-# handlers for ivansible.srv_doh
+## handlers for ivansible.srv_doh
 
 - name: restart rust-doh service
-  systemd:
+  ansible.builtin.systemd:
     name: rust-doh
     state: restarted
     daemon_reload: true
   become: true
 
 - name: remove rust-doh compilation files
-  file:
+  ansible.builtin.file:
     path: /root/.cargo
     state: absent
   become: true

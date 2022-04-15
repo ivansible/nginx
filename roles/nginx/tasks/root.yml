@@ -1,29 +1,29 @@
 ---
 - name: install nginx
-  import_tasks: install.yml
+  ansible.builtin.import_tasks: install.yml
   tags: lin_nginx_install
 
 - name: setup nginx directories
-  import_tasks: dirs.yml
+  ansible.builtin.import_tasks: dirs.yml
   tags: lin_nginx_dirs
 
 - name: create base nginx configration files
-  import_tasks: config.yml
+  ansible.builtin.import_tasks: config.yml
   tags: lin_nginx_config
 
 - name: configure nginx security and tls
-  import_tasks: tls.yml
+  ansible.builtin.import_tasks: tls.yml
   tags: lin_nginx_tls
 
 - name: configure nginx sites
-  import_tasks: site.yml
+  ansible.builtin.import_tasks: site.yml
   tags: lin_nginx_site
 
 - name: activate nginx service
-  import_tasks: run.yml
+  ansible.builtin.import_tasks: run.yml
   tags: lin_nginx_run
 
 - name: fine-tune nginx logs
-  import_tasks: logs.yml
+  ansible.builtin.import_tasks: logs.yml
   tags: lin_nginx_logs
 ...

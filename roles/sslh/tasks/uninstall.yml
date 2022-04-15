@@ -1,6 +1,6 @@
 ---
 - name: disable sslh service (please ignore possible failure, it's expected)
-  systemd:
+  ansible.builtin.systemd:
     name: sslh
     state: stopped
     enabled: false
@@ -19,13 +19,13 @@
   when: lin_firewall == 'ferm'
 
 - name: remove sslh package
-  apt:
+  ansible.builtin.apt:
     name: sslh
     state: absent
     purge: true
 
 - name: remove sslh configuration files
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop:

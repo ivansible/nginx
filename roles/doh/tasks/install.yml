@@ -1,10 +1,10 @@
 ---
 - block:
-    # this block installs rust-doh from zip
-    # and strips top archive directory (unzip cannot do that)
+    ## this block installs rust-doh from zip
+    ## and strips top archive directory (unzip cannot do that)
 
     - name: install rust-doh from zip archive (preferred)
-      unarchive:
+      ansible.builtin.unarchive:
         remote_src: true
         src: "{{ srv_doh_zip_url }}"
         dest: /tmp
@@ -12,12 +12,12 @@
 
     - name: move rust-doh binary in place
       ## ansible_architecture: x86_64 | aarch64
-      command: mv /tmp/doh-proxy-linux-{{ ansible_architecture }}/doh-proxy "{{ srv_doh_binary }}"
-      args:
+      ansible.builtin.command:
+        cmd: mv /tmp/doh-proxy-linux-{{ ansible_architecture }}/doh-proxy "{{ srv_doh_binary }}"
         creates: "{{ srv_doh_binary }}"
 
     - name: ensure rust-doh binary is executable
-      file:
+      ansible.builtin.file:
         path: "{{ srv_doh_binary }}"
         state: file
         owner: root
@@ -26,7 +26,7 @@
       when: not ansible_check_mode
 
     - name: remove temporary directory after unzipping rust-doh
-      file:
+      ansible.builtin.file:
         ## ansible_architecture: x86_64 | aarch64
         path: /tmp/doh-proxy-linux-{{ ansible_architecture }}
         state: absent
@@ -34,11 +34,11 @@
 
 
 - name: install rust-doh from package (not recommended)
-  apt:
+  ansible.builtin.apt:
     deb: "{{ srv_doh_deb_url }}"
-    # workaround for libc6 and libgcc1 dependency problems on xenial
-    # warning: apt remembers broken dependencies in package cache
-    #          making other apt installs fail, please avoid!
+    ## workaround for libc6 and libgcc1 dependency problems on xenial
+    ## warning: apt remembers broken dependencies in package cache
+    ##          making other apt installs fail, please avoid!
     force: true
   when:
     - srv_doh_zip_url == ''  # noqa 602
@@ -46,8 +46,8 @@
 
 
 - name: compile and install rust-doh binary (very long)
-  # warning: rust compilation takes 20+ minutes!
-  import_tasks: compile.yml
+  ## warning: rust compilation takes 20+ minutes!
+  ansible.builtin.import_tasks: compile.yml
   when:
     - srv_doh_zip_url == ''  # noqa 602
     - srv_doh_deb_url == ''  # noqa 602

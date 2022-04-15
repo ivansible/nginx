@@ -1,8 +1,8 @@
 ---
-# handlers for ivansible.srv_v2ray
+## handlers for ivansible.srv_v2ray
 
 - name: restart v2ray service
-  systemd:
+  ansible.builtin.systemd:
     name: v2ray-server
     state: restarted
     enabled: true

@@ -1,13 +1,13 @@
 ---
 - name: configure nginx tls settings
-  template:
+  ansible.builtin.template:
     src: security.conf
     dest: "{{ nginx_conf_dir }}/security.conf"
     mode: 0644
   notify: restart nginx service
 
 - name: generate diffie-helman parameters for nginx tls (may take a while)
-  openssl_dhparam:
+  community.crypto.openssl_dhparam:
     path: "{{ nginx_conf_dir }}/ssl-dhparam.pem"
     ## default 4096 bits can take too long
     ## normally this step takes some 4 minutes
@@ -18,24 +18,24 @@
   notify: restart nginx service
 
 - name: check that nginx certificate exists (if configured)
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: file
   loop:
     - "{{ nginx_ssl_cert }}"
     - "{{ nginx_ssl_key }}"
   when: nginx_ssl_cert |d('')
-     or nginx_ssl_key |d('')
+        or nginx_ssl_key |d('')
 
 - name: directory for letsencrypt post-renewal hooks
-  file:
+  ansible.builtin.file:
     path: "{{ certbot_post_dir }}"
     state: directory
     mode: 0755
   when: nginx_ssl_cert is search('/letsencrypt/')
 
 - name: add letsencrypt post-renewal hook for nginx
-  copy:
+  ansible.builtin.copy:
     dest: "{{ certbot_post_dir }}/nginx"
     owner: root
     group: root

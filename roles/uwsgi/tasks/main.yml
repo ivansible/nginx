@@ -1,10 +1,10 @@
 ---
 - name: use import to become root globally
-  import_tasks: root.yml
+  ansible.builtin.import_tasks: root.yml
   become: true
   tags: lin_uwsgi_all
 
 - name: restart uwsgi now
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
   tags: lin_uwsgi_all
 ...

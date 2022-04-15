@@ -1,16 +1,16 @@
 ---
 - name: install cargo to compile rust-doh
-  apt:
+  ansible.builtin.apt:
     name: cargo
 
 - name: invoke cargo to get and compile rust-doh (may take a while...)
-  command: cargo install doh-proxy
-  args:
+  ansible.builtin.command:
+    cmd: cargo install doh-proxy
     creates: /root/.cargo/bin/doh-proxy
   notify: remove rust-doh compilation files
 
 - name: copy rust-doh binary in place
-  copy:
+  ansible.builtin.copy:
     src: /root/.cargo/bin/doh-proxy
     dest: "{{ srv_doh_binary }}"
     remote_src: true

@@ -1,8 +1,8 @@
 ---
-# handlers for ivansible.lin_sslh
+## handlers for ivansible.lin_sslh
 
 - name: restart sslh service
-  systemd:
+  ansible.builtin.systemd:
     name: sslh
     state: restarted
     daemon_reload: true

@@ -1,6 +1,6 @@
 ---
 - name: configure syslog for a separate squid service logfile
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/rsyslog.d/34-{{ squid_pkg }}.conf"
     content: |
       :programname,isequal,"squid" {{ squid_log_file }}
@@ -12,7 +12,7 @@
     - squid_use_rsyslog |bool
 
 - name: rotate squid service logfile
-  copy:
+  ansible.builtin.copy:
     dest: /etc/logrotate.d/{{ squid_pkg }}-syslog
     content: |
       {{ squid_log_file }} {
@@ -38,7 +38,7 @@
     - lin_compress_logs is not none
 
 - name: control compression of native squid logs
-  replace:
+  ansible.builtin.replace:
     path: "/etc/logrotate.d/{{ squid_pkg }}"
     regexp: "{{ lookbehind }}(compress|delaycompress)"
     replace: "{{ commentout }}\\1"

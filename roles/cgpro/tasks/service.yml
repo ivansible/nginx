@@ -1,18 +1,18 @@
 ---
 - name: disable postfix service
-  systemd:
+  ansible.builtin.systemd:
     name: postfix
     state: stopped
     enabled: false
   register: postfix_result
   failed_when:
-    # do not fail if postfix service cannot be found
-    postfix_result.failed is defined
-    and postfix_result.failed
-    and postfix_result.msg.find('not find the requested service') == -1
+    ## do not fail if postfix service cannot be found
+    - postfix_result.failed is defined
+    - postfix_result.failed
+    - postfix_result.msg.find('not find the requested service') == -1
 
 - name: disable and completely mask sysv-style cgpro service in /etc/init.d
-  systemd:
+  ansible.builtin.systemd:
     name: CommuniGate.service
     state: stopped
     enabled: false
@@ -22,7 +22,7 @@
   failed_when: false
 
 - name: create modern systemd service for cgpro
-  copy:
+  ansible.builtin.copy:
     content: |
       # cgpro.service
       # ansible-managed
@@ -44,7 +44,7 @@
   register: _cgpro_systemd_unit
 
 - name: enable cgpro systemd service
-  systemd:
+  ansible.builtin.systemd:
     name: cgpro
     state: started
     enabled: true

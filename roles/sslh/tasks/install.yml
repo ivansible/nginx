@@ -1,27 +1,27 @@
 ---
 - name: install sslh v1.18 from bionic on xenial
-  # with original xenial's sslh 1.17 an attempt of ssh transparent
-  # proxying for a local process (e.g. shadowsocks) fails with error
-  # "bind:98:Address already in use"
-  # issue description: https://github.com/yrutschle/sslh/issues/64
-  # fixed in sslh 1.18 by PR https://github.com/yrutschle/sslh/pull/69
-  apt:
+  ## with original xenial's sslh 1.17 an attempt of ssh transparent
+  ## proxying for a local process (e.g. shadowsocks) fails with error
+  ## "bind:98:Address already in use"
+  ## issue description: https://github.com/yrutschle/sslh/issues/64
+  ## fixed in sslh 1.18 by PR https://github.com/yrutschle/sslh/pull/69
+  ansible.builtin.apt:
     deb: "{{ sslh_bionic_deb }}"
   when: ansible_lsb.codename in ['xenial']
 
 - name: install sslh v1.20 from focal on bionic
-  apt:
+  ansible.builtin.apt:
     deb: "{{ sslh_focal_deb }}"
   when: ansible_lsb.codename in ['bionic', 'eoan']
 
 - name: install native sslh package on focal+
-  apt:
+  ansible.builtin.apt:
     name: sslh
     state: present
   when: ansible_lsb.release is version('20.04','>=')
 
 - name: remove apache2 packages pulled by sslh on bionic+
-  apt:
+  ansible.builtin.apt:
     name: apache2
     state: absent
     purge: true
@@ -29,11 +29,11 @@
   when: ansible_lsb.release is version('16.04','>')
 
 - name: modify /etc/hosts
-  import_tasks: hosts.yml
+  ansible.builtin.import_tasks: hosts.yml
   tags: etc_hosts
 
 - name: create sslh config file
-  template:
+  ansible.builtin.template:
     src: sslh.cfg
     dest: /etc/sslh.cfg
     owner: root
@@ -43,7 +43,7 @@
 
 
 - name: configure ufw firewall for sslh
-  include_tasks: ufw.yml
+  ansible.builtin.include_tasks: ufw.yml
   args:
     apply:
       become: true
@@ -52,7 +52,7 @@
   tags: lin_sslh_firewall
 
 - name: configure ferm firewall for sslh
-  include_tasks: ferm.yml
+  ansible.builtin.include_tasks: ferm.yml
   args:
     apply:
       become: true
@@ -62,7 +62,7 @@
 
 
 - name: configure sslh service and helper parameters
-  template:
+  ansible.builtin.template:
     src: sslh.defaults
     dest: /etc/default/sslh
     owner: root
@@ -72,7 +72,7 @@
   tags: lin_sslh_firewall
 
 - name: override sslh service config
-  template:
+  ansible.builtin.template:
     src: sslh.service
     dest: /etc/systemd/system/sslh.service
     owner: root
@@ -83,7 +83,7 @@
   tags: lin_sslh_firewall
 
 - name: enable and start sslh service (will be rescued if it fails)
-  systemd:
+  ansible.builtin.systemd:
     name: sslh
     state: started
     enabled: true
@@ -92,12 +92,12 @@
 
 
 - name: determine whether nginx service runs (and possibly blocks ssl port)
-  service_facts:
-  # note: condition "ActiveState == 'failed'" is not enough
+  ansible.builtin.service_facts:
+  ## note: condition "ActiveState == 'failed'" is not enough
   when: sslh_service_start_result.status.ActiveState != 'active'
 
 - name: completely disable apache2 service to unblock ssl port
-  systemd:
+  ansible.builtin.systemd:
     name: apache2
     state: stop
     enabled: false
@@ -109,27 +109,27 @@
 - name: let sslh service start when nginx blocks ssl port due to stale settings
   block:
     - name: prevent pending sslh restart before nginx gets reconfigured
-      meta: flush_handlers
+      ansible.builtin.meta: flush_handlers
 
     - name: stop nginx to unblock ssl port (will restart after reconfiguration)
-      systemd:
+      ansible.builtin.systemd:
         name: nginx
         state: stopped
       register: nginx_service_stop_result
-      # make few attempts until nginx really stops
+      ## make few attempts until nginx really stops
       until: nginx_service_stop_result.status.ActiveState != 'active'
       notify: restart nginx service
-      # sometimes change is not detected but we know for sure nginx was running
+      ## sometimes change is not detected but we know for sure nginx was running
       changed_when: true
 
     - name: pause a little to let ssl port go free in background
-      pause:
+      ansible.builtin.pause:
         seconds: 3
 
     - name: start sslh service once again after stopping nginx
-      systemd:
+      ansible.builtin.systemd:
         name: sslh
-        # perform restart instead of start to override stuck service state
+        ## perform restart instead of start to override stuck service state
         state: started
         enabled: true
 

@@ -1,6 +1,6 @@
 ---
 - name: enable sslh on host (if use_sslh is true)
-  include_tasks: install.yml
+  ansible.builtin.include_tasks: install.yml
   args:
     apply:
       become: true
@@ -15,7 +15,7 @@
 
 ## separately include /etc/hosts task due to tags filtering
 - name: modify hosts (if use_sslh is true)
-  include_tasks: hosts.yml
+  ansible.builtin.include_tasks: hosts.yml
   tags:
     - etc_hosts
     - sslh_all
@@ -23,7 +23,7 @@
   when: use_sslh |bool
 
 - name: disable sslh on host (if use_sslh is false)
-  include_tasks: uninstall.yml
+  ansible.builtin.include_tasks: uninstall.yml
   args:
     apply:
       become: true

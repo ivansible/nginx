@@ -1,21 +1,21 @@
 ---
 - name: check that role lin_nginx is deployed
-  stat:
+  ansible.builtin.stat:
     path: "{{ nginx_def_site_dir }}/favicon.ico"
     get_checksum: false
   register: check_nginx_site_dir
 
 - name: deploy role lin_nginx
-  # Condition for this step will be rarely true.
-  # Prefer include (vs import) to avoid lots of skip messages.
-  include_role:
+  ## Condition for this step will be rarely true.
+  ## Prefer include (vs import) to avoid lots of skip messages.
+  ansible.builtin.include_role:
     name: ivansible.nginx.nginx
     apply:
       tags: [cgpro_nginx, cgpro_all]
   when: not check_nginx_site_dir.stat.exists
 
 - name: deploy custom cgpro favicon
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ cgpro_favicon_url }}"
     dest: "{{ nginx_def_site_dir }}/favicon-cgpro.ico"
     mode: 0644
@@ -23,7 +23,7 @@
   until: _cgpro_favicon_result is successful
 
 - name: configure cgpro webmail for nginx
-  template:
+  ansible.builtin.template:
     src: cgpro-mail.nginx.conf
     dest: "{{ nginx_site_dir }}/cgpro-mail.conf"
     lstrip_blocks: true
@@ -31,7 +31,7 @@
   notify: reload nginx service
 
 - name: configure cgpro admin site for nginx
-  template:
+  ansible.builtin.template:
     src: cgpro-admin.nginx.conf
     dest: "{{ nginx_site_dir }}/cgpro-admin.conf"
     lstrip_blocks: true

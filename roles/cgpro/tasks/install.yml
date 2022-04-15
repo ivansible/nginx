@@ -1,10 +1,10 @@
 ---
 - name: install utilities required to configure cgpro
-  # unzip is required by skin installer to uncompress skin files
-  # curl is required certificate and skin installers
-  # netcat is required by certificate installer script to check if cgpro is alive
-  # netcat is required by now-obsolete PWD based configurator
-  apt:
+  ## unzip is required by skin installer to uncompress skin files
+  ## curl is required certificate and skin installers
+  ## netcat is required by certificate installer script to check if cgpro is alive
+  ## netcat is required by now-obsolete PWD based configurator
+  ansible.builtin.apt:
     name:
       - curl
       - netcat
@@ -15,24 +15,24 @@
 - name: we should backup /bin/mail _before_ cgpro is installed
   block:
     - name: check that /bin/mail exists
-      stat:
+      ansible.builtin.stat:
         path: /bin/mail
         get_checksum: false
       register: bin_mail_check
 
     - name: backup stock /bin/mail (cgpro installer overrides it)
       when: bin_mail_check.stat.exists
-      # using readlink + hardlink to preserve node type
-      shell:
-        ln $(readlink -f /bin/mail) /bin/mail.stock  # noqa 302
-      args:
+      ## using readlink + hardlink to preserve node type
+      ansible.builtin.shell:
+        # noqa 302
+        cmd: ln $(realpath /bin/mail) /bin/mail.stock
         warn: false
         creates: /bin/mail.stock
       tags: skip_ansible_lint
 
     - name: leave mark that stock /bin/mail did not exist
       when: not bin_mail_check.stat.exists
-      copy:
+      ansible.builtin.copy:
         dest: /bin/mail.stock
         content: |
           #!/bin/sh
@@ -43,15 +43,16 @@
 
 
 - name: check that cgpro is installed
-  # this check tries to save on the .deb download time
-  command: dpkg --get-selections cgatepro-linux
+  ## this check tries to save on the .deb download time
+  ansible.builtin.command:
+    cmd: dpkg --get-selections cgatepro-linux
   register: cgpro_dpkg_check
   changed_when: cgpro_dpkg_check.stdout == ''  # noqa 602
 
 - name: install cgpro package from url
   when: cgpro_dpkg_check is changed
         or cgpro_reset |bool
-  apt:
+  ansible.builtin.apt:
     deb: "{{ cgpro_deb_url }}"
     only_upgrade: "{{ not cgpro_reset |bool }}"
   ## retry network errors
@@ -60,7 +61,7 @@
 
 
 - name: tune kernel parameters for cgpro
-  sysctl:
+  ansible.posix.sysctl:
     name: "{{ item.key }}"
     value: "{{ item.value }}"
     state: present

@@ -1,6 +1,6 @@
 ---
 - name: remove sslh helper for ufw
-  file:
+  ansible.builtin.file:
     path: /usr/local/sbin/sslh-helper-ufw.sh
     state: absent
 
@@ -16,7 +16,7 @@
   ivansible.base.ferm_port:
     port: 443
     proto: tcp
-    # actually 'sslh', but mark as 'nginx' for idempotency
+    ## actually 'sslh', but mark as 'nginx' for idempotency
     comment: nginx
   tags: skip_ansible_lint
 ...

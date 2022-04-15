@@ -1,6 +1,6 @@
 ---
 - name: install ansible passlib bindings
-  apt:
+  ansible.builtin.apt:
     name: "{{ lin_use_python2 |bool |ternary(packages_pythons, packages_python3) }}"
     state: present
   vars:
@@ -8,8 +8,8 @@
     packages_python3: python3-passlib,python3-pip
 
 - name: configure squid authentication
-  # crypt_scheme is MD5 because squid does not support SHA
-  htpasswd:
+  ## crypt_scheme is MD5 because squid does not support SHA
+  community.general.htpasswd:
     path: "{{ squid_etc_dir }}/users.db"
     name: "{{ item.user }}"
     password: "{{ item.pass }}"
@@ -27,7 +27,7 @@
 
 
 - name: backup vanilla squid configuration
-  command:
+  ansible.builtin.command:
     argv:
       - cp
       - -a
@@ -38,7 +38,7 @@
   tags: srv_squid_config
 
 - name: configure squid (depends on interfaces created by other roles!)
-  template:
+  ansible.builtin.template:
     src: squid.conf.j2
     dest: "{{ squid_etc_dir }}/squid.conf"
     backup: true
@@ -49,7 +49,7 @@
 
 
 - name: upload squid error pages
-  unarchive:
+  ansible.builtin.unarchive:
     src: "errorpages-{{ squid_cloaking |bool |ternary('cloaked', 'plain') }}.tar.gz"
     dest: "{{ squid_etc_dir }}"
     owner: root
@@ -57,7 +57,7 @@
   notify: restart squid service
 
 - name: upload squid adblock rules
-  copy:
+  ansible.builtin.copy:
     src: adblock
     dest: "{{ squid_etc_dir }}"
     owner: root

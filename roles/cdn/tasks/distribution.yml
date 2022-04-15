@@ -1,10 +1,10 @@
 ---
 - name: determine distribution parameters
   vars:
-    origin: "{{ item.origin |default('', true) }}"
+    origin: "{{ item.origin |d('', true) }}"
     server: "{{ item.server }}"
     ref: "{{ item.reference
-           | default(srv_cdn_cloudfront_default_reference)
+           | d(srv_cdn_cloudfront_default_reference)
            | regex_replace('SERVER', server) }}"
     comment: "{{ '%s - %s%s%s' % (ref, server, (' - ' if origin else ''), origin) }}"
 
@@ -12,11 +12,11 @@
     hdr: "{{ org }}.CustomHeaders.Items"
     cfg: "{{ org }}.CustomOriginConfig"
 
-  set_fact:
-    cfront_dist_enabled: "{{ not(item.delete |default(false) |bool) }}"
+  ansible.builtin.set_fact:
+    cfront_dist_enabled: "{{ not(item.delete |d(false) |bool) }}"
     cfront_dist_origin: "{{ origin }}"
     cfront_dist_server: "{{ server }}"
-    cfront_dist_lecert: "{{ item.lecert |default('', true) }}"
+    cfront_dist_lecert: "{{ item.lecert |d('', true) }}"
     cfront_dist_reference: "{{ ref }}"
     cfront_dist_comment: "{{ comment }}"
 
@@ -44,9 +44,9 @@
 
 - block:
     - name: create (or destroy) cloudfront distribution "{{ cfront_dist_reference }}" (can be rescued)
-      cloudfront_distribution:
-        aws_access_key: "{{ srv_cdn_cloudfront_access_key |default(omit, true) }}"
-        aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |default(omit, true) }}"
+      community.aws.cloudfront_distribution:
+        aws_access_key: "{{ srv_cdn_cloudfront_access_key |d(omit, true) }}"
+        aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |d(omit, true) }}"
 
         caller_reference: "{{ cfront_dist_reference }}"
         state: "{{ cfront_dist_enabled |ternary('present','absent') }}"
@@ -61,9 +61,9 @@
 
   rescue:
     - name: first-time create cloudfront distribution "{{ cfront_dist_reference }}"
-      cloudfront_distribution:
-        aws_access_key: "{{ srv_cdn_cloudfront_access_key |default(omit, true) }}"
-        aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |default(omit, true) }}"
+      community.aws.cloudfront_distribution:
+        aws_access_key: "{{ srv_cdn_cloudfront_access_key |d(omit, true) }}"
+        aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |d(omit, true) }}"
 
         caller_reference: "{{ cfront_dist_reference }}"
         ## FIXME we should run this step only when creating distribution!
@@ -81,9 +81,9 @@
       when: not cfront_dist_curr
 
 - name: update cloudfront distribution "{{ cfront_dist_reference }}"
-  cloudfront_distribution:
-    aws_access_key: "{{ srv_cdn_cloudfront_access_key |default(omit, true) }}"
-    aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |default(omit, true) }}"
+  community.aws.cloudfront_distribution:
+    aws_access_key: "{{ srv_cdn_cloudfront_access_key |d(omit, true) }}"
+    aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |d(omit, true) }}"
 
     caller_reference: "{{ cfront_dist_reference }}"
     state: present
@@ -150,7 +150,7 @@
 
     query_changed: "{ {{ cfront_dist_important_fields |dictsort |map('join',': ') |join(',') }} }"
 
-    cache_enabled: "{{ item.cache |default(srv_cdn_cloudfront_default_cache) |bool }}"
+    cache_enabled: "{{ item.cache |d(srv_cdn_cloudfront_default_cache) |bool }}"
     cache_headers: "{{ [] if cache_enabled else ['*'] }}"
 
     headers_dict:
@@ -158,7 +158,7 @@
       ## cloudfront currently sends server host name in the Host header.
       ## Also send origin override in the X-Back header (if defined)
       ## and server name in the X-Host header in case override is undefined.
-      X-CDN-Front: "{{ cfront_dist_curr.DomainName |default(cfront_dist_anew.domain_name) }}"
+      X-CDN-Front: "{{ cfront_dist_curr.DomainName |d(cfront_dist_anew.domain_name) }}"
       X-CDN-Host: "{{ cfront_dist_server }}"
       X-CDN-Back: "{{ cfront_dist_origin }}"
     ## Sort headers and skip empty ones in attempt to gain idempotence.
@@ -170,16 +170,16 @@
 
 
 - name: gather results for cloudfront distribution "{{ cfront_dist_reference }}"
-  set_fact:
+  ansible.builtion.set_fact:
     cdn_cloudfront_sites: "{{ old_sites + [new_site] }}"
   vars:
     old_sites: "{{ cdn_cloudfront_sites }}"
     new_site:
       comment: "{{ cfront_dist_comment }}"
-      id: "{{ cfront_dist_curr.Id |default(cfront_dist_anew.id) }}"
+      id: "{{ cfront_dist_curr.Id |d(cfront_dist_anew.id) }}"
       lecert: "{{ cfront_dist_lecert }}"
       origin: "{{ cfront_dist_origin }}"
       server: "{{ cfront_dist_server }}"
-      url: "{{ cfront_dist_curr.DomainName |default(cfront_dist_anew.domain_name) }}"
+      url: "{{ cfront_dist_curr.DomainName |d(cfront_dist_anew.domain_name) }}"
   when: cfront_dist_enabled
 ...

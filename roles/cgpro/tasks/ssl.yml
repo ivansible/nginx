@@ -1,6 +1,6 @@
 ---
 - name: get list of cgpro trusted certificate authorities
-  uri:
+  ansible.builtin.uri:
     url: &url_cacerts "{{ cgpro_curl_url }}/Domains/TrustedCommon.html"
     user: postmaster
     password: "{{ cgpro_postmaster_password }}"
@@ -11,7 +11,7 @@
   register: cacerts_page
 
 - name: add new cgpro trusted certificate authorities (skip in check mode)
-  uri:
+  ansible.builtin.uri:
     url: *url_cacerts
     headers:
       Referer: *url_cacerts
@@ -27,9 +27,10 @@
     return_content: false
     use_proxy: false
   environment: {no_proxy: '*'}
-  ## the uri task above is skipped in check mode and produces no connent
-  when: not ansible_check_mode
-        and cacerts_page.content.find(needle) == -1
+  when:
+    ## the uri task above is skipped in check mode and produces no connent
+    - not ansible_check_mode
+    - cacerts_page.content.find(needle) == -1
   vars:
     has_serial: "{{ item.serial |default('') != '' }}"  # noqa 602
     needle: "{{ '<tt>%s</tt>' % item.serial if has_serial else '<td>%s</td>' % item.name }}"
@@ -39,7 +40,7 @@
 
 
 - name: verify that cgpro ssl certificate and key exist on remote host
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: file
   loop:
@@ -48,13 +49,13 @@
 
 
 - name: create directory for cgpro certificate script
-  file:
+  ansible.builtin.file:
     path: "{{ cgpro_cert_update_script |dirname }}"
     state: directory
     mode: 0755
 
 - name: create a script for uploading certificate to cgpro
-  template:
+  ansible.builtin.template:
     src: cgpro-update-certificate.sh
     dest: "{{ cgpro_cert_update_script }}"
     owner: root
@@ -63,21 +64,22 @@
   register: upload_script_result
 
 - name: directory for letsencrypt post-renewal hooks
-  file:
+  ansible.builtin.file:
     path: "{{ certbot_post_dir }}"
     state: directory
     mode: 0755
   when: cgpro_ssl_cert is search('/letsencrypt/')
 
 - name: link a letsencrypt post-renewal hook for cgpro
-  file:
+  ansible.builtin.file:
     state: link
     src: "{{ cgpro_cert_update_script }}"
     dest: "{{ certbot_post_dir }}/cgpro"
   when: cgpro_ssl_cert is search('/letsencrypt/')
 
 - name: upload certificate and private key to cgpro
-  command: "{{ cgpro_cert_update_script }}"
+  ansible.builtin.command:
+    cmd: "{{ cgpro_cert_update_script }}"
   when: upload_script_result is changed
-        or cgpro_dir_check | default({}) is changed
+        or cgpro_dir_check | d({}) is changed
 ...

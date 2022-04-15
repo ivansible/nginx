@@ -1,6 +1,6 @@
 ---
 - name: install ansible openssl bindings
-  apt:
+  ansible.builtin.apt:
     name: "{{ lin_use_python2 |bool |ternary(packages_pythons, packages_python3) }}"
     state: present
   vars:
@@ -9,7 +9,7 @@
 
 - block:
     - name: verify validity of pyOpenSSL (ansible openssl bindings)
-      command:
+      ansible.builtin.command:
         argv:
           - "{{ ansible_python.executable }}"
           - -c
@@ -17,7 +17,7 @@
       changed_when: false
   rescue:
     - name: upgrade ansible openssl bindings
-      command:  # noqa no-changed-when
+      ansible.builtin.command:  # noqa no-changed-when
         argv:
           - "{{ ansible_python.executable }}"
           - -m
@@ -27,7 +27,7 @@
           - pyOpenSSL
 
 - name: check whether squid ssl files need to be generated
-  stat:
+  ansible.builtin.stat:
     path: "{{ ss_cert }}.{{ item }}"
   loop: [crt, key, csr, bundle.pem]
   register: _squid_ss_cert
@@ -37,14 +37,14 @@
 - name: generate squid self-signed ssl files
   block:
     - name: generate ssl private key (4096 bits, rsa) for squid
-      openssl_privatekey:
+      community.crypto.openssl_privatekey:
         path: "{{ ss_cert }}.key"
         owner: root
         group: "{{ squid_group }}"
         mode: 0640
 
     - name: generate certificate signing request for squid
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: "{{ ss_cert }}.csr"
         privatekey_path: "{{ ss_cert }}.key"
         common_name: "{{ squid_host }}"
@@ -53,7 +53,7 @@
         mode: 0640
 
     - name: generate self-signed ssl certificate for squid
-      openssl_certificate:
+      community.crypto.x509_certificate:
         path: "{{ ss_cert }}.crt"
         privatekey_path: "{{ ss_cert }}.key"
         csr_path: "{{ ss_cert }}.csr"
@@ -63,11 +63,12 @@
         mode: 0640
 
     - name: make self-signed certificate bundle
-      shell: cat "{{ ss_cert }}.crt" "{{ ss_cert }}.key" > "{{ ss_cert }}.bundle.pem"
+      ansible.builtin.shell:
+        cmd: cat "{{ ss_cert }}.crt" "{{ ss_cert }}.key" > "{{ ss_cert }}.bundle.pem"
       when: not squid_from_ppa |bool
 
     - name: ensure self-signed bundle permissions
-      file:
+      ansible.builtin.file:
         path: "{{ ss_cert }}.bundle.pem"
         state: file
         owner: root
@@ -75,6 +76,7 @@
         mode: 0640
       when: not squid_from_ppa |bool
 
-  when: _squid_ss_cert is changed
-        and not ansible_check_mode
+  when:
+    - _squid_ss_cert is changed
+    - not ansible_check_mode
 ...

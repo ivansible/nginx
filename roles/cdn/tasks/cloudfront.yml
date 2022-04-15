@@ -1,12 +1,12 @@
 ---
 - name: initialize array of distribution results
-  set_fact:
+  ansible.builtin.set_fact:
     cdn_cloudfront_sites: []
 
 - name: obtain current cloudfront distributions
-  cloudfront_info:
-    aws_access_key: "{{ srv_cdn_cloudfront_access_key |default(omit, true) }}"
-    aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |default(omit, true) }}"
+  community.aws.cloudfront_info:
+    aws_access_key: "{{ srv_cdn_cloudfront_access_key |d(omit, true) }}"
+    aws_secret_key: "{{ srv_cdn_cloudfront_secret_key |d(omit, true) }}"
   register: cloudfront_facts
   ## delegate to ansible's own python on controller
   ## ansible's python should have boto3 installed
@@ -17,7 +17,7 @@
   run_once: true
 
 - name: update cloudfront distributions (skip in check mode)
-  include_tasks: distribution.yml
+  ansible.builtin.include_tasks: distribution.yml
   args:
     apply:
       delegate_to: localhost
@@ -28,7 +28,7 @@
     ansible_python_interpreter: python3
   loop: "{{ srv_cdn_cloudfront }}"
   loop_control:
-    label: "{{ item.reference |default(item.server) |replace('SERVER', item.server) }} -> {{ item.origin |default('.') }}"
+    label: "{{ item.reference |d(item.server) |replace('SERVER', item.server) }} -> {{ item.origin |d('.') }}"
   ## this task fails in check mode
   when: not ansible_check_mode
   register: cdn_cloudfront_results
@@ -36,8 +36,8 @@
   # run_once: false
 
 - name: report cloudfront distributions
-  debug:
+  ansible.builtin.debug:
     msg: "{{ cdn_cloudfront_sites }}"
-  when: cdn_cloudfront_sites |default([])
+  when: cdn_cloudfront_sites |d([])
   tags: srv_cdn_nginx
 ...

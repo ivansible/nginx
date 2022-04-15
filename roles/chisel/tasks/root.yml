@@ -1,15 +1,15 @@
 ---
 - name: install chisel binary
-  import_tasks: install.yml
+  ansible.builtin.import_tasks: install.yml
   tags: srv_chisel_install
 
 - name: create group for proxy processes
-  group:
+  ansible.builtin.group:
     name: proxy
     gid: 13
 
 - name: configure chisel service
-  template:
+  ansible.builtin.template:
     src: chisel-server.defaults
     dest: /etc/default/chisel-server
     owner: root
@@ -18,34 +18,34 @@
   notify: restart chisel service
 
 - name: setup chisel service
-  template:
+  ansible.builtin.template:
     src: chisel-server.service
     dest: /etc/systemd/system/chisel-server.service
     mode: 0644
   notify: restart chisel service
 
 - name: directory for nginx backend configs
-  file:
+  ansible.builtin.file:
     path: /etc/nginx/mixin.d
     state: directory
     mode: 0755
 
 - name: configure nginx redirector for chisel
-  template:
+  ansible.builtin.template:
     src: chisel-server.nginx.conf
     dest: /etc/nginx/mixin.d/chisel.conf
     mode: 0644
   notify: reload nginx service
 
 - name: activate chisel service
-  systemd:
+  ansible.builtin.systemd:
     name: chisel-server
     state: started
     enabled: true
     daemon_reload: true
 
 - name: open (or block) chisel port in ufw
-  ufw:
+  community.general.ufw:
     port: "{{ srv_chisel_port |string }}"
     proto: tcp
     rule: "{{ srv_chisel_direct |bool |ternary('allow','deny') }}"

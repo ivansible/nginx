@@ -1,17 +1,17 @@
 ---
 - name: restart cgpro service after resetting base directory
-  # cgpro could have shutdown itself due to no postmaster password
-  systemd:
+  ## cgpro could have shutdown itself due to no postmaster password
+  ansible.builtin.systemd:
     name: cgpro
     state: restarted
 
 - name: wait for cgpro service start
-  wait_for:
+  ansible.builtin.wait_for:
     port: "{{ cgpro_curl_port }}"
 
 - name: set cgpro postmaster password after reset (and agree with license)
   no_log: "{{ hide_secrets |bool }}"
-  uri:
+  ansible.builtin.uri:
     url: &url_mainadmin "{{ cgpro_curl_url }}/MainAdmin/"
     headers:
       Referer: *url_mainadmin
@@ -30,7 +30,7 @@
   environment: {no_proxy: '*'}
 
 - name: set cgpro quickstart parameters (main domain, time zone, language)
-  uri:
+  ansible.builtin.uri:
     url: &url_quickstart
       "{{ cgpro_curl_url }}/Quickstart.html?Language=&Charset=utf-8"
     headers:

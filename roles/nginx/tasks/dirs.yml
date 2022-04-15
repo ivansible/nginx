@@ -1,6 +1,6 @@
 ---
 - name: create nginx cache directories
-  file:
+  ansible.builtin.file:
     path: "{{ nginx_cache_dir }}"
     state: directory
     owner: "{{ web_user }}"
@@ -9,7 +9,7 @@
 
 - name: activate nginx cache directories in systemd
   when: nginx_cache_enable | bool
-  copy:
+  ansible.builtin.copy:
     content: "d    {{ nginx_cache_dir }}    0750    {{ web_user }}    root    -       -"
     dest: /etc/tmpfiles.d/nginx.conf
     force: true
@@ -17,7 +17,7 @@
   notify: update system temp files
 
 - name: directories for nginx configuration snippets
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: 0755
@@ -27,7 +27,7 @@
     - "{{ nginx_stream_dir }}"
 
 - name: directory for nginx password files
-  file:
+  ansible.builtin.file:
     path: "{{ nginx_base_dir }}/users"
     state: directory
     owner: root
@@ -35,7 +35,7 @@
     mode: 0750
 
 - name: directory for nginx modules
-  file:
+  ansible.builtin.file:
     path: "{{ nginx_base_dir }}/modules-enabled"
     state: directory
     owner: root

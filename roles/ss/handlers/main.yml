@@ -3,7 +3,7 @@
 ## handler 'restart syslog service' is imported from ivansible.lin_base
 
 - name: remove stale obfs build dependencies
-  apt:
+  ansible.builtin.apt:
     name: "{{ srv_ss_obfs_build_deps | difference(srv_ss_obfs_build_deps_keep) }}"
     state: absent
     autoremove: true
@@ -11,7 +11,7 @@
   become: true
 
 - name: remove obfs build directory
-  file:
+  ansible.builtin.file:
     path: "{{ obfs_build_dir.path }}"
     state: absent
   become: true

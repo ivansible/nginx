@@ -1,18 +1,18 @@
 ---
 - name: install shadowsocks-libev
-  import_tasks: install.yml
+  ansible.builtin.import_tasks: install.yml
   tags: srv_ss_install
 
 - name: apply fixes to shadowsocks systemd services
-  import_tasks: fix.yml
+  ansible.builtin.import_tasks: fix.yml
   tags: srv_ss_fix
 
 - name: install plugin v2ray
-  import_tasks: v2ray.yml
+  ansible.builtin.import_tasks: v2ray.yml
   tags: srv_ss_v2ray
 
 - name: check that simple-obfs binary exists
-  stat:
+  ansible.builtin.stat:
     path: "{{ srv_ss_obfs_binary }}"
     get_checksum: false
   register: obfs_plugin_binary
@@ -20,7 +20,7 @@
   tags: srv_ss_obfs
 
 - name: build plugin simple-obfs
-  include_tasks: simple-obfs.yml
+  ansible.builtin.include_tasks: simple-obfs.yml
   args:
     apply:
       become: true
@@ -33,7 +33,7 @@
   tags: srv_ss_obfs
 
 - name: configure shadowsocks services
-  include_tasks: service.yml
+  ansible.builtin.include_tasks: service.yml
   args:
     apply:
       become: true
@@ -42,19 +42,19 @@
   tags: srv_ss_services
 
 - name: find v2ray entries for nginx fronting, the first one will be routed
-  set_fact:
+  ansible.builtin.set_fact:
     backend_entries: "{{ srv_ss_configs | json_query(\"[?plugin=='v2ray']\") }}"
   tags: srv_ss_nginx
 
 - name: directory for nginx backend configs
-  file:
+  ansible.builtin.file:
     path: /etc/nginx/mixin.d
     state: directory
     mode: 0755
   tags: srv_ss_nginx
 
 - name: configure nginx for shadowsocks fronting
-  template:
+  ansible.builtin.template:
     src: nginx-backend.conf
     dest: /etc/nginx/mixin.d/shadowsocks-{{ backend.name }}.conf
     mode: 0644

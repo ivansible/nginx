@@ -1,9 +1,9 @@
 ---
 - name: become root and install squid
-  import_tasks: root.yml
+  ansible.builtin.import_tasks: root.yml
   become: true
   vars:
-    lecert_name: "{{ squid_letsencrypt_cert |default('',true) }}"
+    lecert_name: "{{ squid_letsencrypt_cert |d('',true) }}"
     lecert_dir: "/etc/letsencrypt/live/{{ lecert_name }}"
     lecert_bundle: "{{ squid_etc_dir }}/ssl-letsencrypt.pem"
     self_signed: "{{ lecert_name in ['', 'example.com'] }}"
@@ -15,6 +15,6 @@
   tags: srv_squid_all
 
 - name: apply squid changes now
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
   tags: srv_squid_all
 ...

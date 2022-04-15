@@ -1,12 +1,12 @@
 ---
 - name: stop cgpro service before restoring from backup
-  systemd:
+  ansible.builtin.systemd:
     name: cgpro
     state: stopped
   notify: restart cgpro service
 
 - name: restore cgpro data from backup archives
-  include_role:
+  ansible.builtin.include_role:
     name: ivansible.base.backup
     tasks_from: unarchive_encrypted.yml
   vars:
@@ -19,12 +19,12 @@
             else cgpro_restore_urls }}"
 
 - name: start cgpro service after restoring from backup
-  systemd:
+  ansible.builtin.systemd:
     name: cgpro
     state: started
     enabled: true
 
 - name: wait for cgpro service start
-  wait_for:
+  ansible.builtin.wait_for:
     port: "{{ cgpro_curl_port }}"
 ...

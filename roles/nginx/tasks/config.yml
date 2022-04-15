@@ -1,6 +1,6 @@
 ---
 - name: backup vanilla nginx configuration (optional, so ok to fail)
-  command:
+  ansible.builtin.command:
     argv:
       - cp
       - -a
@@ -10,44 +10,44 @@
   failed_when: false
 
 - name: select nginx fallback resolver on xenial
-  set_fact:
-    # assume installed dnsmasq or bind9
+  ansible.builtin.set_fact:
+    ## assume installed dnsmasq or bind9
     nginx_fallback_resolver: 127.0.0.1
   when:
     - ansible_lsb.codename in ['xenial']
     - nginx_fallback_resolver is not defined
 
 - name: select nginx fallback resolver on bionic+
-  set_fact:
-    # fallback to systemd-resolved on bionic+
+  ansible.builtin.set_fact:
+    ## fallback to systemd-resolved on bionic+
     nginx_fallback_resolver: 127.0.0.53
   when:
     - ansible_lsb.codename not in ['xenial']
     - nginx_fallback_resolver is not defined
 
 - name: create main nginx configuration file
-  template:
+  ansible.builtin.template:
     src: nginx.conf
     dest: "{{ nginx_base_dir }}/nginx.conf"
     mode: 0644
   notify: restart nginx service
 
 - name: uwsgi parameters for nginx behind balancer
-  template:
+  ansible.builtin.template:
     src: uwsgi_params
     dest: "{{ nginx_base_dir }}/uwsgi_params"
     mode: 0644
   notify: restart nginx service
 
 - name: comment for extra mime types
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ nginx_base_dir }}/mime.types"
     regexp: "# \\w+ mime"
     line: "    # custom mime types"
     insertbefore: "^}"
 
 - name: let nginx know some extra mime types
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ nginx_base_dir }}/mime.types"
     regexp: "{{ item.split().0 }}\\s"
     line: "    {{ item }};"
@@ -62,14 +62,14 @@
   notify: restart nginx service
 
 - name: configure nginx proxies
-  template:
+  ansible.builtin.template:
     src: proxies.conf
     dest: "{{ nginx_conf_dir }}/proxies.conf"
     mode: 0644
   notify: restart nginx service
 
 - name: configure nginx stream multiplexor
-  template:
+  ansible.builtin.template:
     src: tlsmux.conf
     dest: "{{ nginx_stream_dir }}/tlsmux.conf"
     mode: 0644

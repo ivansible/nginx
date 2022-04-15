@@ -1,10 +1,10 @@
 ---
 - name: install nginx signing key
-  apt_key:
+  ansible.builtin.apt_key:
     url: http://nginx.org/keys/nginx_signing.key
 
 - name: add nginx apt repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb [arch={{ lin_apt_arch }}] http://nginx.org/packages/{{ repo_path }}/ {{ codename }} nginx"
     filename: nginx
     mode: 0644
@@ -16,7 +16,7 @@
   until: nginx_repo_result is successful
 
 - name: install nginx and ssl packages
-  apt:
+  ansible.builtin.apt:
     name:
       - nginx
       - ssl-cert  # for snakeoil certificate

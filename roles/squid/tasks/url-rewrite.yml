@@ -1,11 +1,11 @@
 ---
 - name: install pypy for url-rewrite
-  apt:
+  ansible.builtin.apt:
     name: pypy
     state: present
 
 - name: create url-rewrite.py
-  template:
+  ansible.builtin.template:
     src: url-rewrite.py.j2
     dest: "{{ squid_lib_dir }}/url-rewrite-custom.py"
     owner: root
@@ -16,7 +16,7 @@
 
 - name: byte-compile url-rewrite
   when: url_rewrite_py is changed
-  command:
+  ansible.builtin.command:
     argv:
       - pypycompile
       - "{{ squid_lib_dir }}/url-rewrite-custom.py"
@@ -24,7 +24,7 @@
 
 - name: harden permissions on url-rewrite-custom
   when: url_rewrite_py is changed
-  shell: >
+  ansible.builtin.shell: >
     if [ -f {{ item }} ]; then
       chown root:{{ squid_group }} {{ item }}
       chmod 0640 {{ item }}
@@ -37,7 +37,7 @@
   notify: restart squid service
 
 - name: remove obsolete url-rewrite log
-  file:
+  ansible.builtin.file:
     path: "{{ squid_log_dir }}/url-rewrite.log"
     state: absent
   when: url_rewrite_py is changed

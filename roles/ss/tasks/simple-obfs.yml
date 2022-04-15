@@ -1,20 +1,20 @@
 ---
 - name: create simple-obfs build directory
-  tempfile:
+  ansible.builtin.tempfile:
     state: directory
     prefix: simple-obfs.
   register: obfs_build_dir
   notify: remove obfs build directory
 
 - name: checkout simple-obfs sources
-  git:
+  ansible.builtin.git:
     repo: https://github.com/shadowsocks/simple-obfs.git
     dest: "{{ obfs_build_dir.path }}"
     version: "{{ srv_ss_obfs_version }}"
     update: false
 
 - name: install simple-obfs build dependencies
-  apt:
+  ansible.builtin.apt:
     name: "{{ srv_ss_obfs_build_deps + srv_ss_obfs_build_deps_keep }}"
     state: present
     install_recommends: false
@@ -22,7 +22,7 @@
 
 - name: build and install simple-obfs
   # noqa 303 306 - cannot use git module here; no pipes here
-  shell: >
+  ansible.builtin.shell: >
     git submodule update --init --recursive &&
     ./autogen.sh &&
     ./configure &&
@@ -37,5 +37,5 @@
     creates: "{{ srv_ss_obfs_binary }}"
 
 - name: remove temporary build stuff now
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 ...

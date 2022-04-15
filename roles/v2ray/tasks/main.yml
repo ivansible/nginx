@@ -1,9 +1,9 @@
 ---
 - name: become root and install v2ray
-  import_tasks: root.yml
+  ansible.builtin.import_tasks: root.yml
   become: true
   tags: srv_v2ray_all
 
 - name: run postponed handlers now
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 ...

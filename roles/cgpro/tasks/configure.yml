@@ -1,6 +1,6 @@
 ---
 - name: set cgpro interface layout to dash
-  uri:
+  ansible.builtin.uri:
     url: &url_prefs "{{ cgpro_curl_url }}/Settings/Preferences.html"
     headers:
       Referer: *url_prefs
@@ -21,7 +21,7 @@
   environment: {no_proxy: '*'}
 
 - name: configure cgpro master and enabling keys
-  uri:
+  ansible.builtin.uri:
     url: &url_license "{{ cgpro_curl_url }}/Master/License.html?"
     headers:
       Referer: *url_license
@@ -38,12 +38,13 @@
     return_content: false
     use_proxy: false
   environment: {no_proxy: '*'}
-  when: cgpro_master_key is defined
-        and cgpro_master_key != ''  # noqa 602
+  when:
+    - cgpro_master_key is defined
+    - cgpro_master_key != ''  # noqa 602
 
 - name: update main domain in general cgpro settings
-  # note: domain name from license will override this setting
-  uri:
+  ## note: domain name from license will override this setting
+  ansible.builtin.uri:
     url: &url_general "{{ cgpro_curl_url }}/Settings/General.html"
     headers:
       Referer: *url_general
@@ -64,7 +65,7 @@
   environment: {no_proxy: '*'}
 
 - name: set aliases of main cgpro domain
-  uri:
+  ansible.builtin.uri:
     url: &url_domalias
       "{{ cgpro_curl_url }}/Domains/DomainSettings.html?domainName={{ cgpro_main_domain }}"
     headers:

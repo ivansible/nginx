@@ -1,13 +1,13 @@
 ---
 - name: open (or block) unencryped squid port in ufw
-  ufw:
+  community.general.ufw:
     port: "{{ squid_port |string }}"
     rule: "{{ squid_allow_plain |bool |ternary('allow','deny') }}"
     proto: tcp
   no_log: "{{ hide_secrets |bool }}"
 
 - name: open (or block) squid ssl port in ufw
-  ufw:
+  community.general.ufw:
     port: "{{ squid_ssl_port |string }}"
     rule: "{{ squid_ssl_enable |bool |ternary('allow','deny') }}"
     proto: tcp

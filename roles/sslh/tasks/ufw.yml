@@ -1,6 +1,6 @@
 ---
 - name: install sslh helper for ufw
-  template:
+  ansible.builtin.template:
     src: ufw-helper.sh
     dest: /usr/local/sbin/sslh-helper-ufw.sh
     owner: root
@@ -9,7 +9,7 @@
   notify: restart sslh service
 
 - name: open tls port for sslh in ufw
-  ufw:
+  community.general.ufw:
     rule: allow
     port: '443'
     proto: tcp

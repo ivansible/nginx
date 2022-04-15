@@ -1,15 +1,15 @@
 ---
-# handlers for ivansible.lin_nginx
-# notes:
-# - handler "restart nginx service" is defined in common role nginx_base
-# - handler "reload nginx service" is defined in common role nginx_base
-# - handler "restart sslh service" duplicates role lin_sslh to avoid dependency
+## handlers for ivansible.lin_nginx
+## notes:
+## - handler "restart nginx service" is defined in common role nginx_base
+## - handler "reload nginx service" is defined in common role nginx_base
+## - handler "restart sslh service" duplicates role lin_sslh to avoid dependency
 
 - name: restart sslh service
-  systemd:
+  ansible.builtin.systemd:
     name: sslh
     state: restarted
     daemon_reload: true
   become: true
-  when: use_sslh |default(false) |bool
+  when: use_sslh |d(false) |bool
 ...

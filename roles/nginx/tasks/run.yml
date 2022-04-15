@@ -1,20 +1,20 @@
 ---
 - name: create cache directories before activating nginx
-  include_tasks: flush-handlers.yml
+  ansible.builtin.include_tasks: flush-handlers.yml
 
 - name: start nginx while taking care of apache
   block:
     - name: enable nginx service (will be rescued if it fails)
-      systemd:
+      ansible.builtin.systemd:
         name: nginx
         state: started
         enabled: true
         daemon_reload: true
 
   rescue:
-    # Note: apache2 may come pre-installed on some cheap hostings
+    ## Note: apache2 may come pre-installed on some cheap hostings
     - name: disable apache2 service (it may block http port)
-      systemd:
+      ansible.builtin.systemd:
         name: apache2
         state: stopped
         enabled: false
@@ -23,12 +23,12 @@
       no_log: "{{ hide_secrets |bool }}"
 
     - name: pause a little to let http port go free in background
-      pause:
+      ansible.builtin.pause:
         seconds: 3
       when: stop_apache2_result is changed
 
     - name: enable nginx service once again
-      systemd:
+      ansible.builtin.systemd:
         name: nginx
         state: started
         enabled: true
@@ -36,9 +36,9 @@
         daemon_reload: true
 
 - name: open nginx ports in ufw
-  ufw:
+  community.general.ufw:
     rule: allow
-    # force string conversion to prevent module warning
+    ## force string conversion to prevent module warning
     port: "{{ item |string }}"
     proto: tcp
   loop: "{{ web_ports }}"
@@ -56,8 +56,8 @@
 - name: open internal nginx ports in ferm
   ivansible.base.ferm_port:
     port:
-      - "{{ nginx_http_port_internal |default('',true) }}"
-      - "{{ nginx_ssl_port_internal |default('',true) }}"
+      - "{{ nginx_http_port_internal |d('',true) }}"
+      - "{{ nginx_ssl_port_internal |d('',true) }}"
     proto: tcp
     zone: internal
     comment: nginx internal
