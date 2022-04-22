@@ -1,23 +1,6 @@
 # Nginx redirector for Squid
 # ansible-managed
 
-# Notes:
-{% if squid_nginx_use_streams |bool %}
-{%   set default_server = '' %}
-# Using Nginx streams or SSLH, CONNECT method will work.
-{% else %}
-{%   if squid_nginx_own_default_server |bool %}
-{%     set default_server = ' default_server' %}
-# Please set nginx_own_default_server = false
-{%   else %}
-{%     set default_server = '' %}
-# GET method won't work yet. Please use Nginx streams, SSLH
-# or set squid_nginx_own_default_server = true
-{%     endif %}
-# This configuration doesn't support CONNECT method,
-# you should use Nginx streams or SSLH for that.
-{% endif %}
-
 server {
     server_name {{ squid_host }};
     listen {{ nginx_http_port }}{{ default_server }};

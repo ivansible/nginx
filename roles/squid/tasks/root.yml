@@ -100,21 +100,38 @@
   tags: srv_squid_service
 
 
-- name: setup nginx redirector for squid
+- name: setup nginx http redirector for squid
   ansible.builtin.template:
     src: nginx.conf.j2
     dest: "{{ nginx_site_dir }}/squid.conf"
     mode: 0644
   notify: reload nginx service
-  when: squid_nginx_redirect |bool
+  when:
+    - squid_nginx_redirect |bool
+    - not squid_nginx_use_streams |bool
   tags: srv_squid_nginx
 
-- name: remove squid redirector from nginx
+- name: remove squid http redirector from nginx
   ansible.builtin.file:
     path: "{{ nginx_site_dir }}/squid.conf"
     state: absent
   notify: reload nginx service
-  when: not squid_nginx_redirect |bool
+  when:
+    - not squid_nginx_redirect |bool
+      or squid_nginx_use_streams |bool
+  tags: srv_squid_nginx
+
+- name: setup nginx sni upstream for mtproxy
+  ansible.builtin.include_role:
+    name: ivansible.base.nginx
+    tasks_from: setup_sni_upstream.yml
+  vars:
+    facility: squid
+    hostname: "{{ squid_nginx_use_streams |bool |ternary(squid_host, '') }}"
+    port: "{{ squid_ssl_port }}"
+  when:
+    - squid_nginx_redirect |bool
+    - squid_ssl_port |d(0,true) |int
   tags: srv_squid_nginx
 
 

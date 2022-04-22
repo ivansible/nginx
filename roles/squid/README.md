@@ -3,9 +3,8 @@
 This role installs `squid` with ssl support on linux:
  - install custom package with ssl support from the [llxdev ppa](https://launchpad.net/~llxdev/+archive/ubuntu/xenial/);
  - configure incoming port for plain http access;
- - configure port and ssl certificate for incoming ssl access;
-   currently, self-signed certificate is installed,
-   but _letsencrypt_ integration is planned;
+ - configure port and ssl certificate for incoming ssl access
+   (self-signed letsencrypt certificate);
  - configure authentication, by default using _MD5_ passwords
    in a _http.passwd_ file, or optionally _LDAP_-based;
  - configure upstream peers based on acl rules
