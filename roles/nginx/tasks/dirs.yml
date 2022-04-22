@@ -25,6 +25,7 @@
     - "{{ nginx_conf_dir }}"
     - "{{ nginx_site_dir }}"
     - "{{ nginx_stream_dir }}"
+    - "{{ nginx_snimux_dir }}"
 
 - name: directory for nginx password files
   ansible.builtin.file:

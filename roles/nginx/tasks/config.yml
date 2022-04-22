@@ -70,8 +70,8 @@
 
 - name: configure nginx stream multiplexor
   ansible.builtin.template:
-    src: tlsmux.conf
-    dest: "{{ nginx_stream_dir }}/tlsmux.conf"
+    src: snimux.conf
+    dest: "{{ nginx_stream_dir }}/snimux.conf"
     mode: 0644
   notify: restart nginx service
 ...

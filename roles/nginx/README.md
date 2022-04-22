@@ -89,15 +89,14 @@ behind the cloudflare web proxy. See:
 ```
 Set this to false if you provide your own default server.
 
-    nginx_sni_mux_port: 3443
-    nginx_sni_servers: []
-These optional settings control stream module multiplexing TLS ports
-behind nginx. The incoming TLS traffic will be accepted on port
-`nginx_sni_mux_port` and multiplexed based on the records in the
-`nginx_sni_servers` list. Every record has the following fields:
- - `comment` -- comment for the record
- - `hostname` -- SNI hostname to pick on
- - `port` -- target port on localhost
+    nginx_snimux_dir: /etc/nginx/snimux.d
+    nginx_snimux_port: 3443
+These optional settings control stream module multiplexing TLS ports behind
+nginx. The incoming TLS traffic will be accepted on port `nginx_snimux_port`
+and multiplexed based on the config files below the `nginx_snimux_dir`
+directory. Such files should be named like `facility.conf` and have the
+contents like this: `sni.host.name [::1]:target_port`.
+The files can be added via task `ivansible.base.nginx/setup_sni_upstream.yml`.
 
 All traffic that is not captured by listed host names will be redirected
 to default port `nginx_ssl_port`, which is normally served by the Nginx
