@@ -13,7 +13,8 @@
   ivansible.base.ferm_port:
     port: "{{ squid_ssl_port }}"
     proto: tcp
-    zone: external
+    zone: "{{ squid_ssl_direct |bool |ternary('external','internal') }}"
+    solo_zone: true
     state: "{{ squid_ssl_enable |bool |ternary('present','absent') }}"
     comment: squid ssl
   tags:

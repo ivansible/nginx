@@ -41,6 +41,9 @@ If this flag is truthy, the non-ssl ports will be open in the firewall.
     squid_ssl_port: 3129
 Unencrypted and SSL-enabled incoming ports
 
+    squid_ssl_direct: true
+If true then SSL port will be open externally, otherwise internally.
+
     squid_host: "{{ ansible_fqdn }}"
 Used as common name in self-signed ssl certificate.
 

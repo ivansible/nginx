@@ -17,6 +17,7 @@ squid_allow_plain: true
 
 squid_ssl_enable: false
 squid_ssl_port: 3129
+squid_ssl_direct: true
 squid_letsencrypt_cert: ""
 
 squid_user: proxy
