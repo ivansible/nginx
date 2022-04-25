@@ -29,6 +29,10 @@ These ports will be opened in the firewall.
     nginx_ssl_port: 443
 These ports are used in configuration snippets.
 
+    nginx_ssl_listen_addr: address, list of addresses, or '*' for all
+IP addresses to listen for SSL traffic.
+By default, all _public_ IPs amended by default IP addresses.
+
     nginx_conf_dir: /etc/nginx/conf.d
 Extra configuration will be put here.
 
@@ -91,8 +95,9 @@ Set this to false if you provide your own default server.
 
     nginx_snimux_dir: /etc/nginx/snimux.d
     nginx_snimux_port: 3443
-These optional settings control stream module multiplexing TLS ports behind
-nginx. The incoming TLS traffic will be accepted on port `nginx_snimux_port`
+Optional settings to control nginx stream module multiplexing TLS ports.
+The incoming TLS traffic will be normally accepted on `nginx_ssl_port`
+(or `nginx_snimux_port` if nginx is running behind SSLH),
 and multiplexed based on the config files below the `nginx_snimux_dir`
 directory. Such files should be named like `facility.conf` and have the
 contents like this: `sni.host.name [::1]:target_port`.

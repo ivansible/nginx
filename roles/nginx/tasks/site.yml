@@ -40,7 +40,7 @@
   ansible.builtin.find:
     paths: "{{ nginx_site_dir }}"
     recurse: false
-    patterns: "*.conf"
+    patterns: ['*.conf', '*.inc']
   register: all_nginx_sites
 
 - name: update ipv4 bind interface on existing nginx sites

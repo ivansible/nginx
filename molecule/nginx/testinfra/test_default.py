@@ -14,8 +14,9 @@ def test_nginx_service(host):
 
 
 def test_http_port(host):
-    sock = host.socket("tcp://127.0.0.1:80")
-    assert sock.is_listening
+    sock_lo = host.socket("tcp://127.0.0.1:80")
+    sock_any = host.socket("tcp://0.0.0.0:80")
+    assert sock_lo.is_listening or sock_any.is_listening
 
 
 def test_http_html(host):

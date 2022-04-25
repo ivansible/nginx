@@ -74,4 +74,5 @@
     dest: "{{ nginx_stream_dir }}/snimux.conf"
     mode: 0644
   notify: restart nginx service
+  tags: lin_nginx_snimux
 ...

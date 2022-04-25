@@ -11,7 +11,13 @@ nginx_upload_progress: false
 nginx_cloudflare_ips: []
 nginx_cloudfront_ips: []
 
-nginx_snimux_port: 3443
+nginx_snimux_port: "{{ use_sslh |bool |ternary(3443, nginx_ssl_port) }}"
+
+nginx_ssl_listen_addr: "{{ [ansible_default_ipv4.address |d(''),
+                            ansible_default_ipv6.address |d(''),
+                            ansible_all_ipv4_addresses |d([]) |ipaddr('public'),
+                            ansible_all_ipv6_addresses |d([]) |ipaddr('public')]
+                           |flatten |select |sort |unique }}"
 
 nginx_own_default_server: true
 
