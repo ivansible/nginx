@@ -95,12 +95,13 @@ Set this to false if you provide your own default server.
 
     nginx_snimux_dir: /etc/nginx/snimux.d
     nginx_snimux_port: 3443
+    nginx_nossl_upstream_port: 0
 Optional settings to control nginx stream module multiplexing TLS ports.
 The incoming TLS traffic will be normally accepted on `nginx_ssl_port`
 (or `nginx_snimux_port` if nginx is running behind SSLH),
 and multiplexed based on the config files below the `nginx_snimux_dir`
 directory. Such files should be named like `facility.conf` and have the
-contents like this: `sni.host.name [::1]:target_port`.
+contents like this: `sni.host.name [upstream_port]`.
 The files can be added via task `ivansible.base.nginx/setup_sni_upstream.yml`.
 
 All traffic that is not captured by listed host names will be redirected
