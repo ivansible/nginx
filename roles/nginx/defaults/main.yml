@@ -17,8 +17,7 @@ nginx_nossl_upstream_port: 0
 
 nginx_ssl_listen_addr: "{{ [ansible_default_ipv4.address |d(''),
                             ansible_default_ipv6.address |d(''),
-                            ansible_all_ipv4_addresses |d([]) |ipaddr('public'),
-                            ansible_all_ipv6_addresses |d([]) |ipaddr('public')]
+                            ansible_all_ipv4_addresses |d([]) |ipaddr('public')]
                            |flatten |select |sort |unique }}"
 
 nginx_own_default_server: true
