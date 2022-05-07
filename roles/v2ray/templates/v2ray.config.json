@@ -1,6 +1,6 @@
 {
-  "logging": {
-    "loglevel": "warning"
+  "log": {
+    "loglevel": "{{ srv_v2ray_debug |bool |ternary('debug','warning') }}"
   },
   "inbounds": [{
     "port": {{ srv_v2ray_port }},
@@ -8,9 +8,7 @@
     "protocol": "vmess",
     "settings": {
       "clients": [{
-          "id": "{{ srv_v2ray_uuid }}",
-          "level": 1,
-          "alterId": {{ srv_v2ray_altids }}
+        "id": "{{ srv_v2ray_uuid }}"
       }]
     },
     "streamSettings": {
