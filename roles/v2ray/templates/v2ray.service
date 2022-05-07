@@ -13,7 +13,7 @@ User=nobody
 {# set group to "proxy" to activate sslh iptables fix #}
 Group=proxy
 Type=simple
-ExecStart=/usr/local/v2ray/v2ray -config /etc/v2ray/config.json
+ExecStart={{ srv_v2ray_binary }} -config /etc/v2ray/config.json
 Restart=on-failure
 {# Don't restart in the case of configuration error #}
 RestartPreventExitStatus=23

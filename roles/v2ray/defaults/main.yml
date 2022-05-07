@@ -9,5 +9,7 @@ srv_v2ray_uuid: aaa-111-222-333-4444
 srv_v2ray_altids: 4
 srv_v2ray_security: aes-128-gcm
 
+srv_v2ray_version: latest
 srv_v2ray_upgrade: false
+srv_v2ray_binary: /usr/local/v2ray/v2ray
 ...

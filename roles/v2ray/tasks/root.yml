@@ -9,9 +9,11 @@
 - name: detect latest v2ray-core release
   ivansible.base.github_release:
     repository: v2fly/v2ray-core
-    release: latest
+    release: "{{ srv_v2ray_version }}"
     template: "{download_url}/{{ tarball_name }}"
-    creates: /usr/local/v2ray/v2ray
+    strip_v: true
+    version_script: "{{ srv_v2ray_binary }} -version"
+    script_regex: '[0-9]+[.][0-9._-]+'
     reinstall: "{{ srv_v2ray_upgrade |bool }}"
   register: latest_v2ray_core_release
   notify: restart v2ray service
@@ -27,7 +29,7 @@
   ansible.builtin.unarchive:
     remote_src: true
     src: "{{ latest_v2ray_core_release.url }}"
-    dest: /usr/local/v2ray
+    dest: "{{ srv_v2ray_binary |dirname }}"
   when: latest_v2ray_core_release is changed
   notify: restart v2ray service
   tags: srv_v2ray_install
