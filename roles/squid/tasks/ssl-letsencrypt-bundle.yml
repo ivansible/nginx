@@ -18,7 +18,7 @@
 
 - name: directory for letsencrypt post-renewal hooks
   ansible.builtin.file:
-    path: "{{ certbot_hook_dir }}"
+    path: "{{ certbot_post_dir }}"
     state: directory
     mode: 0755
 
@@ -26,7 +26,7 @@
   ansible.builtin.file:
     state: link
     src: "{{ cert_update_script }}"
-    dest: "{{ certbot_hook_dir }}/squid"
+    dest: "{{ certbot_post_dir }}/squid"
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: find modification times of squid ssl files

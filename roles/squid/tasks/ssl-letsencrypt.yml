@@ -22,5 +22,4 @@
     ssl_cert: "{{ lecert_dir }}/fullchain.pem"
     ssl_key: "{{ lecert_dir }}/privkey.pem"
     cert_update_script: /usr/local/sbin/squid-cert-update.sh
-    certbot_hook_dir: /etc/letsencrypt/renewal-hooks/post
 ...
