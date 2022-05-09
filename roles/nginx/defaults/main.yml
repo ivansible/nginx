@@ -12,13 +12,21 @@ nginx_cloudflare_ips: []
 nginx_cloudfront_ips: []
 
 nginx_snimux_port: "{{ use_sslh |bool |ternary(3443, nginx_ssl_port) }}"
-
 nginx_nossl_upstream_port: 0
 
-nginx_ssl_listen_addr: "{{ [ansible_default_ipv4.address |d(''),
+## listen on public interfaces only if local and public ssl ports overlap
+## listen everywhere when transparency is on because it cannot handle overlap anyway
+nginx_ssl_listen_addr: "{{ '*' if nginx_ssl_port |int != nginx_ssl_port_local |int
+                           else _nginx_ssl_listen_pub }}"
+_nginx_ssl_listen_pub: "{{ [ansible_default_ipv4.address |d(''),
                             ansible_default_ipv6.address |d(''),
-                            ansible_all_ipv4_addresses |d([]) |ipaddr('public')]
+                            ansible_all_ipv4_addresses |d([]) |ansible.utils.ipaddr('public')]
                            |flatten |select |sort |unique }}"
+
+## transparent proxying (enabled in ivansible.base.nginx)
+## note: the mark must literally match hexadecimal output of `ip rule ls`
+nginx_mark_value: '0x2'
+nginx_lookup_table: '102'
 
 nginx_own_default_server: true
 

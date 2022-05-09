@@ -63,4 +63,15 @@
     comment: nginx internal
   tags: skip_ansible_lint
   when: lin_firewall == 'ferm'
+
+- name: enable nginx transparent proxying in ferm
+  ivansible.base.ferm_rule:
+    name: nginx-transparent
+    prio: 42
+    hook: custom
+    rule: "{{ lookup('template', 'transparent.ferm') }}"
+  tags: skip_ansible_lint
+  when:
+    - nginx_transparent |bool
+    - lin_firewall == 'ferm'
 ...

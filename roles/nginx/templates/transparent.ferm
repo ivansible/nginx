@@ -1,0 +1,48 @@
+# Nginx Transparent Upstream Proxying
+
+@if @not($openvz) {
+    @def $nginx_uid  = {{ web_user }};
+    @def $nginx_mask = 0x0f;
+    @def $nginx_mark = {{ nginx_mark_value }};
+    @def $nginx_rt   = {{ nginx_lookup_table }};
+
+    # Allow nginx to use localhost as destination
+    @hook pre "sysctl -q -w net.ipv4.conf.default.route_localnet=1";
+    @hook pre "sysctl -q -w net.ipv4.conf.all.route_localnet=1";
+
+    domain $ip_all {
+        # Drop martian packets as they would have been if route_localnet was zero
+        # Packets not leaving the server aren't affected by this
+        @if @eq($DOMAIN,ip)  @def $lo_ip = 127.0.0.0/8;
+        @if @eq($DOMAIN,ip6) @def $lo_ip = ::1/128;
+        table raw    chain $PREROUTING  interface !lo daddr $lo_ip DROP;
+        table mangle chain $POSTROUTING outerface !lo saddr $lo_ip DROP;
+
+        # Mark all connections made by nginx for special treatment
+        table nat chain $OUTPUT
+              proto tcp outerface lo
+              syn mod owner uid-owner $nginx_uid
+              CONNMARK set-xmark "$nginx_mark/$nginx_mask";
+
+        # Mark (ctmark -> fwmark) outgoing packets destined to nginx for rerouting
+        table mangle chain $OUTPUT
+              proto tcp outerface !lo
+              mod connmark mark "$nginx_mark/$nginx_mask"
+              CONNMARK restore-mark mask $nginx_mask;
+    }
+
+    # Set routing for marked IPv4/IPv6 packets
+    @if $do_ipv4 @hook post  "ip -4 route replace local  0/0 dev lo table $nginx_rt";
+    @if $do_ipv6 @hook post  "ip -6 route replace local ::/0 dev lo table $nginx_rt";
+
+    # Workaround for the absense of "ip rule replace" ($nginx_mark must be hexadecimal)
+    @def $nginx_routing = "fwmark $nginx_mark lookup $nginx_rt";
+    @if $do_ipv4 @hook post  "ip -4 rule ls |grep -q 'from all $nginx_routing' || ip -4 rule add $nginx_routing";
+    @if $do_ipv6 @hook post  "ip -6 rule ls |grep -q 'from all $nginx_routing' || ip -6 rule add $nginx_routing";
+
+    # Flush route rules
+    @if $do_ipv4 @hook flush "ip -4 route del local   0/0 dev lo table  $nginx_rt 2>/dev/null";
+    @if $do_ipv6 @hook flush "ip -6 route del local  ::/0 dev lo table  $nginx_rt 2>/dev/null";
+    @if $do_ipv4 @hook flush "ip -4 rule  del $nginx_routing 2>/dev/null";
+    @if $do_ipv6 @hook flush "ip -6 rule  del $nginx_routing 2>/dev/null";
+}

@@ -46,7 +46,7 @@
 - name: update ipv4 bind interface on existing nginx sites
   ansible.builtin.replace:
     path: "{{ item.path }}"
-    regexp: 'listen\s+(127\.0\.0\.1:|0\.0\.0\.0:|)443\s+ssl(\s+http2)?'
+    regexp: 'listen\s+(127\.0\.0\.1:|0\.0\.0\.0:|)(443|{{ nginx_ssl_port }}|{{ nginx_ssl_port_local }})\s+ssl(\s+http2)?'
     replace: "{{ nginx_conf_listen_ssl_ipv4 }}"
   loop: "{{ all_nginx_sites.files }}"
   loop_control:
@@ -59,7 +59,7 @@
 - name: update ipv6 bind interface on existing nginx sites
   ansible.builtin.replace:
     path: "{{ item.path }}"
-    regexp: 'listen\s+\[::1?\]:443\s+ssl(\s+http2)?'
+    regexp: 'listen\s+\[::1?\]:(443|{{ nginx_ssl_port }}|{{ nginx_ssl_port_local }})\s+ssl(\s+http2)?'
     replace: "{{ nginx_conf_listen_ssl_ipv6 }}"
   loop: "{{ all_nginx_sites.files }}"
   loop_control:
